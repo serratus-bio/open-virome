@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActiveModule, selectActiveModule } from '../../app/slice.ts';
+import { moduleConfig } from '../Explore/constants.ts';
 
 import Divider from '@mui/material/Divider';
 import MenuList from '@mui/material/MenuList';
@@ -40,51 +41,41 @@ const SidePanel = () => {
                 Virus
             </Typography>
             <MenuList dense>
-                <MenuItem selected={activeModule === 'phylum'} onClick={() => handleItemClick('phylum')}>
-                    <ListItemText inset>Phylum</ListItemText>
-                </MenuItem>
-                <MenuItem selected={activeModule === 'family'} onClick={() => handleItemClick('family')}>
-                    <ListItemText inset>Family</ListItemText>
-                </MenuItem>
-                <MenuItem selected={activeModule === 'palmprint'} onClick={() => handleItemClick('palmprint')}>
-                    <ListItemText inset>RdRP Palmprint</ListItemText>
-                </MenuItem>
+                {['family', 'palmdb'].map((item) => (
+                    <MenuItem key={item} selected={activeModule === item} onClick={() => handleItemClick(item)}>
+                        <ListItemText inset>{moduleConfig[item].title}</ListItemText>
+                    </MenuItem>
+                ))}
             </MenuList>
             <Typography sx={{ mt: 2, ml: 2 }} variant='h6' component='div'>
-                Ecology
+                Environment
             </Typography>
             <MenuList dense>
-                <MenuItem selected={activeModule === 'geography'} onClick={() => handleItemClick('geography')}>
-                    <ListItemText inset>Geography</ListItemText>
-                </MenuItem>
-                <MenuItem selected={activeModule === 'ecology'} onClick={() => handleItemClick('ecology')}>
-                    <ListItemText inset>Ecological zone</ListItemText>
-                </MenuItem>
+                {['geography', 'ecology'].map((item) => (
+                    <MenuItem key={item} selected={activeModule === item} onClick={() => handleItemClick(item)}>
+                        <ListItemText inset>{moduleConfig[item].title}</ListItemText>
+                    </MenuItem>
+                ))}
             </MenuList>
             <Typography sx={{ mt: 2, ml: 2 }} variant='h6' component='div'>
                 Host
             </Typography>
             <MenuList dense>
-                <MenuItem selected={activeModule === 'host'} onClick={() => handleItemClick('host')}>
-                    <ListItemText inset>Organism label</ListItemText>
-                </MenuItem>
-                <MenuItem selected={activeModule === 'statHost'} onClick={() => handleItemClick('statHost')}>
-                    <ListItemText inset>STAT Host</ListItemText>
-                </MenuItem>
-                <MenuItem selected={activeModule === 'tissue'} onClick={() => handleItemClick('tissue')}>
-                    <ListItemText inset>Tissue</ListItemText>
-                </MenuItem>
+                {['host', 'statHost', 'tissue'].map((item) => (
+                    <MenuItem key={item} selected={activeModule === item} onClick={() => handleItemClick(item)}>
+                        <ListItemText inset>{moduleConfig[item].title}</ListItemText>
+                    </MenuItem>
+                ))}
             </MenuList>
             <Typography sx={{ mt: 2, ml: 2 }} variant='h6' component='div'>
-                Sample
+                Project Info
             </Typography>
             <MenuList dense>
-                <MenuItem selected={activeModule === 'bioproject'} onClick={() => handleItemClick('bioproject')}>
-                    <ListItemText inset>Bioproject</ListItemText>
-                </MenuItem>
-                <MenuItem selected={activeModule === 'date'} onClick={() => handleItemClick('date')}>
-                    <ListItemText inset>Collection date</ListItemText>
-                </MenuItem>
+                {['bioproject', 'date'].map((item) => (
+                    <MenuItem key={item} selected={activeModule === item} onClick={() => handleItemClick(item)}>
+                        <ListItemText inset>{moduleConfig[item].title}</ListItemText>
+                    </MenuItem>
+                ))}
             </MenuList>
         </Drawer>
     );

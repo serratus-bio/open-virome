@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { useGetResultQuery } from '../../api/client.ts';
+import { useDispatch, useSelector } from 'react-redux';
+import { useGetResultQuery, useGetRunsQuery } from '../../api/client.ts';
 import { setActiveModule, setActiveView } from '../../app/slice.ts';
 import { moduleConfig } from './constants.ts';
+import { selectAllFilters } from '../Query/slice.ts';
+import { getFilterQuery } from '../../common/utils/filters.ts';
+import { handleIdKeyIrregularities } from '../../common/utils/filters.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -16,14 +19,37 @@ import PagedTable from '../../common/PagedTable.tsx';
 const Module = ({ domRef, sectionKey }) => {
     const dispatch = useDispatch();
     const [moduleView, setModuleView] = useState('table');
-    const { data, error, isLoading } = useGetResultQuery({
-        filters: [],
-        table: moduleConfig[sectionKey].resultsTable,
-        // sortByColumn: moduleConfig[sectionKey].groupByKey,
-        // sortByDirection: 'asc',
-        pageStart: 0,
-        pageEnd: 10,
+    const filters = useSelector(selectAllFilters);
+
+    const {
+        data: runData,
+        error: runError,
+        isLoading: runIsLoading,
+    } = useGetRunsQuery({
+        filters: getFilterQuery({ filters }),
     });
+    console.log(runData ? runData.length : '');
+
+    const {
+        data: resultData,
+        error: resultError,
+        isLoading: resultIsLoading,
+    } = useGetResultQuery(
+        {
+            idColumn: moduleConfig[sectionKey].resultsIdColumn,
+            ids: runData
+                ? runData.map((run) => run[handleIdKeyIrregularities(moduleConfig[sectionKey].resultsIdColumn)])
+                : [],
+            table: moduleConfig[sectionKey].resultsTable,
+            sortByColumn: moduleConfig[sectionKey].resultsIdColumn,
+            sortByDirection: 'asc',
+            pageStart: 0,
+            pageEnd: 10,
+        },
+        {
+            skip: runIsLoading,
+        },
+    );
 
     const handleFilterClick = (sectionKey) => {
         dispatch(setActiveModule(sectionKey));
@@ -44,7 +70,7 @@ const Module = ({ domRef, sectionKey }) => {
     };
 
     const getHeaders = (data) => {
-        if (data.length) {
+        if (data && data.length) {
             return Object.keys(data[0]);
         }
         return [];
@@ -85,7 +111,7 @@ const Module = ({ domRef, sectionKey }) => {
                     </IconButton>
                 </Box>
             </Box>
-            {isLoading ? getPlaceholder() : <PagedTable rows={data} headers={getHeaders(data)} />}
+            {resultIsLoading ? getPlaceholder() : <PagedTable rows={resultData} headers={getHeaders(resultData)} />}
         </Box>
     );
 };

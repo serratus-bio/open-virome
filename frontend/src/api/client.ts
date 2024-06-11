@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 const API_URL = 'http://localhost:8000';
 
-export const api = createApi({
+export const apiSlice = createApi({
     baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
     tagTypes: ['Counts', 'Results', 'Runs'],
     endpoints: (build) => ({
@@ -33,5 +33,5 @@ export const api = createApi({
     }),
 });
 
-export const { useGetCountQuery, useGetRunsQuery, useGetResultQuery } = api;
-export const { endpoints, reducerPath, reducer, middleware } = api;
+export const { useGetCountQuery, useGetRunsQuery, useGetResultQuery } = apiSlice;
+export const { endpoints, reducerPath, reducer, middleware } = apiSlice;

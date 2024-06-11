@@ -4,6 +4,7 @@ import { selectActiveModule, setActiveView } from '../../app/slice.ts';
 import { moduleConfig } from '../Explore/constants.ts';
 import { useGetCountQuery, useGetRunsQuery } from '../../api/client.ts';
 import { addFilter, selectAllFilters } from './slice.ts';
+import { getFilterQuery } from '../../common/utils/filters.ts';
 
 import SearchBar from '../../common/SearchBar.tsx';
 import VirtualizedTable from '../../common/VirtualizedTable.tsx';
@@ -21,27 +22,12 @@ const Query = () => {
     const activeModule = useSelector(selectActiveModule);
     const filters = useSelector(selectAllFilters);
 
-    const getFilterQuery = ({ filters, excludeSelf = false }) => {
-        if (excludeSelf) {
-            return filters
-                .filter((filter) => filter.filterType !== activeModule)
-                .map((filter) => ({
-                    filterType: moduleConfig[filter.filterType].groupByKey,
-                    filterValue: filter.filterValue,
-                }));
-        }
-        return filters.map((filter) => ({
-            filterType: moduleConfig[filter.filterType].groupByKey,
-            filterValue: filter.filterValue,
-        }));
-    };
-
     const {
         data: countData,
         error: countError,
         isLoading: countIsLoading,
     } = useGetCountQuery({
-        filters: getFilterQuery({ filters, excludeSelf: true }),
+        filters: getFilterQuery({ filters, excludeType: activeModule }),
         groupBy: moduleConfig[activeModule].groupByKey,
         sortByColumn: 'count',
         sortByDirection: 'desc',
@@ -106,10 +92,10 @@ const Query = () => {
                             width: '100%',
                             justifySelf: 'flex-end',
                         }}
-                        >
-                    <Box  sx={{ width: '50%' }}>
-                        <SearchBar />
-                    </Box>
+                    >
+                        <Box sx={{ width: '50%' }}>
+                            <SearchBar />
+                        </Box>
                     </Box>
                 ) : null}
                 <Box>
