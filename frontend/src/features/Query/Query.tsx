@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectActiveModule, setActiveView } from '../../app/slice.ts';
 import { moduleConfig } from '../Explore/constants.ts';
-import { useGetCountQuery, useGetRunsQuery } from '../../api/client.ts';
+import { useGetFiltersQuery, useGetIdsQuery } from '../../api/client.ts';
 import { addFilter, selectAllFilters } from './slice.ts';
 import { getFilterQuery } from '../../common/utils/filters.ts';
 
@@ -25,8 +25,8 @@ const Query = () => {
     const {
         data: countData,
         error: countError,
-        isLoading: countIsLoading,
-    } = useGetCountQuery({
+        isFetching: countIsFetching,
+    } = useGetFiltersQuery({
         filters: getFilterQuery({ filters, excludeType: activeModule }),
         groupBy: moduleConfig[activeModule].groupByKey,
         sortByColumn: 'count',
@@ -37,8 +37,8 @@ const Query = () => {
     const {
         data: runData,
         error: runError,
-        isLoading: runIsLoading,
-    } = useGetRunsQuery({
+        isFetching: runIsFetching,
+    } = useGetIdsQuery({
         filters: getFilterQuery({ filters }),
     });
 
@@ -59,6 +59,7 @@ const Query = () => {
         setShowSearchBar(!showSearchBar);
     };
 
+    console.log(countIsFetching, runIsFetching);
     return (
         <Box>
             <Box
@@ -99,18 +100,18 @@ const Query = () => {
                     </Box>
                 ) : null}
                 <Box>
-                    {countIsLoading || !countData ? (
+                    {countIsFetching || !countData ? (
                         <Skeleton variant='rounded' height={400} />
                     ) : (
                         <VirtualizedTable rows={countData} onRowClick={onRowClick} />
                     )}
                 </Box>
                 <Box sx={{ mt: 4 }}>
-                    {runIsLoading || countIsLoading || !runData || !countData ? (
+                    {runIsFetching || countIsFetching ? (
                         <Skeleton variant='rounded' height={20} />
                     ) : (
                         <Typography component={'div'} variant='h6' sx={{ mt: 2, textAlign: 'left' }}>
-                            {`Unique ${moduleConfig[activeModule].tag}: ${countData.length}, Total matches: ${runData.length} `}
+                            {`${moduleConfig[activeModule].tag}: ${countData ? countData.length : ''}, Sequences: ${runData.run ? runData.run.totalCount : ''}, Bioprojects: ${runData.bioproject ? runData.bioproject.totalCount : ''}`}
                         </Typography>
                     )}
                 </Box>

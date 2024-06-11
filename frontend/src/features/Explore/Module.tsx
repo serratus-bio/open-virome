@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetResultQuery, useGetRunsQuery } from '../../api/client.ts';
+import { useGetResultQuery, useGetIdsQuery } from '../../api/client.ts';
 import { setActiveModule, setActiveView } from '../../app/slice.ts';
 import { moduleConfig } from './constants.ts';
 import { selectAllFilters } from '../Query/slice.ts';
@@ -24,22 +24,20 @@ const Module = ({ domRef, sectionKey }) => {
     const {
         data: runData,
         error: runError,
-        isLoading: runIsLoading,
-    } = useGetRunsQuery({
+        isFetching: runFetching,
+    } = useGetIdsQuery({
         filters: getFilterQuery({ filters }),
     });
-    console.log(runData ? runData.length : '');
 
     const {
         data: resultData,
         error: resultError,
-        isLoading: resultIsLoading,
+        isFetching: resultIsFetching,
     } = useGetResultQuery(
         {
             idColumn: moduleConfig[sectionKey].resultsIdColumn,
-            ids: runData
-                ? runData.map((run) => run[handleIdKeyIrregularities(moduleConfig[sectionKey].resultsIdColumn)])
-                : [],
+            ids: runData ? runData[handleIdKeyIrregularities(moduleConfig[sectionKey].resultsIdColumn)].single : [],
+            idRanges: runData ? runData[handleIdKeyIrregularities(moduleConfig[sectionKey].resultsIdColumn)].range : [],
             table: moduleConfig[sectionKey].resultsTable,
             sortByColumn: moduleConfig[sectionKey].resultsIdColumn,
             sortByDirection: 'asc',
@@ -47,7 +45,7 @@ const Module = ({ domRef, sectionKey }) => {
             pageEnd: 10,
         },
         {
-            skip: runIsLoading,
+            skip: runFetching,
         },
     );
 
@@ -111,7 +109,7 @@ const Module = ({ domRef, sectionKey }) => {
                     </IconButton>
                 </Box>
             </Box>
-            {resultIsLoading ? getPlaceholder() : <PagedTable rows={resultData} headers={getHeaders(resultData)} />}
+            {resultIsFetching ? getPlaceholder() : <PagedTable rows={resultData} headers={getHeaders(resultData)} />}
         </Box>
     );
 };
