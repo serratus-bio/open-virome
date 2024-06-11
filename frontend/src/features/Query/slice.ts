@@ -1,5 +1,5 @@
-import { createSlice, createEntityAdapter, createSelector } from '@reduxjs/toolkit';
 import { RootState } from '../../app/store';
+import { createSlice, createEntityAdapter, createSelector } from '@reduxjs/toolkit';
 
 /* Reducers */
 

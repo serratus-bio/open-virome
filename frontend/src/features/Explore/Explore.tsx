@@ -11,16 +11,12 @@ import Module from './Module.tsx';
 const Explore = () => {
     const activeModule = useSelector(selectActiveModule);
     const sectionRefs = {
-        phylum: {
-            ...moduleConfig['phylum'],
-            ref: useRef(),
-        },
         family: {
             ...moduleConfig['family'],
             ref: useRef(),
         },
-        palmprint: {
-            ...moduleConfig['palmprint'],
+        palmdb: {
+            ...moduleConfig['palmdb'],
             ref: useRef(),
         },
         date: {
@@ -59,7 +55,7 @@ const Explore = () => {
             return;
         }
 
-        if (sectionRefs[activeModule].title === 'Phylum') {
+        if (sectionRefs[activeModule].title === 'Family') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
             const pos = section.style.position;
@@ -93,14 +89,14 @@ const Explore = () => {
                         flexWrap: 'wrap',
                     }}
                 >
-                    {['phylum', 'family', 'palmprint'].map((sectionKey) => (
+                    {['family', 'palmdb'].map((sectionKey) => (
                         <Module key={sectionKey} domRef={sectionRefs[sectionKey].ref} sectionKey={sectionKey} />
                     ))}
                 </Box>
             </Box>
             <Box sx={sectionStyle}>
                 <Typography component={'div'} variant='h4'>
-                    Ecology
+                    Environment
                 </Typography>
                 <Divider />
                 <Box
@@ -138,7 +134,7 @@ const Explore = () => {
             </Box>
             <Box sx={sectionStyle}>
                 <Typography component={'div'} variant='h4'>
-                    Sample
+                    Project Info
                 </Typography>
                 <Divider />
                 <Box
