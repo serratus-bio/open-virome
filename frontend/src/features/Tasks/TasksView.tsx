@@ -3,7 +3,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 
-const Tasks = () => {
+const TasksView = () => {
     return (
         <Box>
             <Typography component={'div'} variant='h4' sx={{ mt: 2, mb: 2 }}>
@@ -13,4 +13,4 @@ const Tasks = () => {
     );
 };
 
-export default Tasks;
+export default TasksView;

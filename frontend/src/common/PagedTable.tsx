@@ -114,13 +114,13 @@ const PagedTable = ({ rows = [], headers = [] }) => {
     const [dense, setDense] = React.useState(true);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-    const handleRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
+    const onRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
         const isAsc = orderBy === property && order === 'asc';
         setOrder(isAsc ? 'desc' : 'asc');
         setOrderBy(property);
     };
 
-    const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+    const onClick = (event: React.MouseEvent<unknown>, id: number) => {
         const selectedIndex = selected.indexOf(id);
         let newSelected: number[] = [];
 
@@ -136,11 +136,11 @@ const PagedTable = ({ rows = [], headers = [] }) => {
         setSelected(newSelected);
     };
 
-    const handleChangePage = (event: unknown, newPage: number) => {
+    const onChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
     };
 
-    const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const onChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
@@ -166,7 +166,7 @@ const PagedTable = ({ rows = [], headers = [] }) => {
                             numSelected={selected.length}
                             order={order}
                             orderBy={orderBy}
-                            onRequestSort={handleRequestSort}
+                            onRequestSort={onRequestSort}
                             rowCount={rows.length}
                         />
                         <TableBody>
@@ -176,7 +176,7 @@ const PagedTable = ({ rows = [], headers = [] }) => {
                                 return (
                                     <TableRow
                                         hover
-                                        onClick={(event) => handleClick(event, row.id)}
+                                        onClick={(event) => onClick(event, row.id)}
                                         aria-checked={isItemSelected}
                                         tabIndex={-1}
                                         key={row.id}
@@ -186,9 +186,9 @@ const PagedTable = ({ rows = [], headers = [] }) => {
                                         {headers.map((header, index) => (
                                             <TableCell key={index} align='right'>
                                                 {row[header] &&
-                                                row[header].toString().length > Math.min(header.length, 15)
-                                                    ? row[header].toString().substring(0, Math.min(header.length, 15)) +
-                                                      '...'
+                                                (row[header].toString().length > 15 ||
+                                                    row[header].toString().split(' ').length > 1)
+                                                    ? row[header].toString().split(' ')[0].substring(0, 15) + '...'
                                                     : row[header]}
                                             </TableCell>
                                         ))}
@@ -213,8 +213,8 @@ const PagedTable = ({ rows = [], headers = [] }) => {
                     count={rows.length}
                     rowsPerPage={rowsPerPage}
                     page={page}
-                    onPageChange={handleChangePage}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    onPageChange={onChangePage}
+                    onRowsPerPageChange={onChangeRowsPerPage}
                 />
             </Paper>
         </Box>

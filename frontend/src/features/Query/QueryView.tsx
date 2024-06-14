@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectActiveModule, setActiveView } from '../../app/slice.ts';
 import { moduleConfig } from '../Explore/constants.ts';
-import { useGetFiltersQuery, useGetIdsQuery } from '../../api/client.ts';
+import { useGetCountsQuery, useGetIdentifiersQuery } from '../../api/client.ts';
 import { addFilter, selectAllFilters } from './slice.ts';
-import { getFilterQuery } from '../../common/utils/filters.ts';
+import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
+import { formatNumber } from '../../common/utils/textFormatting.ts';
 
 import SearchBar from '../../common/SearchBar.tsx';
 import VirtualizedTable from '../../common/VirtualizedTable.tsx';
@@ -14,11 +15,10 @@ import Skeleton from '@mui/material/Skeleton';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import PlotIcon from '@mui/icons-material/InsertChart';
-import SearchIcon from '@mui/icons-material/Search';
 
-const Query = () => {
+const QueryView = () => {
     const dispatch = useDispatch();
-    const [showSearchBar, setShowSearchBar] = useState(false);
+    const [searchString, setSearchString] = useState('');
     const activeModule = useSelector(selectActiveModule);
     const filters = useSelector(selectAllFilters);
 
@@ -26,7 +26,7 @@ const Query = () => {
         data: countData,
         error: countError,
         isFetching: countIsFetching,
-    } = useGetFiltersQuery({
+    } = useGetCountsQuery({
         filters: getFilterQuery({ filters, excludeType: activeModule }),
         groupBy: moduleConfig[activeModule].groupByKey,
         sortByColumn: 'count',
@@ -38,7 +38,7 @@ const Query = () => {
         data: runData,
         error: runError,
         isFetching: runIsFetching,
-    } = useGetIdsQuery({
+    } = useGetIdentifiersQuery({
         filters: getFilterQuery({ filters }),
     });
 
@@ -55,11 +55,16 @@ const Query = () => {
         dispatch(setActiveView('explore'));
     };
 
-    const onSearchIconClick = () => {
-        setShowSearchBar(!showSearchBar);
-    };
+    const getFilteredCounts = (countData) => {
+        if (!countData) {
+            return [];
+        }
+        if (!searchString) {
+            return countData;
+        }
+        return countData.filter((row) => row.name.toLowerCase().includes(searchString.toLowerCase()));
+    }
 
-    console.log(countIsFetching, runIsFetching);
     return (
         <Box>
             <Box
@@ -73,37 +78,34 @@ const Query = () => {
                 <Typography component={'div'} variant='h4' sx={{ mt: 2, mb: 2, mr: 8 }}>
                     {moduleConfig[activeModule].title}
                 </Typography>
-                <Box>
-                    <IconButton sx={{ mt: -0.5, height: 30, width: 30 }} onClick={() => onSearchIconClick()}>
-                        <SearchIcon fontSize='small' />
-                    </IconButton>
-                    <IconButton sx={{ mt: -0.5, height: 30, width: 30 }} onClick={() => onPlotIconClick()}>
-                        <PlotIcon fontSize='small' />
-                    </IconButton>
-                </Box>
+
             </Box>
             <Divider sx={{ mb: 3 }} />
             <Box sx={{ width: 800 }}>
-                {showSearchBar ? (
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'flex-end',
-                            alignItems: 'center',
-                            width: '100%',
-                            justifySelf: 'flex-end',
-                        }}
-                    >
-                        <Box sx={{ width: '50%' }}>
-                            <SearchBar />
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        width: '100%',
+                        justifySelf: 'flex-end',
+                        mb: 1,
+                    }}
+                >
+                        <Box sx={{ width: '50%', mr:8 }}>
+                            <SearchBar query={searchString} setQuery={setSearchString} />
                         </Box>
+                        <Box>
+                        <IconButton sx={{ mt: -1}} onClick={() => onPlotIconClick()}>
+                            <PlotIcon fontSize='medium' />
+                        </IconButton>
                     </Box>
-                ) : null}
+                </Box>
                 <Box>
                     {countIsFetching || !countData ? (
                         <Skeleton variant='rounded' height={400} />
                     ) : (
-                        <VirtualizedTable rows={countData} onRowClick={onRowClick} />
+                        <VirtualizedTable rows={getFilteredCounts(countData)} onRowClick={onRowClick} />
                     )}
                 </Box>
                 <Box sx={{ mt: 4 }}>
@@ -111,7 +113,9 @@ const Query = () => {
                         <Skeleton variant='rounded' height={20} />
                     ) : (
                         <Typography component={'div'} variant='h6' sx={{ mt: 2, textAlign: 'left' }}>
-                            {`${moduleConfig[activeModule].tag}: ${countData ? countData.length : ''}, Sequences: ${runData.run ? runData.run.totalCount : ''}, Bioprojects: ${runData.bioproject ? runData.bioproject.totalCount : ''}`}
+                            {`${moduleConfig[activeModule].tag}: ${countData ? formatNumber(countData.length) : ''}${
+                                runData ? `, Bioprojects: ${runData?.bioproject ? formatNumber(runData.bioproject.totalCount) : ''}, Sequences: ${runData?.run ? formatNumber(runData.run.totalCount) : ''}` : ''
+                            }`}
                         </Typography>
                     )}
                 </Box>
@@ -120,4 +124,4 @@ const Query = () => {
     );
 };
 
-export default Query;
+export default QueryView;

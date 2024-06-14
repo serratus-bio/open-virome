@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useGetResultQuery, useGetIdsQuery } from '../../api/client.ts';
+import { useGetCountsQuery, useGetResultQuery, useGetIdentifiersQuery } from '../../api/client.ts';
 import { setActiveModule, setActiveView } from '../../app/slice.ts';
 import { moduleConfig } from './constants.ts';
 import { selectAllFilters } from '../Query/slice.ts';
-import { getFilterQuery } from '../../common/utils/filters.ts';
-import { handleIdKeyIrregularities } from '../../common/utils/filters.ts';
+import { getFilterQuery, handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
+import { transformRowsToPlotData } from '../../common/utils/plotHelpers.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -15,17 +15,21 @@ import PlotIcon from '@mui/icons-material/InsertChart';
 import TuneIcon from '@mui/icons-material/Tune';
 import Skeleton from '@mui/material/Skeleton';
 import PagedTable from '../../common/PagedTable.tsx';
+import BarPlot from '../../common/BarPlot.tsx';
 
 const Module = ({ domRef, sectionKey }) => {
     const dispatch = useDispatch();
-    const [moduleView, setModuleView] = useState('table');
+    const [moduleDisplay, setModuleDisplay] = useState(moduleConfig[sectionKey].defaultDisplay);
     const filters = useSelector(selectAllFilters);
+
+    const isTableView = () => moduleDisplay === 'table';
+    const isPlotView = () => moduleDisplay === 'plot';
 
     const {
         data: runData,
         error: runError,
         isFetching: runFetching,
-    } = useGetIdsQuery({
+    } = useGetIdentifiersQuery({
         filters: getFilterQuery({ filters }),
     });
 
@@ -45,7 +49,43 @@ const Module = ({ domRef, sectionKey }) => {
             pageEnd: 10,
         },
         {
-            skip: runFetching,
+            skip: runFetching || !isTableView(),
+        },
+    );
+
+    const {
+        data: countData,
+        error: countError,
+        isFetching: countIsFetching,
+    } = useGetCountsQuery(
+        {
+            filters: getFilterQuery({ filters, excludeType: sectionKey }),
+            groupBy: moduleConfig[sectionKey].groupByKey,
+            sortByColumn: 'count',
+            sortByDirection: 'desc',
+            pageStart: 0,
+        },
+        {
+            skip: runFetching || !isPlotView(),
+        },
+    );
+
+    const {
+        data: controlCountData,
+        error: controlCountError,
+        isFetching: controlCountIsFetching,
+    } = useGetCountsQuery(
+        {
+            idColumn: 'bioproject',
+            ids: runData ? runData['bioproject'].single : [],
+            idRanges: runData ? runData['bioproject'].range : [],
+            groupBy: moduleConfig[sectionKey].groupByKey,
+            sortByColumn: 'count',
+            sortByDirection: 'desc',
+            pageStart: 0,
+        },
+        {
+            skip: runFetching || !isPlotView(),
         },
     );
 
@@ -59,12 +99,62 @@ const Module = ({ domRef, sectionKey }) => {
         mb: 2,
     };
 
-    const getPlaceholder = () => {
+    const shouldRenderPlaceholder = (
+        resultData,
+        resultError,
+        resultIsFetching,
+        countData,
+        countError,
+        countIsFetching,
+        controlCountData,
+        controlCountError,
+        controlCountIsFetching,
+    ) => {
+        return (
+            (isTableView() && (resultError || !resultData || resultIsFetching)) ||
+            (isPlotView() &&
+                (countError ||
+                    controlCountError ||
+                    (!countData && !controlCountData) ||
+                    (countIsFetching && controlCountIsFetching)))
+        );
+    };
+
+    const renderPlaceholder = (resultData, resultError, resultIsFetching, countData, countError, countIsFetching) => {
+        if ((isTableView() && resultError) || (isPlotView() && countError)) {
+            return (
+                <Box sx={{ flex: 1 }}>
+                    <Typography variant='body1' sx={{ ...sectionStyle }}>
+                        Error loading data
+                    </Typography>
+                </Box>
+            );
+        }
+        if (
+            (isTableView() && resultData && resultData.length === 0 && !resultIsFetching) ||
+            (isPlotView() && countData && countData.length === 0 && !countIsFetching)
+        ) {
+            return (
+                <Box sx={{ flex: 1, height: 100 }}>
+                    <Typography variant='body1' sx={{ ...sectionStyle }}>
+                        {`No ${moduleConfig[sectionKey].title.toLowerCase()} data available`}
+                    </Typography>
+                </Box>
+            );
+        }
         return (
             <Box sx={{ flex: 1 }}>
                 <Skeleton width='90%' height={300} />
             </Box>
         );
+    };
+
+    const renderResultsView = (resultData, countData, controlCountData) => {
+        if (isTableView() && resultData && resultData.length > 0) {
+            return <PagedTable rows={resultData} headers={getHeaders(resultData)} />;
+        }
+        const plotData = transformRowsToPlotData(countData, controlCountData);
+        return <BarPlot plotData={plotData} />;
     };
 
     const getHeaders = (data) => {
@@ -74,8 +164,8 @@ const Module = ({ domRef, sectionKey }) => {
         return [];
     };
 
-    const handleViewChange = (view) => {
-        setModuleView(view);
+    const onViewChange = (view) => {
+        setModuleDisplay(view);
     };
 
     return (
@@ -92,15 +182,15 @@ const Module = ({ domRef, sectionKey }) => {
                 <Box>
                     <IconButton
                         sx={{ mt: -0.5, height: 30, width: 30 }}
-                        color={moduleView === 'plot' ? 'primary' : 'default'}
-                        onClick={() => handleViewChange('plot')}
+                        color={isPlotView() ? 'primary' : 'default'}
+                        onClick={() => onViewChange('plot')}
                     >
                         <PlotIcon fontSize='small' />
                     </IconButton>
                     <IconButton
                         sx={{ mt: -0.5, height: 30, width: 30 }}
-                        color={moduleView === 'table' ? 'primary' : 'default'}
-                        onClick={() => handleViewChange('table')}
+                        color={isTableView() ? 'primary' : 'default'}
+                        onClick={() => onViewChange('table')}
                     >
                         <TableIcon fontSize='small' />
                     </IconButton>
@@ -109,7 +199,29 @@ const Module = ({ domRef, sectionKey }) => {
                     </IconButton>
                 </Box>
             </Box>
-            {resultIsFetching ? getPlaceholder() : <PagedTable rows={resultData} headers={getHeaders(resultData)} />}
+
+            <Box sx={{ minWidth: 400 }}>
+                {shouldRenderPlaceholder(
+                    resultData,
+                    resultError,
+                    resultIsFetching,
+                    countData,
+                    countError,
+                    countIsFetching,
+                    controlCountData,
+                    controlCountError,
+                    controlCountIsFetching,
+                )
+                    ? renderPlaceholder(
+                          resultData,
+                          resultError,
+                          resultIsFetching,
+                          countData,
+                          countError,
+                          countIsFetching,
+                      )
+                    : renderResultsView(resultData, countData, controlCountData)}
+            </Box>
         </Box>
     );
 };

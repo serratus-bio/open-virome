@@ -15,7 +15,7 @@ const appSlice = createSlice({
     initialState: {
         sidebarOpen: true,
         activeView: 'query',
-        activeModule: 'family',
+        activeModule: 'host',
         darkMode: true,
     },
     reducers: {
