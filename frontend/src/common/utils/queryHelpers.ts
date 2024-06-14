@@ -11,7 +11,7 @@ export const getFilterQuery = ({ filters, excludeType = '' }) => {
 
 export const handleIdKeyIrregularities = (idKey) => {
     if (['run', 'run_id'].includes(idKey)) {
-        return 'run_id';
+        return 'run';
     }
     if (['bioproject', 'bioproject_id'].includes(idKey)) {
         return 'bioproject';

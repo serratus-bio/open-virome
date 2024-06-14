@@ -4,23 +4,23 @@ const API_URL = 'http://localhost:8000';
 
 export const apiSlice = createApi({
     baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
-    tagTypes: ['Counts', 'Results', 'Runs'],
+    tagTypes: ['Counts', 'Identifiers', 'Results'],
     endpoints: (build) => ({
-        getCount: build.query({
+        getCounts: build.query({
             query: (args) => ({
                 url: 'counts',
                 method: 'POST',
                 body: args,
             }),
-            providesTags: (result) => (result ? result.map((obj) => ({ type: 'Count', ...obj })) : []),
+            providesTags: ['Counts'],
         }),
-        getRuns: build.query({
+        getIdentifiers: build.query({
             query: (args) => ({
-                url: 'runs',
+                url: 'identifiers',
                 method: 'POST',
                 body: args,
             }),
-            providesTags: (result) => (result ? result.map((obj) => ({ type: 'Run', ...obj })) : []),
+            providesTags: ['Identifiers'],
         }),
         getResult: build.query({
             query: (args) => ({
@@ -28,10 +28,10 @@ export const apiSlice = createApi({
                 method: 'POST',
                 body: args,
             }),
-            providesTags: (result) => (result ? result.map((obj) => ({ type: 'Result', ...obj })) : []),
+            providesTags: ['Results'],
         }),
     }),
 });
 
-export const { useGetCountQuery, useGetRunsQuery, useGetResultQuery } = apiSlice;
+export const { useGetCountsQuery, useGetIdentifiersQuery, useGetResultQuery } = apiSlice;
 export const { endpoints, reducerPath, reducer, middleware } = apiSlice;

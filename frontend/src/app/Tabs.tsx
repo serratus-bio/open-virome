@@ -5,9 +5,9 @@ import { selectActiveView } from './slice.ts';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import Query from '../features/Query/Query.tsx';
-import Explore from '../features/Explore/Explore.tsx';
-import Tasks from '../features/Tasks/Tasks.tsx';
+import QueryView from '../features/Query/QueryView.tsx';
+import ExploreView from '../features/Explore/ExploreView.tsx';
+import TasksView from '../features/Tasks/TasksView.tsx';
 
 interface TabPanelProps {
     children?: React.ReactNode;
@@ -49,13 +49,13 @@ const Tabs = () => {
             <Toolbar />
             <Box>
                 <TabPanel value={activeViewMap[activeView]} index={0}>
-                    <Query />
+                    <QueryView />
                 </TabPanel>
                 <TabPanel value={activeViewMap[activeView]} index={1}>
-                    <Explore />
+                    <ExploreView />
                 </TabPanel>
                 <TabPanel value={activeViewMap[activeView]} index={2}>
-                    <Tasks />
+                    <TasksView />
                 </TabPanel>
             </Box>
         </Box>

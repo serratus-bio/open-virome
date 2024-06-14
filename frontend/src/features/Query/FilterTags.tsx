@@ -8,7 +8,7 @@ import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 
-const FilterBar = () => {
+const FilterTags = () => {
     const filters = useSelector(selectAllFilters);
     const dispatch = useDispatch();
 
@@ -16,11 +16,11 @@ const FilterBar = () => {
         return `${moduleConfig[filter.filterType].tag}: ${filter.filterValue}`;
     };
 
-    const handleFilterDelete = (filterId) => {
+    const onFilterDelete = (filterId) => {
         dispatch(removeFilter(filterId));
     };
 
-    const handleFilterClick = (filterType) => {
+    const onFilterClick = (filterType) => {
         dispatch(setActiveModule(filterType));
         dispatch(setActiveView('query'));
     };
@@ -43,8 +43,8 @@ const FilterBar = () => {
                     <Chip
                         key={filter.filterId}
                         label={getFilterDisplayText(filter)}
-                        onDelete={() => handleFilterDelete(filter.filterId)}
-                        onClick={() => handleFilterClick(filter.filterType)}
+                        onDelete={() => onFilterDelete(filter.filterId)}
+                        onClick={() => onFilterClick(filter.filterType)}
                     />
                 ))}
             </Stack>
@@ -52,4 +52,4 @@ const FilterBar = () => {
     );
 };
 
-export default FilterBar;
+export default FilterTags;

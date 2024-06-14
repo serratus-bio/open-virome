@@ -1,11 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Paper from '@mui/material/Paper';
 import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 
-const SearchBar = () => {
-    const [query, setQuery] = useState('');
+const SearchBar = ({query, setQuery}) => {
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {

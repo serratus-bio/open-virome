@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import FilterBar from '../features/Query/FilterBar.tsx';
+import FilterTags from '../features/Query/FilterTags.tsx';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 
@@ -57,7 +57,7 @@ const AppToolbar = () => {
         explore: 1,
         tasks: 2,
     };
-    const handleItemClick = (item: number) => {
+    const onItemClick = (item: number) => {
         const activeView = Object.keys(activeViewMap).find((key) => activeViewMap[key] === item);
         dispatch(setActiveView(activeView));
     };
@@ -67,14 +67,14 @@ const AppToolbar = () => {
             <Toolbar>
                 <StyledTabs
                     value={activeViewMap[activeView]}
-                    onChange={(event, newValue) => handleItemClick(newValue)}
+                    onChange={(event, newValue) => onItemClick(newValue)}
                     aria-label='styled tabs example'
                 >
                     <StyledTab label='Query' />
                     <StyledTab label='Explore' />
                     <StyledTab label='Tasks' />
                 </StyledTabs>
-                <FilterBar />
+                <FilterTags />
             </Toolbar>
         </AppBar>
     );

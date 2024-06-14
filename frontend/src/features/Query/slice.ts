@@ -1,5 +1,5 @@
 import { RootState } from '../../app/store';
-import { createSlice, createEntityAdapter, createSelector } from '@reduxjs/toolkit';
+import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
 
 /* Reducers */
 
@@ -14,9 +14,11 @@ const filtersAdapter = createEntityAdapter({
     sortComparer: (a, b) => a.filterId.localeCompare(b.filterId),
 });
 
+const emptyInitialState = filtersAdapter.getInitialState();
+
 const filtersSlice = createSlice({
     name: 'filters',
-    initialState: filtersAdapter.getInitialState(),
+    initialState: emptyInitialState,
     reducers: {
         addFilter: filtersAdapter.addOne,
         removeFilter: filtersAdapter.removeOne,
