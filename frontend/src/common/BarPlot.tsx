@@ -35,19 +35,6 @@ const BarPlot = ({ plotData = {} }) => {
             type: 'category',
         },
         series: [],
-        dataZoom: [
-            {
-                // scroll zoom
-                type: 'inside',
-                id: 'insideY',
-                yAxisIndex: 0,
-                start: 0.5,
-                end: 0,
-                zoomOnMouseWheel: false,
-                moveOnMouseMove: true,
-                moveOnMouseWheel: true,
-            },
-        ],
     };
 
     const options = {

@@ -1,6 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
-const API_URL = 'http://localhost:8000';
+const API_URL =
+    !process.env.NODE_ENV || process.env.NODE_ENV === 'development'
+        ? 'http://localhost:3000/'
+        : 'https://zrdbegawce.execute-api.us-east-1.amazonaws.com/prod/';
 
 export const apiSlice = createApi({
     baseQuery: fetchBaseQuery({ baseUrl: API_URL }),

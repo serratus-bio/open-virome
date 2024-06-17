@@ -120,8 +120,18 @@ const Module = ({ domRef, sectionKey }) => {
         );
     };
 
-    const renderPlaceholder = (resultData, resultError, resultIsFetching, countData, countError, countIsFetching) => {
-        if ((isTableView() && resultError) || (isPlotView() && countError)) {
+    const renderPlaceholder = (
+        resultData,
+        resultError,
+        resultIsFetching,
+        countData,
+        countError,
+        countIsFetching,
+        controlCountData,
+        controlCountError,
+        controlCountIsFetching,
+    ) => {
+        if ((isTableView() && resultError) || (isPlotView() && (countError || controlCountData))) {
             return (
                 <Box sx={{ flex: 1 }}>
                     <Typography variant='body1' sx={{ ...sectionStyle }}>
@@ -132,7 +142,13 @@ const Module = ({ domRef, sectionKey }) => {
         }
         if (
             (isTableView() && resultData && resultData.length === 0 && !resultIsFetching) ||
-            (isPlotView() && countData && countData.length === 0 && !countIsFetching)
+            (isPlotView() &&
+                countData &&
+                countData.length === 0 &&
+                !countIsFetching &&
+                controlCountData &&
+                controlCountData.length === 0 &&
+                !controlCountIsFetching)
         ) {
             return (
                 <Box sx={{ flex: 1, height: 100 }}>
@@ -219,6 +235,9 @@ const Module = ({ domRef, sectionKey }) => {
                           countData,
                           countError,
                           countIsFetching,
+                          controlCountData,
+                          controlCountError,
+                          controlCountIsFetching,
                       )
                     : renderResultsView(resultData, countData, controlCountData)}
             </Box>

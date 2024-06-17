@@ -4,8 +4,7 @@ import InputBase from '@mui/material/InputBase';
 import IconButton from '@mui/material/IconButton';
 import SearchIcon from '@mui/icons-material/Search';
 
-const SearchBar = ({query, setQuery}) => {
-
+const SearchBar = ({ query, setQuery }) => {
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') {
             return;

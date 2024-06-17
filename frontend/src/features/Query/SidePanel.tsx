@@ -10,6 +10,7 @@ import ListItemText from '@mui/material/ListItemText';
 import Drawer from '@mui/material/Drawer';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
+import { Box } from '@mui/material';
 
 const SidePanel = () => {
     const dispatch = useDispatch();
@@ -37,8 +38,8 @@ const SidePanel = () => {
         >
             <Toolbar />
             <Divider />
-            {['SRA Project', 'Virus', 'Environment', 'Host'].map((item) => (
-                <>
+            {['SRA Run', 'Virus', 'Environment', 'Host'].map((item) => (
+                <Box key={item}>
                     <Typography sx={{ mt: 2, ml: 2 }} variant='h6' component='div'>
                         {item}
                     </Typography>
@@ -53,7 +54,7 @@ const SidePanel = () => {
                             </MenuItem>
                         ))}
                     </MenuList>
-                </>
+                </Box>
             ))}
         </Drawer>
     );

@@ -63,7 +63,7 @@ const QueryView = () => {
             return countData;
         }
         return countData.filter((row) => row.name.toLowerCase().includes(searchString.toLowerCase()));
-    }
+    };
 
     return (
         <Box>
@@ -78,7 +78,6 @@ const QueryView = () => {
                 <Typography component={'div'} variant='h4' sx={{ mt: 2, mb: 2, mr: 8 }}>
                     {moduleConfig[activeModule].title}
                 </Typography>
-
             </Box>
             <Divider sx={{ mb: 3 }} />
             <Box sx={{ width: 800 }}>
@@ -92,11 +91,11 @@ const QueryView = () => {
                         mb: 1,
                     }}
                 >
-                        <Box sx={{ width: '50%', mr:8 }}>
-                            <SearchBar query={searchString} setQuery={setSearchString} />
-                        </Box>
-                        <Box>
-                        <IconButton sx={{ mt: -1}} onClick={() => onPlotIconClick()}>
+                    <Box sx={{ width: '50%', mr: 8 }}>
+                        <SearchBar query={searchString} setQuery={setSearchString} />
+                    </Box>
+                    <Box>
+                        <IconButton sx={{ mt: -1 }} onClick={() => onPlotIconClick()}>
                             <PlotIcon fontSize='medium' />
                         </IconButton>
                     </Box>
@@ -114,7 +113,9 @@ const QueryView = () => {
                     ) : (
                         <Typography component={'div'} variant='h6' sx={{ mt: 2, textAlign: 'left' }}>
                             {`${moduleConfig[activeModule].tag}: ${countData ? formatNumber(countData.length) : ''}${
-                                runData ? `, Bioprojects: ${runData?.bioproject ? formatNumber(runData.bioproject.totalCount) : ''}, Sequences: ${runData?.run ? formatNumber(runData.run.totalCount) : ''}` : ''
+                                runData
+                                    ? `, Bioprojects: ${runData?.bioproject ? formatNumber(runData.bioproject.totalCount) : ''}, Sequences: ${runData?.run ? formatNumber(runData.run.totalCount) : ''}`
+                                    : ''
                             }`}
                         </Typography>
                     )}

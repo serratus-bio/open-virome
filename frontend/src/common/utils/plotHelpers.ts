@@ -42,7 +42,7 @@ export const transformRowsToPlotData = (targetRows = [], controlRows = []) => {
                       id: 'insideY',
                       yAxisIndex: 0,
                       start: 100,
-                      end: getPercentageFromRows(5, targetRows.length),
+                      end: getPercentageFromRows(1, targetRows.length),
                       zoomOnMouseWheel: false,
                       moveOnMouseMove: true,
                       moveOnMouseWheel: true,

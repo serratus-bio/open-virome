@@ -1,4 +1,3 @@
-
 const getNumericSuffix = (str = '') => {
     const match = str.match(/\d+$/);
     return match ? parseInt(match[0]) : null;
@@ -81,5 +80,14 @@ export const formatIdentifiersResponse = (result) => {
             range: biosampleRanges,
             totalCount: biosamples.length,
         },
+    };
+};
+
+export const getRequestBody = (req) => {
+    if (req.body !== undefined) {
+        return req.body;
     }
-}
+    if (req?.apiGateway?.event?.body !== undefined) {
+        return JSON.parse(req.apiGateway.event.body);
+    }
+};

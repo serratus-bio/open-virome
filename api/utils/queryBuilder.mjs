@@ -47,9 +47,8 @@ export const getFilterClauses = (filters, groupBy = undefined) => {
     return clauses;
 };
 
-
-export const getIdClauses = (ids, idRanges, idColumn) => {
-    const idColumnRemap = handleIdKeyIrregularities(idColumn, 'srarun');
+export const getIdClauses = (ids, idRanges, idColumn, table = 'srarun') => {
+    const idColumnRemap = handleIdKeyIrregularities(idColumn, table);
     const clauses = [];
     if (ids.length > 0) {
         clauses.push(`${idColumnRemap} IN (${ids.map((id) => `'${id}'`).join(',')})`);
