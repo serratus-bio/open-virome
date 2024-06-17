@@ -3,19 +3,16 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import * as db from './db/index.mjs';
 import 'dotenv/config';
-import {
-    getIdClauses,
-    getMinimalJoinSubQuery,
-    handleIdKeyIrregularities,
-} from './utils/queryBuilder.mjs';
-import { formatIdentifiersResponse } from './utils/format.mjs';
-
+import { getIdClauses, getMinimalJoinSubQuery, handleIdKeyIrregularities } from './utils/queryBuilder.mjs';
+import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
+import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware.js';
 
 const app = express();
 const port = 8000;
 
 app.use(cors());
 
+app.use(awsServerlessExpressMiddleware.eventContext());
 app.use(bodyParser.json());
 app.use(express.json({ limit: '100mb' }));
 app.use(
@@ -26,7 +23,7 @@ app.use(
 
 const runQuery = async (query) => {
     try {
-        console.log(query)
+        console.log(query);
         const result = await db.query(query);
         return result.rows;
     } catch (e) {
@@ -35,7 +32,7 @@ const runQuery = async (query) => {
 };
 
 app.post('/counts', async (req, res) => {
-    const body = req.body;
+    const body = getRequestBody(req);
 
     if (body === undefined) {
         return res.status(400).json({ error: 'Invalid request!' });
@@ -63,15 +60,15 @@ app.post('/counts', async (req, res) => {
 
     let query = ``;
     if (idColumn) {
-        let clauses = getIdClauses(ids, idRanges, idColumn);
+        let clauses = getIdClauses(ids, idRanges, idColumn, 'srarun');
         let remappedGroupBy = handleIdKeyIrregularities(groupBy, 'srarun');
         clauses = `${clauses.length > 0 ? `WHERE ${clauses.join(' OR ')}` : ''}`;
         query = `
-            SELECT ${remappedGroupBy} as name${includeCounts ? `, COUNT(*) as count` : ''}
+            SELECT ${remappedGroupBy} as name, COUNT(*) as count
             FROM srarun
             ${clauses}
             GROUP BY ${remappedGroupBy}
-            ${includeCounts?  `ORDER BY ${sortByColumn} ${sortByDirection}` : ''}
+            ${includeCounts ? `ORDER BY ${sortByColumn} ${sortByDirection}` : ''}
             ${pageEnd !== undefined ? `LIMIT ${pageEnd} OFFSET ${pageStart}` : ''}
         `;
     } else {
@@ -80,7 +77,7 @@ app.post('/counts', async (req, res) => {
             SELECT ${groupBy} as name${includeCounts ? `, COUNT(*) as count` : ''}
             FROM (${subquery}) as open_virome
             GROUP BY ${groupBy}
-            ${includeCounts?  `ORDER BY ${sortByColumn} ${sortByDirection}` : ''}
+            ${includeCounts ? `ORDER BY ${sortByColumn} ${sortByDirection}` : ''}
             ${pageEnd !== undefined ? `LIMIT ${pageEnd} OFFSET ${pageStart}` : ''}
         `;
     }
@@ -94,7 +91,7 @@ app.post('/counts', async (req, res) => {
 });
 
 app.post('/identifiers', async (req, res) => {
-    const body = req.body;
+    const body = getRequestBody(req);
 
     if (body === undefined) {
         return res.status(400).json({ error: 'Invalid request!' });
@@ -124,7 +121,7 @@ app.post('/identifiers', async (req, res) => {
 });
 
 app.post('/results', async (req, res) => {
-    const body = req.body;
+    const body = getRequestBody(req);
     if (body === undefined) {
         return res.status(400).json({ error: 'Invalid request!' });
     }
@@ -137,7 +134,7 @@ app.post('/results', async (req, res) => {
     const pageStart = body?.pageStart || 0;
     const pageEnd = body?.pageEnd || 10;
 
-    const clauses = getIdClauses(ids, idRanges, idColumn);
+    const clauses = getIdClauses(ids, idRanges, idColumn, table);
 
     const query = `
         SELECT ${columns}
@@ -153,6 +150,6 @@ app.post('/results', async (req, res) => {
     return res.json(result);
 });
 
-app.listen(port, () => console.log(`API listening on port ${port}!`));
+app.listen(port, () => console.log(`API listening on port ${port}`));
 
 export default app;

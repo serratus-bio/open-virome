@@ -66,7 +66,7 @@ export const moduleConfig = {
 };
 
 export const sectionToModules = {
-    'SRA Project': ['host', 'bioproject', 'date'],
+    'SRA Run': ['host', 'bioproject', 'date'],
     'Virus': ['family', 'palmdb'],
     'Environment': ['geography'],
     'Host': ['statHost', 'tissue'],
