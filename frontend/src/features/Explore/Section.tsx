@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import { selectAllFilters } from '../Query/slice.ts';
-import { moduleConfig, sectionConfig } from './constants.ts';
+import { sectionConfig } from './constants.ts';
 import { getFilterQuery, handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
 import { useGetResultQuery, useGetIdentifiersQuery } from '../../api/client.ts';
 
@@ -88,7 +88,7 @@ const Section = ({ sectionKey }) => {
             return (
                 <Box sx={{ flex: 1, height: 100 }}>
                     <Typography variant='body1' sx={{ ...sectionStyle }}>
-                        {`No ${moduleConfig[sectionKey].title.toLowerCase()} data available`}
+                        {`No ${sectionConfig[sectionKey].title.toLowerCase()} data available`}
                     </Typography>
                 </Box>
             );

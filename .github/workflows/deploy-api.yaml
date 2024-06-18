@@ -44,5 +44,5 @@ jobs:
           function_name: open-virome-api
           zip_file: api/build.zip
           memory_size: 128
-          timeout: 10
+          timeout: 500
           runtime: nodejs16.x
