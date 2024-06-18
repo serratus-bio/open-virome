@@ -1,98 +1,53 @@
 import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectActiveModule } from '../../app/slice.ts';
-import { moduleConfig, sectionToModules } from './constants.ts';
+import { sectionConfig } from './constants.ts';
 
+import Section from './Section.tsx';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
-import Module from './Module.tsx';
 
 const ExploreView = () => {
     const activeModule = useSelector(selectActiveModule);
-    const activeSection = Object.keys(sectionToModules).find((section) =>
-        sectionToModules[section].includes(activeModule),
-    );
+
     const sectionRefs = {
-        family: {
-            ...moduleConfig['family'],
-            ref: useRef(),
-        },
-        palmdb: {
-            ...moduleConfig['palmdb'],
-            ref: useRef(),
-        },
-        date: {
-            ...moduleConfig['date'],
-            ref: useRef(),
-        },
-        bioproject: {
-            ...moduleConfig['bioproject'],
-            ref: useRef(),
-        },
-        geography: {
-            ...moduleConfig['geography'],
-            ref: useRef(),
-        },
-        tissue: {
-            ...moduleConfig['tissue'],
-            ref: useRef(),
-        },
-        host: {
-            ...moduleConfig['host'],
-            ref: useRef(),
-        },
-        statHost: {
-            ...moduleConfig['statHost'],
-            ref: useRef(),
-        },
+        'SRA Run': useRef(),
+        'Virus family': useRef(),
+        'Palmdb': useRef(),
+        'Environment': useRef(),
+        'Host': useRef(),
+        'Tissue': useRef(),
     };
 
     useEffect(() => {
-        // temp: remove this if revert to full page
-        if (true) {
-            return;
-        }
-        const section = sectionRefs[activeModule].ref.current;
-        if (!section) {
-            return;
-        }
+        const activeSection = Object.keys(sectionConfig).find((section) =>
+            sectionConfig[section].modules.includes(activeModule),
+        );
 
-        if (sectionRefs[activeModule].title === 'Family') {
+        if (!activeSection) {
+            return;
+        }
+        if (activeSection === 'SRA Run') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-            const pos = section.style.position;
-            const top = section.style.top;
-            section.style.position = 'relative';
-            section.style.top = '-80px';
-            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            section.style.top = top;
-            section.style.position = pos;
+            const sectionRef = sectionRefs[activeSection].current;
+            const pos = sectionRef.style.position;
+            const top = sectionRef.style.top;
+            sectionRef.style.position = 'relative';
+            sectionRef.style.top = '-80px';
+            sectionRef.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            sectionRef.style.top = top;
+            sectionRef.style.position = pos;
         }
     }, [activeModule, sectionRefs]);
 
     return (
-        <Box sx={{ maxWidth: '70vw' }}>
-            <Typography component={'div'} variant='h4'>
-                {activeSection}
-            </Typography>
-            <Divider />
-            <Box
-                sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    alignItems: 'center',
-                    flexWrap: 'wrap',
-                }}
-            >
-                {sectionToModules[activeSection].map((module) => (
-                    <Box sx={{ mr: 4 }} key={module}>
-                        <Module domRef={sectionRefs[module].ref} sectionKey={module} />
-                    </Box>
-                ))}
-            </Box>
-        </Box>
+        <>
+            {Object.keys(sectionConfig).map((sectionKey) => (
+                <Box key={sectionKey} ref={sectionRefs[sectionKey]}>
+                    <Section sectionKey={sectionKey} />
+                </Box>
+            ))}
+        </>
     );
 };
 

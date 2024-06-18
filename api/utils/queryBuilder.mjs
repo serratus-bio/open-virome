@@ -10,7 +10,7 @@ export const handleIdKeyIrregularities = (key, table) => {
             run_id: 'run',
         },
         rfamily2: {
-            run_id: 'run',
+            run_id: 'run_id',
         },
         biosample_tissue: {
             biosample: 'biosample_id',
@@ -26,12 +26,7 @@ export const handleIdKeyIrregularities = (key, table) => {
 };
 
 export const getFilterClauses = (filters, groupBy = undefined) => {
-    let clauses = [];
-
-    if (groupBy !== undefined) {
-        clauses = [...clauses, `${groupBy} IS NOT NULL`];
-    }
-
+    let filterClauses = [];
     if (Object.keys(filters).length > 0) {
         let filterTypes = filters.map((filter) => filter.filterType);
         filterTypes = [...new Set(filterTypes)];
@@ -40,11 +35,10 @@ export const getFilterClauses = (filters, groupBy = undefined) => {
                 .filter((filter) => filter.filterType === filterType)
                 .map((filter) => filter.filterValue);
 
-            const filterClauses = filterValues.map((filterValue) => `${filterType} = '${filterValue}'`);
-            clauses = [...clauses, `(${filterClauses.join(' OR ')})`];
+            filterClauses = filterValues.map((filterValue) => `${filterType} = '${filterValue}'`);
         });
     }
-    return clauses;
+    return `${filterClauses.join(' OR ')}${groupBy !== undefined ? ` AND ${groupBy} IS NOT NULL` : ''}`;
 };
 
 export const getIdClauses = (ids, idRanges, idColumn, table = 'srarun') => {
@@ -66,7 +60,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
     const filterTypes = filters.map((filter) => filter.filterType);
 
     const tableToInnerSelect = {
-        srarun: "run as run_id, to_char(release_date, 'YYYY-MM') as release_date, bio_project as bioproject, bio_sample as biosample, scientific_name as host_label",
+        srarun: "run as run_id, to_char(release_date, 'YYYY-MM') as release_date, bio_project as bioproject, bio_sample as biosample, scientific_name as host_label, library_strategy",
         sra_stat: 'run as run_id, name as stat_host_order, kmer_perc as percent_identity_stat',
         rfamily2: 'run_id, family_name, percent_identity as percent_identity_rfam',
         palm_sra2: 'run_id, sotu, percent_identity as percent_identity_sotu',
@@ -75,7 +69,15 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
     };
 
     const tableToColumn = {
-        srarun: ['run_id', 'release_date', 'bioproject', 'biosample', 'host_label', 'host_label_tax_id'],
+        srarun: [
+            'run_id',
+            'release_date',
+            'bioproject',
+            'biosample',
+            'host_label',
+            'host_label_tax_id',
+            'library_strategy',
+        ],
         sra_stat: ['run_id', 'stat_host_order', 'percent_identity_stat'],
         rfamily2: ['run_id', 'family_name', 'percent_identity_rfam'],
         palm_sra2: ['run_id', 'sotu', 'percent_identity_sotu', 'qc_pass_sotu'],
@@ -139,6 +141,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
             ) as ${table}`);
         }
     }
+
     let selectStatements = ['srarun.run_id as run_id, srarun.biosample as biosample, srarun.bioproject as bioproject'];
     if (groupBy !== undefined && !selectStatements[0].includes(groupBy)) {
         const groupByTable = tables.find((table) => tableToColumn[table].includes(groupBy));

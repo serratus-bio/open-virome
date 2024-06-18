@@ -1,73 +1,86 @@
-export const moduleConfig = {
-    family: {
-        title: 'Family',
-        tag: 'Family',
-        groupByKey: 'family_name',
+export const sectionConfig = {
+    'SRA Run': {
+        modules: ['host', 'seqType', 'bioproject', 'date'],
+        resultsTable: 'srarun',
+        resultsIdColumn: 'run',
+        defaultDisplay: 'table',
+    },
+    'Virus family': {
+        modules: ['family'],
         resultsTable: 'rfamily2',
         resultsIdColumn: 'run_id',
         defaultDisplay: 'table',
     },
-    palmdb: {
-        title: 'Palmdb',
-        tag: 'Palmdb',
-        groupByKey: 'sotu',
+    'Palmdb': {
+        modules: ['palmdb'],
         resultsTable: 'palm_sra2',
         resultsIdColumn: 'run_id',
         defaultDisplay: 'table',
     },
-    date: {
-        title: 'Collection date',
-        tag: 'Date',
-        groupByKey: 'release_date',
-        resultsTable: 'srarun',
-        resultsIdColumn: 'run',
-        defaultDisplay: 'table',
-    },
-    geography: {
-        title: 'Geography',
-        tag: 'Geography',
-        groupByKey: 'geo',
+    'Environment': {
+        modules: ['geography'],
         resultsTable: 'biosample_geo_coordinates',
         resultsIdColumn: 'biosample_id',
         defaultDisplay: 'table',
     },
-    tissue: {
-        title: 'Tissue',
-        tag: 'Tissue',
-        groupByKey: 'tissue',
+    'Host': {
+        modules: ['statHost'],
+        resultsTable: 'sra_stat',
+        resultsIdColumn: 'run',
+        defaultDisplay: 'table',
+    },
+    'Tissue': {
+        modules: ['tissue'],
         resultsTable: 'biosample_tissue',
         resultsIdColumn: 'biosample_id',
         defaultDisplay: 'table',
     },
+};
+
+export const moduleConfig = {
     host: {
         title: 'Organism label',
         tag: 'Organism',
         groupByKey: 'host_label',
-        resultsTable: 'srarun',
-        resultsIdColumn: 'run',
-        defaultDisplay: 'table',
-    },
-    statHost: {
-        title: 'STAT Host',
-        tag: 'STAT Host',
-        groupByKey: 'stat_host_order',
-        resultsTable: 'sra_stat',
-        resultsIdColumn: 'run',
-        defaultDisplay: 'table',
     },
     bioproject: {
         title: 'Bioproject',
         tag: 'Bioproject',
         groupByKey: 'bioproject',
-        resultsTable: 'srarun',
-        resultsIdColumn: 'run',
-        defaultDisplay: 'table',
     },
-};
-
-export const sectionToModules = {
-    'SRA Run': ['host', 'bioproject', 'date'],
-    'Virus': ['family', 'palmdb'],
-    'Environment': ['geography'],
-    'Host': ['statHost', 'tissue'],
+    seqType: {
+        title: 'Dataset type',
+        tag: 'Dataset type',
+        groupByKey: 'library_strategy',
+    },
+    date: {
+        title: 'Collection date',
+        tag: 'Date',
+        groupByKey: 'release_date',
+    },
+    family: {
+        title: 'Family',
+        tag: 'Family',
+        groupByKey: 'family_name',
+    },
+    palmdb: {
+        title: 'Palmdb',
+        tag: 'Palmdb',
+        groupByKey: 'sotu',
+    },
+    geography: {
+        title: 'Geography',
+        tag: 'Geography',
+        groupByKey: 'geo',
+    },
+    tissue: {
+        title: 'Tissue',
+        tag: 'Tissue',
+        groupByKey: 'tissue',
+    },
+    statHost: {
+        title: 'STAT Host',
+        tag: 'STAT Host',
+        groupByKey: 'stat_host_order',
+    },
 };

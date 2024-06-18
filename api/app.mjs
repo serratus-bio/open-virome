@@ -2,7 +2,6 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import * as db from './db/index.mjs';
-import 'dotenv/config';
 import { getIdClauses, getMinimalJoinSubQuery, handleIdKeyIrregularities } from './utils/queryBuilder.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware.js';
@@ -23,7 +22,6 @@ app.use(
 
 const runQuery = async (query) => {
     try {
-        console.log(query);
         const result = await db.query(query);
         return result.rows;
     } catch (e) {
@@ -100,7 +98,7 @@ app.post('/identifiers', async (req, res) => {
     const filters = body?.filters || [];
 
     if (filters.length === 0) {
-        return res.status(400).json({ error: 'filters is required!' });
+        return res.json(formatIdentifiersResponse([]));
     }
 
     const subquery = getMinimalJoinSubQuery(filters);

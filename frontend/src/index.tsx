@@ -4,5 +4,4 @@ import App from './app/App.tsx';
 
 const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
-// <React.StrictMode>
 root.render(<App />);

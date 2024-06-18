@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActiveModule, selectActiveModule } from '../../app/slice.ts';
-import { moduleConfig, sectionToModules } from '../Explore/constants.ts';
+import { moduleConfig, sectionConfig } from '../Explore/constants.ts';
 
 import Divider from '@mui/material/Divider';
 import MenuList from '@mui/material/MenuList';
@@ -38,13 +38,13 @@ const SidePanel = () => {
         >
             <Toolbar />
             <Divider />
-            {['SRA Run', 'Virus', 'Environment', 'Host'].map((item) => (
+            {Object.keys(sectionConfig).map((item) => (
                 <Box key={item}>
                     <Typography sx={{ mt: 2, ml: 2 }} variant='h6' component='div'>
                         {item}
                     </Typography>
                     <MenuList dense>
-                        {sectionToModules[item].map((module) => (
+                        {sectionConfig[item].modules.map((module) => (
                             <MenuItem
                                 key={module}
                                 selected={activeModule === module}
