@@ -17,6 +17,10 @@ const getNumericToIdMap = (ids) => {
 };
 
 const reduceConsecutiveToRange = (ids) => {
+    if (ids.length === 0) {
+        return [[], []];
+    }
+
     const numericToIdMap = getNumericToIdMap(ids);
     const sortedNumericSuffixes = Object.keys(numericToIdMap).sort((a, b) => a - b);
 
@@ -33,25 +37,29 @@ const reduceConsecutiveToRange = (ids) => {
             prevEnd = current;
         } else {
             if (prevStart === prevEnd) {
-                idRanges.push(numericToIdMap[prevStart]);
+                idSingles.push(numericToIdMap[prevStart]);
             } else {
-                idSingles.push([numericToIdMap[prevStart], numericToIdMap[prevEnd]]);
+                idRanges.push([numericToIdMap[prevStart], numericToIdMap[prevEnd]]);
             }
             prevStart = current;
             prevEnd = current;
         }
     }
-    if (prevStart === prevEnd && prevEnd - prevStart > 1) {
-        idRanges.push(numericToIdMap[prevStart]);
-    } else if (prevStart !== prevEnd) {
-        idSingles.push([numericToIdMap[prevStart], numericToIdMap[prevEnd]]);
+
+    if (prevStart == prevEnd) {
+        idSingles.push(numericToIdMap[prevStart]);
     } else {
-        idSingles.push([numericToIdMap[prevStart], numericToIdMap[prevEnd]]);
+        if (parseInt(prevEnd) - parseInt(prevStart) == 1) {
+            idSingles.push(numericToIdMap[prevStart], numericToIdMap[prevEnd]);
+        } else {
+            idRanges.push([numericToIdMap[prevStart], numericToIdMap[prevEnd]]);
+        }
     }
-    return [idSingles, idRanges];
+
+    return [idRanges, idSingles];
 };
 
-export const formatIdentifiersResponse = (result) => {
+export const formatIdentifiersResponse = (result = []) => {
     let runIds = result.map((row) => row.run_id).filter((biosample) => biosample !== null);
     runIds = [...new Set(runIds)];
     const [runIdRanges, runIdSingles] = reduceConsecutiveToRange(runIds);
@@ -68,17 +76,17 @@ export const formatIdentifiersResponse = (result) => {
         run: {
             single: runIdSingles,
             range: runIdRanges,
-            totalCount: runIds.length,
+            totalCount: result.length > 0 ? runIds.length : -1,
         },
         bioproject: {
             single: bioprojectSingles,
             range: bioprojectRanges,
-            totalCount: biprojects.length,
+            totalCount: result.length > 0 ? biprojects.length : -1,
         },
         biosample: {
             single: biosampleSingles,
             range: biosampleRanges,
-            totalCount: biosamples.length,
+            totalCount: result.length > 0 ? biosamples.length : -1,
         },
     };
 };

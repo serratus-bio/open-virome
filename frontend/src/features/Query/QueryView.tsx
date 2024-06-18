@@ -15,6 +15,7 @@ import Skeleton from '@mui/material/Skeleton';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import PlotIcon from '@mui/icons-material/InsertChart';
+import TuneIcon from '@mui/icons-material/Tune';
 
 const QueryView = () => {
     const dispatch = useDispatch();
@@ -35,9 +36,9 @@ const QueryView = () => {
     });
 
     const {
-        data: runData,
-        error: runError,
-        isFetching: runIsFetching,
+        data: identifiersData,
+        error: identifiersError,
+        isFetching: identifiersIsFetching,
     } = useGetIdentifiersQuery({
         filters: getFilterQuery({ filters }),
     });
@@ -78,6 +79,14 @@ const QueryView = () => {
                 <Typography component={'div'} variant='h4' sx={{ mt: 2, mb: 2, mr: 8 }}>
                     {moduleConfig[activeModule].title}
                 </Typography>
+                <Box>
+                    <IconButton sx={{ mt: -1 }} onClick={() => onPlotIconClick()}>
+                        <PlotIcon fontSize='medium' />
+                    </IconButton>
+                    <IconButton sx={{ mt: -1 }} onClick={() => {}}>
+                        <TuneIcon fontSize='medium' color={'primary'} />
+                    </IconButton>
+                </Box>
             </Box>
             <Divider sx={{ mb: 3 }} />
             <Box sx={{ width: 800 }}>
@@ -94,11 +103,6 @@ const QueryView = () => {
                     <Box sx={{ width: '50%', mr: 8 }}>
                         <SearchBar query={searchString} setQuery={setSearchString} />
                     </Box>
-                    <Box>
-                        <IconButton sx={{ mt: -1 }} onClick={() => onPlotIconClick()}>
-                            <PlotIcon fontSize='medium' />
-                        </IconButton>
-                    </Box>
                 </Box>
                 <Box>
                     {countIsFetching || !countData ? (
@@ -108,13 +112,15 @@ const QueryView = () => {
                     )}
                 </Box>
                 <Box sx={{ mt: 4 }}>
-                    {runIsFetching || countIsFetching ? (
+                    {identifiersIsFetching || countIsFetching ? (
                         <Skeleton variant='rounded' height={20} />
                     ) : (
                         <Typography component={'div'} variant='h6' sx={{ mt: 2, textAlign: 'left' }}>
                             {`${moduleConfig[activeModule].tag}: ${countData ? formatNumber(countData.length) : ''}${
-                                runData
-                                    ? `, Bioprojects: ${runData?.bioproject ? formatNumber(runData.bioproject.totalCount) : ''}, Sequences: ${runData?.run ? formatNumber(runData.run.totalCount) : ''}`
+                                identifiersData &&
+                                identifiersData?.run?.totalCount >= 0 &&
+                                identifiersData?.bioproject?.totalCount >= 0
+                                    ? `, Bioprojects: ${identifiersData?.bioproject ? formatNumber(identifiersData.bioproject.totalCount) : ''}, Sequences: ${identifiersData?.run ? formatNumber(identifiersData.run.totalCount) : ''}`
                                     : ''
                             }`}
                         </Typography>
