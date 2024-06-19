@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectAllFilters } from '../Query/slice.ts';
 import { sectionConfig } from './constants.ts';
@@ -18,9 +18,17 @@ import Skeleton from '@mui/material/Skeleton';
 const Section = ({ sectionKey }) => {
     const filters = useSelector(selectAllFilters);
 
-    const [moduleDisplay, setModuleDisplay] = useState('table');
+    const [moduleDisplay, setModuleDisplay] = useState(sectionConfig[sectionKey].defaultDisplay);
     const isTableView = () => moduleDisplay === 'table';
     const isFigureView = () => moduleDisplay === 'figure';
+
+
+    const shouldDisableTableView = () => {
+        return identifiersData && identifiersData['run'].totalCount > 10000;
+    }
+    const shouldDisableFigureView = () => {
+        return filters.length === 0 || identifiersData && identifiersData['run'].totalCount > 10000;
+    };
 
     const {
         data: identifiersData,
@@ -50,9 +58,15 @@ const Section = ({ sectionKey }) => {
             pageEnd: 10,
         },
         {
-            skip: identifiersFetching || !isTableView(),
+            skip: identifiersFetching || !isTableView() || shouldDisableTableView(),
         },
     );
+
+    useEffect(() => {
+        if (shouldDisableFigureView()) {
+            setModuleDisplay('table');
+        }
+    }, [identifiersData]);
 
     const onViewChange = (view) => {
         setModuleDisplay(view);
@@ -75,6 +89,16 @@ const Section = ({ sectionKey }) => {
     };
 
     const renderPlaceholder = () => {
+
+        if (isTableView() && shouldDisableTableView()) {
+            return (
+                <Box sx={{ flex: 1 }}>
+                    <Typography variant='body1' sx={{ ...sectionStyle }}>
+                        Too many results to display, please add more filters.
+                    </Typography>
+                </Box>
+            );
+        }
         if (resultError) {
             return (
                 <Box sx={{ flex: 1 }}>
@@ -100,10 +124,6 @@ const Section = ({ sectionKey }) => {
         );
     };
 
-    const shouldDisableFigureView = () => {
-        return filters.length === 0;
-    };
-
     return (
         <Box sx={{ maxWidth: '70vw' }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -117,14 +137,14 @@ const Section = ({ sectionKey }) => {
                         onClick={() => onViewChange('figure')}
                         disabled={shouldDisableFigureView()}
                     >
-                        <PlotIcon fontSize='small' />
+                        <PlotIcon fontSize='medium' />
                     </IconButton>
                     <IconButton
                         sx={{ mt: -0.5, height: 30, width: 30 }}
                         color={isTableView() ? 'primary' : 'default'}
                         onClick={() => onViewChange('table')}
                     >
-                        <TableIcon fontSize='small' />
+                        <TableIcon fontSize='medium' />
                     </IconButton>
                 </Box>
             </Box>
