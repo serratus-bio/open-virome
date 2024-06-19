@@ -8,6 +8,9 @@ import Box from '@mui/material/Box';
 
 const ExploreView = () => {
     const activeModule = useSelector(selectActiveModule);
+    const activeSection = Object.keys(sectionConfig).find((section) =>
+        sectionConfig[section].modules.includes(activeModule),
+    );
 
     const sectionRefs = {
         'SRA Run': useRef(),
@@ -42,11 +45,9 @@ const ExploreView = () => {
 
     return (
         <>
-            {Object.keys(sectionConfig).map((sectionKey) => (
-                <Box key={sectionKey} ref={sectionRefs[sectionKey]}>
-                    <Section sectionKey={sectionKey} />
-                </Box>
-            ))}
+            <Box key={activeSection} ref={sectionRefs[activeSection]}>
+                <Section sectionKey={activeSection} />
+            </Box>
         </>
     );
 };

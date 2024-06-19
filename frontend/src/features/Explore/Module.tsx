@@ -12,7 +12,7 @@ import TuneIcon from '@mui/icons-material/Tune';
 import Skeleton from '@mui/material/Skeleton';
 import BarPlot from '../../common/BarPlot.tsx';
 
-const Module = ({ identifiers, moduleKey }) => {
+const Module = ({ identifiers, moduleKey, isFigureView }) => {
     const dispatch = useDispatch();
 
     const {
@@ -27,7 +27,11 @@ const Module = ({ identifiers, moduleKey }) => {
         sortByColumn: 'count',
         sortByDirection: 'desc',
         pageStart: 0,
-    });
+    },
+    {
+        skip: identifiers['run'].single.length > 10000,
+    }
+);
 
     const {
         data: controlCountData,
@@ -109,7 +113,7 @@ const Module = ({ identifiers, moduleKey }) => {
                 flex: 1,
             }}
         >
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
                 <Typography component={'div'} variant='h6' sx={{ ...sectionStyle, mr: 2 }}>
                     {moduleConfig[moduleKey].title}
                 </Typography>
