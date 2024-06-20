@@ -6,7 +6,13 @@ const API_URL =
         : 'https://zrdbegawce.execute-api.us-east-1.amazonaws.com/prod/';
 
 export const apiSlice = createApi({
-    baseQuery: fetchBaseQuery({ baseUrl: API_URL }),
+    baseQuery: fetchBaseQuery({
+        baseUrl: API_URL,
+        prepareHeaders: (headers) => {
+            headers.set('Accept-Encoding', 'gzip,deflate');
+            return headers;
+        },
+    }),
     tagTypes: ['Counts', 'Identifiers', 'Results'],
     endpoints: (build) => ({
         getCounts: build.query({
