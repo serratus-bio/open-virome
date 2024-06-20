@@ -22,12 +22,11 @@ const Section = ({ sectionKey }) => {
     const isTableView = () => moduleDisplay === 'table';
     const isFigureView = () => moduleDisplay === 'figure';
 
-
     const shouldDisableTableView = () => {
         return identifiersData && identifiersData['run'].totalCount > 10000;
-    }
+    };
     const shouldDisableFigureView = () => {
-        return filters.length === 0 || identifiersData && identifiersData['run'].totalCount > 10000;
+        return filters.length === 0 || (identifiersData && identifiersData['run'].totalCount > 10000);
     };
 
     const {
@@ -89,7 +88,6 @@ const Section = ({ sectionKey }) => {
     };
 
     const renderPlaceholder = () => {
-
         if (isTableView() && shouldDisableTableView()) {
             return (
                 <Box sx={{ flex: 1 }}>

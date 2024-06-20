@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import compression from 'compression';
 import * as db from './db/index.mjs';
 import { getIdClauses, getMinimalJoinSubQuery, handleIdKeyIrregularities } from './utils/queryBuilder.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
@@ -19,6 +20,7 @@ app.use(
         extended: true,
     }),
 );
+app.use(compression());
 
 const runQuery = async (query) => {
     try {

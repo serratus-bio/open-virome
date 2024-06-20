@@ -19,19 +19,20 @@ const Module = ({ identifiers, moduleKey, isFigureView }) => {
         data: countData,
         error: countError,
         isFetching: countIsFetching,
-    } = useGetCountsQuery({
-        idColumn: 'run',
-        ids: identifiers ? identifiers['run'].single : [],
-        idRanges: identifiers ? identifiers['run'].range : [],
-        groupBy: moduleConfig[moduleKey].groupByKey,
-        sortByColumn: 'count',
-        sortByDirection: 'desc',
-        pageStart: 0,
-    },
-    {
-        skip: identifiers['run'].single.length > 10000,
-    }
-);
+    } = useGetCountsQuery(
+        {
+            idColumn: 'run',
+            ids: identifiers ? identifiers['run'].single : [],
+            idRanges: identifiers ? identifiers['run'].range : [],
+            groupBy: moduleConfig[moduleKey].groupByKey,
+            sortByColumn: 'count',
+            sortByDirection: 'desc',
+            pageStart: 0,
+        },
+        {
+            skip: identifiers['run'].single.length > 10000,
+        },
+    );
 
     const {
         data: controlCountData,
