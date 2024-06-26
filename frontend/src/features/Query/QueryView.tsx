@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectActiveModule, setActiveView } from '../../app/slice.ts';
-import { moduleConfig } from '../Explore/constants.ts';
+import { moduleConfig } from '../Explore/Module/constants.ts';
 import { useGetCountsQuery, useGetIdentifiersQuery } from '../../api/client.ts';
 import { addFilter, selectAllFilters } from './slice.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
@@ -14,8 +14,10 @@ import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
-import PlotIcon from '@mui/icons-material/InsertChart';
 import TuneIcon from '@mui/icons-material/Tune';
+import PlotIcon from '@mui/icons-material/Pageview';
+// import PlotIcon from '@mui/icons-material/InsertChart';
+// import PlotIcon from '@mui/icons-material/QueryStats';
 
 const QueryView = () => {
     const dispatch = useDispatch();
@@ -80,11 +82,11 @@ const QueryView = () => {
                     {moduleConfig[activeModule].title}
                 </Typography>
                 <Box>
-                    <IconButton sx={{ mt: -1 }} onClick={() => onPlotIconClick()}>
-                        <PlotIcon fontSize='medium' />
-                    </IconButton>
                     <IconButton sx={{ mt: -1 }} onClick={() => {}}>
                         <TuneIcon fontSize='medium' color={'primary'} />
+                    </IconButton>
+                    <IconButton sx={{ mt: -1 }} onClick={() => onPlotIconClick()}>
+                        <PlotIcon fontSize='medium' />
                     </IconButton>
                 </Box>
             </Box>

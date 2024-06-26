@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { selectAllFilters } from '../Query/slice.ts';
+import { selectAllFilters } from '../../Query/slice.ts';
 import { sectionConfig } from './constants.ts';
-import { getFilterQuery, handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
-import { useGetResultQuery, useGetIdentifiersQuery } from '../../api/client.ts';
+import { getFilterQuery, handleIdKeyIrregularities } from '../../../common/utils/queryHelpers.ts';
+import { useGetResultQuery, useGetIdentifiersQuery } from '../../../api/client.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import Module from './Module.tsx';
-import PagedTable from '../../common/PagedTable.tsx';
+import SRARunLayout from './SRARunLayout.tsx';
+import PagedTable from '../../../common/PagedTable.tsx';
 import IconButton from '@mui/material/IconButton';
-import TableIcon from '@mui/icons-material/Toc';
+import TableIcon from '@mui/icons-material/TableRows';
 import PlotIcon from '@mui/icons-material/InsertChart';
 import Skeleton from '@mui/material/Skeleton';
 
-const Section = ({ sectionKey }) => {
+const Module = ({ sectionKey }) => {
     const filters = useSelector(selectAllFilters);
 
     const [moduleDisplay, setModuleDisplay] = useState(sectionConfig[sectionKey].defaultDisplay);
@@ -122,6 +122,12 @@ const Section = ({ sectionKey }) => {
         );
     };
 
+    const getModuleFigureLayout = (sectionKey) => {
+        if (sectionKey === 'SRA Run') {
+            return <SRARunLayout identifiers={identifiersData} />;
+        }
+    };
+
     return (
         <Box sx={{ maxWidth: '70vw' }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -164,15 +170,11 @@ const Section = ({ sectionKey }) => {
                         <PagedTable rows={resultData} headers={getTableHeaders(resultData)} />
                     )
                 ) : (
-                    sectionConfig[sectionKey].modules.map((moduleKey) => (
-                        <Box sx={{ mr: 4 }} key={moduleKey}>
-                            <Module identifiers={identifiersData} moduleKey={moduleKey} />
-                        </Box>
-                    ))
+                    getModuleFigureLayout(sectionKey)
                 )}
             </Box>
         </Box>
     );
 };
 
-export default Section;
+export default Module;

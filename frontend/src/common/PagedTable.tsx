@@ -179,7 +179,7 @@ const PagedTable = ({ rows = [], headers = [] }) => {
                                         onClick={(event) => onClick(event, row.id)}
                                         aria-checked={isItemSelected}
                                         tabIndex={-1}
-                                        key={row.id}
+                                        key={`${row.id}_${index}`}
                                         selected={isItemSelected}
                                         sx={{ cursor: 'pointer' }}
                                     >

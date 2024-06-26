@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectActiveModule } from '../../app/slice.ts';
-import { sectionConfig } from './constants.ts';
+import { sectionConfig } from './Module/constants.ts';
 
-import Section from './Section.tsx';
+import Section from './Module/Module.tsx';
 import Box from '@mui/material/Box';
 
 const ExploreView = () => {

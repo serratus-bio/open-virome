@@ -1,11 +1,22 @@
 import { truncate } from './textFormatting.ts';
 
-export const transformRowsToPlotData = (targetRows = [], controlRows = []) => {
+export const transformRowsToPlotData = (targetRows = [], controlRows = [], countKey = 'count') => {
+    const parseNumber = (value) => {
+        if (countKey === 'count') {
+            return parseInt(value);
+        } else if (countKey === 'percent') {
+            return parseInt(value);
+        } else if (countKey === 'gbp') {
+            return parseFloat(value).toFixed(1);
+        }
+        return value;
+    };
+
     const mergedRows = targetRows
-        .map((row) => ({ name: row['name'], target: parseInt(row['count']), control: 0 }))
-        .concat(controlRows.map((row) => ({ name: row['name'], target: 0, control: parseInt(row['count']) })))
+        .map((row) => ({ name: row['name'], target: parseNumber(row[countKey]), control: 0.0 }))
+        .concat(controlRows.map((row) => ({ name: row['name'], target: 0.0, control: parseNumber(row[countKey]) })))
         .reduce((acc, row) => {
-            const existingRow = acc.find((r) => r.name === row.name);
+            const existingRow = acc.find((existing) => existing.name === row.name);
             if (existingRow) {
                 existingRow.target += row.target;
                 existingRow.control += row.control;
@@ -17,8 +28,8 @@ export const transformRowsToPlotData = (targetRows = [], controlRows = []) => {
         .map((row) => {
             return {
                 name: row.name ? row.name : 'N/A',
-                target: row.target,
-                control: Math.abs(row.control - row.target),
+                target: parseNumber(row.target),
+                control: parseNumber(Math.abs(row.control - row.target)),
             };
         });
 
@@ -33,33 +44,32 @@ export const transformRowsToPlotData = (targetRows = [], controlRows = []) => {
         return Math.floor(endPercentage);
     };
 
-    const dataZoom =
-        targetRows.length > 10
-            ? [
-                  {
-                      // scroll zoom
-                      type: 'inside',
-                      id: 'insideY',
-                      yAxisIndex: 0,
-                      start: 100,
-                      end: getPercentageFromRows(10, targetRows.length),
-                      zoomOnMouseWheel: false,
-                      moveOnMouseMove: true,
-                      moveOnMouseWheel: true,
-                  },
-              ]
-            : [];
+    const dataZoom = [
+        {
+            // scroll zoom
+            type: 'inside',
+            id: 'insideY',
+            yAxisIndex: 0,
+            start: 100,
+            end: getPercentageFromRows(10, mergedRows.length),
+            zoomOnMouseWheel: false,
+            moveOnMouseMove: true,
+            moveOnMouseWheel: true,
+        },
+    ];
 
+    const maxCount = Math.max(...mergedRows.map((row) => Math.max(row.target, row.control)));
     return {
         xAxis: {
             type: 'value',
-            max: 'dataMax',
+            max: maxCount,
+            // max: 'dataMax',
         },
         yAxis: {
             type: 'category',
             axisLabel: {
                 formatter: (value) => {
-                    return truncate(value, 30);
+                    return truncate(value, 20);
                 },
             },
         },
@@ -69,7 +79,8 @@ export const transformRowsToPlotData = (targetRows = [], controlRows = []) => {
         },
         series: [
             {
-                name: 'Target',
+                id: 'Target',
+                name: `Target`,
                 type: 'bar',
                 stack: 'total',
                 label: {
@@ -82,7 +93,8 @@ export const transformRowsToPlotData = (targetRows = [], controlRows = []) => {
                 color: 'cornflowerblue',
             },
             {
-                name: 'Background',
+                id: 'Control',
+                name: `Control`,
                 type: 'bar',
                 stack: 'total',
                 label: {

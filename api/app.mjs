@@ -64,7 +64,7 @@ app.post('/counts', async (req, res) => {
         let remappedGroupBy = handleIdKeyIrregularities(groupBy, 'srarun');
         clauses = `${clauses.length > 0 ? `WHERE ${clauses.join(' OR ')}` : ''}`;
         query = `
-            SELECT ${remappedGroupBy} as name, COUNT(*) as count
+            SELECT ${remappedGroupBy} as name, COUNT(*) as count, (COUNT(*)/(SUM(COUNT(*))OVER())) * 100 as percent, SUM(spots)/POWER(10,9) as gbp
             FROM srarun
             ${clauses}
             GROUP BY ${remappedGroupBy}
