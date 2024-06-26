@@ -12,6 +12,19 @@ export const apiSlice = createApi({
             headers.set('Accept-Encoding', 'gzip,deflate');
             return headers;
         },
+        responseHandler: (response) =>
+            response.text().then((text) => {
+                try {
+                    return JSON.parse(text);
+                } catch (e) {
+                    console.error('Error parsing JSON response', e);
+                }
+                try {
+                    return JSON.parse(atob(text));
+                } catch (e) {
+                    console.error('Error parsing base64 response', e);
+                }
+            }),
     }),
     tagTypes: ['Counts', 'Identifiers', 'Results'],
     endpoints: (build) => ({
