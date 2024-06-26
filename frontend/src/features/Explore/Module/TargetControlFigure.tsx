@@ -32,7 +32,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             sortByDirection: 'desc',
         },
         {
-            skip: identifiers['run'].single.length > 10000,
+            skip: identifiers && identifiers?.run?.single?.length > 10000,
         },
     );
 
@@ -50,7 +50,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             sortByDirection: 'desc',
         },
         {
-            skip: identifiers['run'].single.length > 10000,
+            skip: identifiers && identifiers?.run?.single?.length > 10000,
         },
     );
 
