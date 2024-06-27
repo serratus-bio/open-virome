@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setActiveModule, setActiveView } from '../../../app/slice.ts';
 import { moduleConfig } from './constants.ts';
-import { transformRowsToPlotData } from '../../../common/utils/plotHelpers.ts';
+import { shouldDisableFigureView, getControlTargetPlotData } from '../../../common/utils/plotHelpers.ts';
 import { useGetCountsQuery } from '../../../api/client.ts';
 
 import Box from '@mui/material/Box';
@@ -19,9 +19,9 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
     const [activeCountKey, setActiveCountKey] = useState('count');
 
     const {
-        data: countData,
-        error: countError,
-        isFetching: countIsFetching,
+        data: targetCountData,
+        error: targetCountError,
+        isFetching: targetCountIsFetching,
     } = useGetCountsQuery(
         {
             idColumn: 'run',
@@ -32,7 +32,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             sortByDirection: 'desc',
         },
         {
-            skip: identifiers['run'].single.length > 10000,
+            skip: shouldDisableFigureView(identifiers),
         },
     );
 
@@ -50,7 +50,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             sortByDirection: 'desc',
         },
         {
-            skip: identifiers['run'].single.length > 10000,
+            skip: shouldDisableFigureView(identifiers),
         },
     );
 
@@ -71,7 +71,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
     };
 
     const renderFigure = (seriesName) => {
-        const plotData = transformRowsToPlotData(countData, controlCountData, activeCountKey);
+        const plotData = getControlTargetPlotData(targetCountData, controlCountData, activeCountKey);
         // const totalCount = plotData.dataset.source.reduce((acc, row) => acc + row[seriesName.toLowerCase()], 0);
         const filteredPlotData = {
             ...plotData,
@@ -117,7 +117,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
     };
 
     const renderPlaceholder = () => {
-        if (countError || controlCountError) {
+        if (targetCountError || controlCountError) {
             return (
                 <Box sx={{ flex: 1 }}>
                     <Typography variant='body1' sx={{ ...sectionStyle }}>
@@ -127,9 +127,9 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             );
         }
         if (
-            countData &&
-            countData.length === 0 &&
-            !countIsFetching &&
+            targetCountData &&
+            targetCountData.length === 0 &&
+            !targetCountIsFetching &&
             controlCountData &&
             controlCountData.length === 0 &&
             !controlCountIsFetching
@@ -180,7 +180,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
                 ) : (
                     <Box sx={{ flex: 1, width: 400 }}>{renderFigure('Control')}</Box>
                 )}
-                {shouldRenderPlaceholder(countError, countIsFetching, countData) ? (
+                {shouldRenderPlaceholder(targetCountError, targetCountIsFetching, targetCountData) ? (
                     renderPlaceholder()
                 ) : (
                     <Box sx={{ flex: 1, width: 400 }}>{renderFigure('Target')}</Box>

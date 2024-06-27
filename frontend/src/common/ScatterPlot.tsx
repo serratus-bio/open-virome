@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 
-const BarPlot = ({ plotData = {}, styles = {} }) => {
+const ScatterPlot = ({ plotData = {}, styles = {} }) => {
     const defaultConfig = {
         backgroundColor: 'transparent',
         textStyle: {
@@ -15,12 +15,6 @@ const BarPlot = ({ plotData = {}, styles = {} }) => {
                 color: 'white',
             },
         },
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'shadow',
-            },
-        },
         grid: {
             left: '3%',
             right: '4%',
@@ -32,7 +26,7 @@ const BarPlot = ({ plotData = {}, styles = {} }) => {
             type: 'value',
         },
         yAxis: {
-            type: 'category',
+            type: 'value',
         },
         series: [],
     };
@@ -45,4 +39,4 @@ const BarPlot = ({ plotData = {}, styles = {} }) => {
     return <ReactEcharts option={options} style={styles} />;
 };
 
-export default BarPlot;
+export default ScatterPlot;

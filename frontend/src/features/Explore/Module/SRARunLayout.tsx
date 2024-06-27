@@ -2,6 +2,7 @@ import React from 'react';
 
 import Box from '@mui/material/Box';
 import TargetControlFigure from './TargetControlFigure.tsx';
+import BioprojectFigure from './BioprojectFigure.tsx';
 
 const SRARunLayout = ({ identifiers }) => {
     return (
@@ -11,6 +12,9 @@ const SRARunLayout = ({ identifiers }) => {
             </Box>
             <Box sx={{ mr: 4, flex: 1 }}>
                 <TargetControlFigure identifiers={identifiers} moduleKey={'seqType'} figureType={'polar'} />
+            </Box>
+            <Box sx={{ mr: 4, flex: 1, width: '100%' }}>
+                <BioprojectFigure identifiers={identifiers} />
             </Box>
         </Box>
     );
