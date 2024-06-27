@@ -106,11 +106,10 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     );
 }
 
-const PagedTable = ({ rows = [], headers = [] }) => {
+const PagedTable = ({ page=0, rows = [], headers = [], total, onPageChange }) => {
     const [order, setOrder] = React.useState<Order>('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);
-    const [page, setPage] = React.useState(0);
     const [dense, setDense] = React.useState(true);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -134,15 +133,6 @@ const PagedTable = ({ rows = [], headers = [] }) => {
             newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
         }
         setSelected(newSelected);
-    };
-
-    const onChangePage = (event: unknown, newPage: number) => {
-        setPage(newPage);
-    };
-
-    const onChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0);
     };
 
     const isSelected = (id: number) => selected.indexOf(id) !== -1;
@@ -208,13 +198,12 @@ const PagedTable = ({ rows = [], headers = [] }) => {
                     </Table>
                 </TableContainer>
                 <TablePagination
-                    rowsPerPageOptions={[5, 10, 25]}
+                    rowsPerPageOptions={[10]}
                     component='div'
-                    count={rows.length}
+                    count={total}
                     rowsPerPage={rowsPerPage}
                     page={page}
-                    onPageChange={onChangePage}
-                    onRowsPerPageChange={onChangeRowsPerPage}
+                    onPageChange={onPageChange}
                 />
             </Paper>
         </Box>

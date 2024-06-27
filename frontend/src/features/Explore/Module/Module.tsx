@@ -2,18 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectAllFilters } from '../../Query/slice.ts';
 import { sectionConfig } from './constants.ts';
-import { getFilterQuery, handleIdKeyIrregularities } from '../../../common/utils/queryHelpers.ts';
-import { useGetResultQuery, useGetIdentifiersQuery } from '../../../api/client.ts';
+import { getFilterQuery } from '../../../common/utils/queryHelpers.ts';
+import { useGetIdentifiersQuery } from '../../../api/client.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import SRARunLayout from './SRARunLayout.tsx';
-import PagedTable from '../../../common/PagedTable.tsx';
 import IconButton from '@mui/material/IconButton';
 import TableIcon from '@mui/icons-material/TableRows';
 import PlotIcon from '@mui/icons-material/InsertChart';
-import Skeleton from '@mui/material/Skeleton';
+import ResultsTable from './ResultsTable.tsx';
 
 const Module = ({ sectionKey }) => {
     const filters = useSelector(selectAllFilters);
@@ -22,9 +21,6 @@ const Module = ({ sectionKey }) => {
     const isTableView = () => moduleDisplay === 'table';
     const isFigureView = () => moduleDisplay === 'figure';
 
-    const shouldDisableTableView = () => {
-        return identifiersData && identifiersData['run'].totalCount > 10000;
-    };
     const shouldDisableFigureView = () => {
         return filters.length === 0 || (identifiersData && identifiersData['run'].totalCount > 10000);
     };
@@ -37,30 +33,6 @@ const Module = ({ sectionKey }) => {
         filters: getFilterQuery({ filters }),
     });
 
-    const {
-        data: resultData,
-        error: resultError,
-        isFetching: resultIsFetching,
-    } = useGetResultQuery(
-        {
-            idColumn: sectionConfig[sectionKey].resultsIdColumn,
-            ids: identifiersData
-                ? identifiersData[handleIdKeyIrregularities(sectionConfig[sectionKey].resultsIdColumn)].single
-                : [],
-            idRanges: identifiersData
-                ? identifiersData[handleIdKeyIrregularities(sectionConfig[sectionKey].resultsIdColumn)].range
-                : [],
-            table: sectionConfig[sectionKey].resultsTable,
-            sortByColumn: sectionConfig[sectionKey].resultsIdColumn,
-            sortByDirection: 'asc',
-            pageStart: 0,
-            pageEnd: 10,
-        },
-        {
-            skip: identifiersFetching || !isTableView() || shouldDisableTableView(),
-        },
-    );
-
     useEffect(() => {
         if (shouldDisableFigureView()) {
             setModuleDisplay('table');
@@ -71,56 +43,6 @@ const Module = ({ sectionKey }) => {
         setModuleDisplay(view);
     };
 
-    const getTableHeaders = (data) => {
-        if (data && data.length) {
-            return Object.keys(data[0]);
-        }
-        return [];
-    };
-
-    const shouldRenderPlaceholder = () => {
-        return resultError || resultIsFetching || !resultData || resultData.length === 0;
-    };
-
-    const sectionStyle = {
-        mt: 2,
-        mb: 2,
-    };
-
-    const renderPlaceholder = () => {
-        if (isTableView() && shouldDisableTableView()) {
-            return (
-                <Box sx={{ flex: 1 }}>
-                    <Typography variant='body1' sx={{ ...sectionStyle }}>
-                        Too many results to display, please add more filters.
-                    </Typography>
-                </Box>
-            );
-        }
-        if (resultError) {
-            return (
-                <Box sx={{ flex: 1 }}>
-                    <Typography variant='body1' sx={{ ...sectionStyle }}>
-                        Error loading data
-                    </Typography>
-                </Box>
-            );
-        }
-        if (resultData && resultData.length === 0 && !resultIsFetching) {
-            return (
-                <Box sx={{ flex: 1, height: 100 }}>
-                    <Typography variant='body1' sx={{ ...sectionStyle }}>
-                        {`No ${sectionConfig[sectionKey].title.toLowerCase()} data available`}
-                    </Typography>
-                </Box>
-            );
-        }
-        return (
-            <Box sx={{ flex: 1 }}>
-                <Skeleton width='90%' height={300} />
-            </Box>
-        );
-    };
 
     const getModuleFigureLayout = (sectionKey) => {
         if (sectionKey === 'SRA Run') {
@@ -164,11 +86,12 @@ const Module = ({ sectionKey }) => {
                 }}
             >
                 {isTableView() ? (
-                    shouldRenderPlaceholder() ? (
-                        renderPlaceholder()
-                    ) : (
-                        <PagedTable rows={resultData} headers={getTableHeaders(resultData)} />
-                    )
+                        <ResultsTable
+                            identifiersData={identifiersData}
+                            sectionKey={sectionKey}
+                            shouldSkipFetching={identifiersFetching || !isTableView()}
+                        />
+
                 ) : (
                     getModuleFigureLayout(sectionKey)
                 )}
