@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 
-const PolarBarPlot = ({ plotData = {}, styles = {} }) => {
+const HistogramPlot = ({ plotData = {}, styles = {} }) => {
     const defaultConfig = {
         backgroundColor: 'transparent',
         textStyle: {
@@ -10,48 +10,37 @@ const PolarBarPlot = ({ plotData = {}, styles = {} }) => {
         subtextStyle: {
             color: 'white',
         },
-        grid: {
-            left: '-1%',
-            borderColor: 'transparent',
-        },
         legend: {
             textStyle: {
                 color: 'white',
             },
         },
         tooltip: {
-            trigger: 'axis',
+            trigger: 'item',
             axisPointer: {
                 type: 'shadow',
             },
         },
-
-        animation: true,
-        angleAxis: {
-            type: 'category',
+        xAxis: {
+            type: 'value',
         },
-        polar: {
-            radius: [10, '80%'],
+        yAxis: {
+            type: 'value',
         },
-        radiusAxis: {},
+        series: [],
     };
 
     const options = {
         ...defaultConfig,
         ...plotData,
-        series: [
-            {
-                coordinateSystem: 'polar',
-                ...plotData.series[0],
-            },
-            {
-                coordinateSystem: 'polar',
-                ...plotData.series[1],
-            },
-        ],
     };
+
+    options.series.forEach((obj) => {
+        obj.barWidth = '101%';
+        obj.barMaxWidth = 10;
+    });
 
     return <ReactEcharts option={options} style={styles} />;
 };
 
-export default PolarBarPlot;
+export default HistogramPlot;
