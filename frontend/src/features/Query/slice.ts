@@ -1,5 +1,5 @@
 import { RootState } from '../../app/store';
-import { createSlice, createEntityAdapter } from '@reduxjs/toolkit';
+import { createSlice, createEntityAdapter, createSelector } from '@reduxjs/toolkit';
 
 /* Reducers */
 
@@ -41,3 +41,8 @@ export const {
     selectEntities: selectFilterEntities,
     selectTotal: selectTotalFilters,
 } = filtersAdapter.getSelectors((state: RootState) => state.filters);
+
+export const selectFiltersByType = createSelector(
+    [selectAllFilters, (_: RootState, type: string) => type],
+    (filters, type) => filters.filter((filter) => filter.filterType === type),
+);
