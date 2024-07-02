@@ -65,7 +65,7 @@ const QueryView = () => {
         if (!searchString) {
             return countData;
         }
-        return countData.filter((row) => row.name.toLowerCase().includes(searchString.toLowerCase()));
+        return countData.filter((row) => row?.name && row.name.toLowerCase().includes(searchString.toLowerCase()));
     };
 
     return (

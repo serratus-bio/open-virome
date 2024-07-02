@@ -37,7 +37,7 @@ const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
 
     const onPageChange = (event: unknown, newPage: number) => {
         setPage(newPage);
-    }
+    };
 
     const getTableHeaders = (data) => {
         if (data && data.length) {
@@ -56,7 +56,6 @@ const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
     };
 
     const renderPlaceholder = () => {
-
         if (resultError) {
             return (
                 <Box sx={{ flex: 1 }}>
@@ -70,7 +69,7 @@ const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
             return (
                 <Box sx={{ flex: 1, height: 100 }}>
                     <Typography variant='body1' sx={{ ...sectionStyle }}>
-                        {`No ${sectionConfig[sectionKey].title.toLowerCase()} data available`}
+                        {`No data available`}
                     </Typography>
                 </Box>
             );
@@ -84,15 +83,19 @@ const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
 
     return (
         <>
-        {
-            shouldRenderPlaceholder() ? (
+            {shouldRenderPlaceholder() ? (
                 renderPlaceholder()
             ) : (
-                <PagedTable page={page} onPageChange={onPageChange} total={identifiersData?.run?.totalCount} rows={resultData} headers={getTableHeaders(resultData)} />
-            )
-        }
+                <PagedTable
+                    page={page}
+                    onPageChange={onPageChange}
+                    total={identifiersData?.run?.totalCount}
+                    rows={resultData}
+                    headers={getTableHeaders(resultData)}
+                />
+            )}
         </>
     );
-}
+};
 
 export default ResultsTable;
