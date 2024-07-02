@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectActiveModule, setActiveView } from '../../app/slice.ts';
 import { moduleConfig } from '../Explore/Module/constants.ts';
 import { useGetCountsQuery, useGetIdentifiersQuery } from '../../api/client.ts';
-import { addFilter, selectAllFilters } from './slice.ts';
+import { addFilter, removeFilter, selectAllFilters, selectFiltersByType } from './slice.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
 import { formatNumber } from '../../common/utils/textFormatting.ts';
 
@@ -24,6 +24,7 @@ const QueryView = () => {
     const [searchString, setSearchString] = useState('');
     const activeModule = useSelector(selectActiveModule);
     const filters = useSelector(selectAllFilters);
+    const moduleFilters = useSelector((state) => selectFiltersByType(state, activeModule));
 
     const {
         data: countData,
@@ -45,27 +46,49 @@ const QueryView = () => {
         filters: getFilterQuery({ filters }),
     });
 
+    useEffect(() => {
+        setSearchString('');
+    }, [activeModule]);
+
     const onRowClick = (row) => {
-        const filter = {
-            filterId: `${activeModule}-${row.name}`,
-            filterType: activeModule,
-            filterValue: row.name,
-        };
-        dispatch(addFilter(filter));
+        if (row.selected) {
+            dispatch(removeFilter(`${activeModule}-${row.name}`));
+            return;
+        } else {
+            dispatch(
+                addFilter({
+                    filterId: `${activeModule}-${row.name}`,
+                    filterType: activeModule,
+                    filterValue: row.name,
+                }),
+            );
+        }
     };
 
     const onPlotIconClick = () => {
         dispatch(setActiveView('explore'));
     };
 
-    const getFilteredCounts = (countData) => {
+    const getRows = (countData, searchString, moduleFilters) => {
+        const addFilterState = (rows) => {
+            return rows.map((row) => {
+                const filterState = moduleFilters.find((filter) => filter.filterValue === row.name);
+                return {
+                    ...row,
+                    selected: !!filterState,
+                };
+            });
+        };
+
         if (!countData) {
             return [];
         }
+
+        let rows = addFilterState(countData);
         if (!searchString) {
-            return countData;
+            return rows;
         }
-        return countData.filter((row) => row?.name && row.name.toLowerCase().includes(searchString.toLowerCase()));
+        return rows.filter((row) => row?.name && row.name.toLowerCase().includes(searchString.toLowerCase()));
     };
 
     return (
@@ -110,7 +133,11 @@ const QueryView = () => {
                     {countIsFetching || !countData ? (
                         <Skeleton variant='rounded' height={400} />
                     ) : (
-                        <VirtualizedTable rows={getFilteredCounts(countData)} onRowClick={onRowClick} />
+                        <VirtualizedTable
+                            rows={getRows(countData, searchString, moduleFilters)}
+                            onRowClick={onRowClick}
+                            onSelectAllClick={() => {}}
+                        />
                     )}
                 </Box>
                 <Box sx={{ mt: 4 }}>
