@@ -106,7 +106,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     );
 }
 
-const PagedTable = ({ page=0, rows = [], headers = [], total, onPageChange }) => {
+const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange }) => {
     const [order, setOrder] = React.useState<Order>('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [selected, setSelected] = React.useState([]);

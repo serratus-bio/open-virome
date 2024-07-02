@@ -9,6 +9,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import SRARunLayout from './SRARunLayout.tsx';
+import EnvironmentLayout from './EnvironmentLayout.tsx';
 import IconButton from '@mui/material/IconButton';
 import TableIcon from '@mui/icons-material/TableRows';
 import PlotIcon from '@mui/icons-material/InsertChart';
@@ -17,7 +18,7 @@ import ResultsTable from './ResultsTable.tsx';
 const Module = ({ sectionKey }) => {
     const filters = useSelector(selectAllFilters);
 
-    const [moduleDisplay, setModuleDisplay] = useState(sectionConfig[sectionKey].defaultDisplay);
+    const [moduleDisplay, setModuleDisplay] = useState(sectionConfig[sectionKey]?.defaultDisplay);
     const isTableView = () => moduleDisplay === 'table';
     const isFigureView = () => moduleDisplay === 'figure';
 
@@ -43,10 +44,12 @@ const Module = ({ sectionKey }) => {
         setModuleDisplay(view);
     };
 
-
     const getModuleFigureLayout = (sectionKey) => {
         if (sectionKey === 'SRA Run') {
             return <SRARunLayout identifiers={identifiersData} />;
+        }
+        if (sectionKey === 'Environment') {
+            return <EnvironmentLayout identifiers={identifiersData} />;
         }
     };
 
@@ -86,12 +89,11 @@ const Module = ({ sectionKey }) => {
                 }}
             >
                 {isTableView() ? (
-                        <ResultsTable
-                            identifiersData={identifiersData}
-                            sectionKey={sectionKey}
-                            shouldSkipFetching={identifiersFetching || !isTableView()}
-                        />
-
+                    <ResultsTable
+                        identifiersData={identifiersData}
+                        sectionKey={sectionKey}
+                        shouldSkipFetching={identifiersFetching || !isTableView()}
+                    />
                 ) : (
                     getModuleFigureLayout(sectionKey)
                 )}
