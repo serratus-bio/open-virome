@@ -1,8 +1,18 @@
 import { truncate } from './textFormatting.ts';
+import { histogram } from 'echarts-stat';
 
 export const shouldDisableFigureView = (identifiers) => {
     return identifiers && (identifiers?.run?.totalCount === -1 || identifiers?.run?.totalCount > 10000);
 };
+
+// https://github.com/ecomfe/echarts-stat?tab=readme-ov-file#return-value-only-for-standalone-usage
+export function histogramBins(values) {
+    let bins = histogram(values, 'squareRoot');
+    bins.data.forEach((bin, index) => {
+        bins.data[index][1] += bins.data[index][1];
+    });
+    return bins;
+}
 
 export const getControlTargetPlotData = (targetRows = [], controlRows = [], countKey = 'count') => {
     const parseCount = (value) => {
@@ -63,7 +73,7 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
         },
     ];
 
-    const maxCount = Math.max(...mergedRows.map((row) => Math.max(row.target, row.control)));
+    const maxCount = Math.max(...mergedRows.reduce((acc, cur) => acc.concat([cur.target, cur.control]), []));
     return {
         xAxis: {
             type: 'value',
@@ -115,26 +125,16 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
 };
 
 export const getBioprojectSizePlotData = (controlRows = []) => {
-    const countToNumRuns = controlRows.reduce((acc, row) => {
-        const numRuns = parseInt(row['count']);
-        if (acc[numRuns]) {
-            acc[numRuns] += 1;
-        } else {
-            acc[numRuns] = 1;
-        }
-        return acc;
-    }, {});
+    const values = controlRows.map((row) => parseInt(row['count']));
+    const bins = histogramBins(values);
 
-    const rows = Object.keys(countToNumRuns).map((numRuns) => {
-        return [numRuns, countToNumRuns[numRuns]];
-    });
-    const maxRuns = Math.max(...rows.map((row) => row[0]));
-    const maxCount = Math.max(...rows.map((row) => row[1]));
+    const maxRuns = Math.max(...bins.data.map((bin) => bin[1]));
+    const maxCount = Math.max(...bins.data.map((bin) => bin[1]));
 
     const tooltipFormatter = (args) => {
-        const count = args.value[1];
-        const runs = rows[args.dataIndex][0];
-        return `${args.marker} ${count} ${args.seriesName} <br />  &ensp; &ensp;  ${runs} Runs`;
+        const count = args[0].value[1];
+        const runs = args[0].value[4];
+        return `${args[0].marker} ${count} ${args[0].seriesName} <br />  &ensp; &ensp;  ${runs} Runs`;
     };
 
     return {
@@ -143,28 +143,21 @@ export const getBioprojectSizePlotData = (controlRows = []) => {
             nameLocation: 'middle',
             nameGap: 25,
             boundaryGap: ['0%', '5%'],
-            type: maxRuns > 1000 ? 'log' : 'value',
+            // type: maxRuns > 1000 ? 'log' : 'value',
         },
         yAxis: {
             name: 'Count',
             nameLocation: 'middle',
-            nameGap: 22,
+            nameGap: 24,
             minInterval: 1,
             boundaryGap: ['0%', '10%'],
-            type: maxCount > 100 ? 'log' : 'value',
-        },
-        dataset: {
-            dimensions: ['count', 'runs'],
-            source: [...rows],
+            // type: maxCount > 100 ? 'log' : 'value',
         },
         legend: {
             show: false,
         },
         tooltip: {
-            trigger: 'item',
-            axisPointer: {
-                type: 'shadow',
-            },
+            trigger: 'axis',
             formatter: tooltipFormatter,
         },
         title: {
@@ -191,34 +184,30 @@ export const getBioprojectSizePlotData = (controlRows = []) => {
                     focus: 'series',
                 },
                 color: 'gray',
+                data: bins.data,
             },
         ],
     };
 };
 
 export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRows = []) => {
-    const percentageToNumRuns = controlRows.reduce((acc, row) => {
+    const percentageToNumRuns = controlRows.map((row) => {
         const bioprojectId = row['name'];
         const targetRow = targetRows.find((targetRow) => targetRow['name'] === bioprojectId);
-        const percentage = targetRow ? parseInt((parseFloat(targetRow['count']) / parseFloat(row['count'])) * 100) : 0;
-
-        if (acc[percentage]) {
-            acc[percentage] += 1;
-        } else {
-            acc[percentage] = 1;
+        let percentage = targetRow ? parseInt((parseFloat(targetRow['count']) / parseFloat(row['count'])) * 100) : 0;
+        if (percentage == 100) {
+            percentage = 99;
         }
-        return acc;
-    }, {});
-
-    const rows = Object.keys(percentageToNumRuns).map((key) => {
-        return [key, percentageToNumRuns[key]];
+        return percentage;
     });
-    const maxPercentage = Math.max(...rows.map((row) => row[0]));
-    const maxCount = Math.max(...rows.map((row) => row[1]));
+
+    const bins = histogramBins(percentageToNumRuns);
+    const maxCount = Math.max(...bins.data.map((bin) => bin[1]));
+
     const tooltipFormatter = (args) => {
-        const count = args.value[1];
-        const percentage = rows[args.dataIndex][0];
-        return `${args.marker} ${count} ${args.seriesName} <br />  &ensp; &ensp;  ${percentage}% Target`;
+        const count = args[0].value[1];
+        const percentage = args[0].value[4];
+        return `${args[0].marker} ${count} ${args[0].seriesName} <br />  &ensp; &ensp;  ${percentage}% in target set`;
     };
 
     return {
@@ -227,7 +216,7 @@ export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRo
             name: 'Target (%)',
             nameLocation: 'middle',
             nameGap: 25,
-            max: maxPercentage < 95 ? 100 : 110,
+            boundaryGap: ['-10%', '0%'],
         },
         yAxis: {
             name: 'Count',
@@ -235,7 +224,7 @@ export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRo
             nameGap: 22,
             minInterval: 1,
             boundaryGap: ['0%', '10%'],
-            type: maxCount > 100 ? 'log' : 'value',
+            // type: maxCount > 100 ? 'log' : 'value',
         },
         title: {
             text: '% of BioProject in Target set',
@@ -259,15 +248,8 @@ export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRo
             },
         },
         tooltip: {
-            trigger: 'item',
-            axisPointer: {
-                type: 'shadow',
-            },
+            trigger: 'axis',
             formatter: tooltipFormatter,
-        },
-        dataset: {
-            dimensions: ['percentage', 'count'],
-            source: [...rows],
         },
         legend: {
             show: false,
@@ -285,6 +267,7 @@ export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRo
                     focus: 'series',
                 },
                 color: 'gray',
+                data: bins.data,
             },
         ],
     };

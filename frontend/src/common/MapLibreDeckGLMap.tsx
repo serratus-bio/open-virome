@@ -240,7 +240,14 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
             const mapRefCurrentUnsafe = mapRef.current as any;
 
             const mapDiv = mapRefCurrentUnsafe.appendChild(document.createElement('div'));
-            Object.assign(mapDiv.style, { height: '100%', left: 0, position: 'absolute', top: 0, width: '100%' });
+            Object.assign(mapDiv.style, {
+                height: '100%',
+                left: 0,
+                position: 'absolute',
+                top: 0,
+                width: '100%',
+                borderRadius: '8px',
+            });
             const mlglMap = new (globalThis as any).maplibregl.Map({
                 center: [15.529, 43.8234],
                 container: mapDiv,

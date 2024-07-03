@@ -61,10 +61,6 @@ const BioprojectFigure = ({ identifiers }) => {
         return isError || isFetching || !data;
     };
 
-    const renderPlaceholder = () => {
-        return <Skeleton variant='rectangular' width={300} height={300} />;
-    };
-
     const renderTotalSizePlot = () => {
         return (
             <Box sx={{ flex: 1, width: 350 }}>
@@ -133,20 +129,26 @@ const BioprojectFigure = ({ identifiers }) => {
                         alignItems: 'center',
                     }}
                 >
-                    {shouldRenderPlaceholder(controlCountError, controlCountIsFetching, controlCountData)
-                        ? renderPlaceholder()
-                        : renderTotalSizePlot()}
+                    {shouldRenderPlaceholder(controlCountError, controlCountIsFetching, controlCountData) ? (
+                        <Skeleton variant='rectangular' width={300} height={265} sx={{ mb: 8 }} />
+                    ) : (
+                        renderTotalSizePlot()
+                    )}
                     {shouldRenderPlaceholder(controlCountError, controlCountIsFetching, controlCountData) ||
-                    shouldRenderPlaceholder(targetCountError, targetCountIsFetching, targetCountData)
-                        ? renderPlaceholder()
-                        : renderTargetPercentagePlot()}
+                    shouldRenderPlaceholder(targetCountError, targetCountIsFetching, targetCountData) ? (
+                        <Skeleton variant='rectangular' width={300} height={265} />
+                    ) : (
+                        renderTargetPercentagePlot()
+                    )}
                 </Box>
 
                 <Box sx={{ flex: 1.5 }}>
                     {shouldRenderPlaceholder(controlCountError, controlCountIsFetching, controlCountData) ||
-                    shouldRenderPlaceholder(targetCountError, targetCountIsFetching, targetCountData)
-                        ? renderPlaceholder()
-                        : renderSizeVsPercentagePlot()}
+                    shouldRenderPlaceholder(targetCountError, targetCountIsFetching, targetCountData) ? (
+                        <Skeleton variant='rectangular' width={600} height={600} />
+                    ) : (
+                        renderSizeVsPercentagePlot()
+                    )}
                 </Box>
             </Box>
         </Box>
