@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect } from 'react';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -137,10 +137,14 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) =
             return 0;
         });
 
+    useEffect(() => {
+        sortRowsBySelected(rows);
+    }, []);
+
     return (
         <Paper style={{ height: 400, width: '100%', maxWidth: 800 }}>
             <TableVirtuoso
-                data={sortRowsBySelected(rows)}
+                data={rows}
                 components={VirtuosoTableComponents}
                 fixedHeaderContent={() => fixedHeaderContent(columns, rows, onSelectAllClick)}
                 itemContent={rowContent}

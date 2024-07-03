@@ -33,9 +33,6 @@ const QueryView = () => {
     } = useGetCountsQuery({
         filters: getFilterQuery({ filters, excludeType: activeModule }),
         groupBy: moduleConfig[activeModule].groupByKey,
-        sortByColumn: 'count',
-        sortByDirection: 'desc',
-        pageStart: 0,
     });
 
     const {
@@ -136,7 +133,6 @@ const QueryView = () => {
                         <VirtualizedTable
                             rows={getRows(countData, searchString, moduleFilters)}
                             onRowClick={onRowClick}
-                            onSelectAllClick={() => {}}
                         />
                     )}
                 </Box>

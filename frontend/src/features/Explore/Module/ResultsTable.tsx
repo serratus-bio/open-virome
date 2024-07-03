@@ -3,7 +3,7 @@ import { sectionConfig } from './constants.ts';
 import { handleIdKeyIrregularities } from '../../../common/utils/queryHelpers.ts';
 
 import PagedTable from '../../../common/PagedTable.tsx';
-import { useGetResultQuery } from '../../../api/client.ts';
+import { useGetResultQuery, useGetCountsQuery } from '../../../api/client.ts';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
@@ -29,6 +29,25 @@ const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
             sortByDirection: 'asc',
             pageStart: page * 10,
             pageEnd: (page + 1) * 10,
+        },
+        {
+            skip: shouldSkipFetching,
+        },
+    );
+
+    const {
+        data: totalCount,
+        error: totalCountError,
+        isFetching: totalCountIsFetching,
+    } = useGetCountsQuery(
+        {
+            idColumn: sectionConfig[sectionKey].resultsIdColumn,
+            ids: identifiersData
+                ? identifiersData[handleIdKeyIrregularities(sectionConfig[sectionKey].resultsIdColumn)].single
+                : [],
+            idRanges: identifiersData
+                ? identifiersData[handleIdKeyIrregularities(sectionConfig[sectionKey].resultsIdColumn)].range
+                : [],
         },
         {
             skip: shouldSkipFetching,
@@ -89,7 +108,7 @@ const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
                 <PagedTable
                     page={page}
                     onPageChange={onPageChange}
-                    total={identifiersData?.run?.totalCount}
+                    total={totalCount?.length ? totalCount[0]?.count : 0}
                     rows={resultData}
                     headers={getTableHeaders(resultData)}
                 />

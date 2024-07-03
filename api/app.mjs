@@ -2,7 +2,13 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import * as db from './db/index.mjs';
-import { getIdClauses, getMinimalJoinSubQuery, handleIdKeyIrregularities } from './utils/queryBuilder.mjs';
+import {
+    getIdClauses,
+    getMinimalJoinSubQuery,
+    getTotalCountsQuery,
+    getGroupedCountsByIdentifiers,
+    getGroupedCountsByFilters,
+} from './utils/queryBuilder.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware.js';
 
@@ -42,43 +48,46 @@ app.post('/counts', async (req, res) => {
 
     const filters = body?.filters || [];
     const groupBy = body?.groupBy || undefined;
-    const sortByColumn = body?.sortByColumn || 'count';
-    const sortByDirection = body?.sortByDirection || 'desc';
+    const sortByColumn = body?.sortByColumn || undefined;
+    const sortByDirection = body?.sortByDirection || undefined;
     const pageStart = body?.pageStart || undefined;
     const pageEnd = body?.pageEnd || undefined;
 
-    if (groupBy === undefined) {
-        return res.status(400).json({ error: 'groupBy is required!' });
-    }
     if (idColumn && filters.length > 0) {
         return res.status(400).json({ error: 'Cannot have both idColumn and filters!' });
     }
 
-    const includeCounts = filters.filter((filter) => filter.filterType !== groupBy).length > 0;
-
     let query = ``;
-    if (idColumn) {
-        let clauses = getIdClauses(ids, idRanges, idColumn, 'srarun');
-        let remappedGroupBy = handleIdKeyIrregularities(groupBy, 'srarun');
-        clauses = `${clauses.length > 0 ? `WHERE ${clauses.join(' OR ')}` : ''}`;
-        query = `
-            SELECT ${remappedGroupBy} as name, COUNT(*) as count, (COUNT(*)/(SUM(COUNT(*))OVER())) * 100 as percent, SUM(spots)/POWER(10,9) as gbp
-            FROM srarun
-            ${clauses}
-            GROUP BY ${remappedGroupBy}
-            ${includeCounts ? `ORDER BY ${sortByColumn} ${sortByDirection}` : ''}
-            ${pageEnd !== undefined ? `LIMIT ${pageEnd} OFFSET ${pageStart}` : ''}
-        `;
+
+    if (groupBy === undefined) {
+        if (!idColumn) {
+            return res.status(400).json({ error: 'groupBy is required!' });
+        }
+        query = getTotalCountsQuery({
+            ids,
+            idRanges,
+            idColumn,
+            table: 'srarun',
+        });
+    } else if (idColumn) {
+        query = getGroupedCountsByIdentifiers({
+            ids,
+            idRanges,
+            idColumn,
+            groupBy,
+            table: 'srarun',
+        });
     } else {
-        const subquery = getMinimalJoinSubQuery(filters, groupBy);
-        query = `
-            SELECT ${groupBy} as name${includeCounts ? `, COUNT(*) as count` : ''}
-            FROM (${subquery}) as open_virome
-            GROUP BY ${groupBy}
-            ${includeCounts ? `ORDER BY ${sortByColumn} ${sortByDirection}` : ''}
-            ${pageEnd !== undefined ? `LIMIT ${pageEnd} OFFSET ${pageStart}` : ''}
-        `;
+        query = getGroupedCountsByFilters({
+            filters,
+            groupBy,
+        });
     }
+    query = `
+        ${query}
+        ${sortByColumn !== undefined ? `ORDER BY ${sortByColumn} ${sortByDirection}` : ''}
+        ${pageEnd !== undefined ? `LIMIT ${pageEnd - pageStart} OFFSET ${pageStart}` : ''}
+    `;
 
     const result = await runQuery(query);
     if (result.error) {
@@ -100,7 +109,6 @@ app.post('/identifiers', async (req, res) => {
     if (filters.length === 0) {
         return res.json(formatIdentifiersResponse([]));
     }
-
     const subquery = getMinimalJoinSubQuery(filters);
     const query = `
         SELECT run_id, bioproject, biosample
@@ -138,7 +146,7 @@ app.post('/results', async (req, res) => {
         SELECT ${columns}
         FROM ${table}
         ${clauses.length > 0 ? `WHERE ${clauses.join(' OR ')}` : ''}
-        LIMIT ${pageEnd} OFFSET ${pageStart}
+        LIMIT ${pageEnd - pageStart} OFFSET ${pageStart}
     `;
     const result = await runQuery(query);
     if (result.error) {
