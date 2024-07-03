@@ -35,10 +35,13 @@ export const getFilterClauses = (filters, groupBy = undefined) => {
                 .filter((filter) => filter.filterType === filterType)
                 .map((filter) => filter.filterValue);
 
-            filterClauses = filterValues.map((filterValue) => `${filterType} = '${filterValue}'`);
+            filterClauses = [
+                ...filterClauses,
+                `${filterType} IN (${filterValues.map((filterValue) => `'${filterValue}'`).join(', ')})`,
+            ];
         });
     }
-    return `${filterClauses.join(' OR ')}${groupBy !== undefined ? ` AND ${groupBy} IS NOT NULL` : ''}`;
+    return `${filterClauses.join(' AND ')}${groupBy !== undefined ? ` AND ${groupBy} IS NOT NULL` : ''}`;
 };
 
 export const getIdClauses = (ids, idRanges, idColumn, table = 'srarun') => {
@@ -54,6 +57,38 @@ export const getIdClauses = (ids, idRanges, idColumn, table = 'srarun') => {
         });
     }
     return clauses;
+};
+
+export const getTotalCountsQuery = ({ ids, idRanges, idColumn, table }) => {
+    let clauses = getIdClauses(ids, idRanges, idColumn, table);
+    clauses = `${clauses.length > 0 ? `WHERE ${clauses.join(' OR ')}` : ''}`;
+    return `
+        SELECT COUNT(*) as count
+        FROM ${table}
+        ${clauses}
+    `;
+};
+
+export const getGroupedCountsByIdentifiers = ({ ids, idRanges, idColumn, groupBy, table }) => {
+    let clauses = getIdClauses(ids, idRanges, idColumn, table);
+    let remappedGroupBy = handleIdKeyIrregularities(groupBy, table);
+    clauses = `${clauses.length > 0 ? `WHERE ${clauses.join(' OR ')}` : ''}`;
+    return `
+        SELECT ${remappedGroupBy} as name, COUNT(*) as count, (COUNT(*)/(SUM(COUNT(*))OVER())) * 100 as percent, SUM(spots)/POWER(10,9) as gbp
+        FROM ${table}
+        ${clauses}
+        GROUP BY ${remappedGroupBy}
+    `;
+};
+
+export const getGroupedCountsByFilters = ({ filters, groupBy }) => {
+    const tableJoin = getMinimalJoinSubQuery(filters, groupBy);
+    const includeCounts = filters.filter((filter) => filter.filterType !== groupBy).length > 0;
+    return `
+        SELECT ${groupBy} as name${includeCounts ? `, COUNT(*) as count` : ''}
+        FROM (${tableJoin}) as open_virome
+        GROUP BY ${groupBy}
+    `;
 };
 
 export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
@@ -124,7 +159,6 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
                 filterType: handleIdKeyIrregularities(filter.filterType, table),
             };
         });
-
         const selectStatement =
             i == 0 || columns.includes(groupBy) || tableFilters.length > 0 ? tableToInnerSelect[table] : tableJoinKey;
         const whereStatement = tableFilters.length > 0 ? `WHERE ${getFilterClauses(tableFilters)}` : '';

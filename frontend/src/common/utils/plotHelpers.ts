@@ -217,6 +217,7 @@ export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRo
             nameLocation: 'middle',
             nameGap: 25,
             boundaryGap: ['-10%', '0%'],
+            max: 100,
         },
         yAxis: {
             name: 'Count',

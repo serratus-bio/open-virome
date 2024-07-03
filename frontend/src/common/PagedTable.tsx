@@ -57,15 +57,13 @@ interface HeadCell {
 
 interface EnhancedTableProps {
     headers: string[];
-    numSelected: number;
     onRequestSort: (event: React.MouseEvent<unknown>, property: keyof Data) => void;
     order: Order;
     orderBy: string;
-    rowCount: number;
 }
 
 function EnhancedTableHead(props: EnhancedTableProps) {
-    const { headers, order, orderBy, numSelected, rowCount, onRequestSort } = props;
+    const { headers, order, orderBy, onRequestSort } = props;
     const createSortHandler = (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
         onRequestSort(event, property);
     };
@@ -109,7 +107,6 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange }) => {
     const [order, setOrder] = React.useState<Order>('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
-    const [selected, setSelected] = React.useState([]);
     const [dense, setDense] = React.useState(true);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
@@ -119,30 +116,11 @@ const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange }) 
         setOrderBy(property);
     };
 
-    const onClick = (event: React.MouseEvent<unknown>, id: number) => {
-        const selectedIndex = selected.indexOf(id);
-        let newSelected: number[] = [];
-
-        if (selectedIndex === -1) {
-            newSelected = newSelected.concat(selected, id);
-        } else if (selectedIndex === 0) {
-            newSelected = newSelected.concat(selected.slice(1));
-        } else if (selectedIndex === selected.length - 1) {
-            newSelected = newSelected.concat(selected.slice(0, -1));
-        } else if (selectedIndex > 0) {
-            newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
-        }
-        setSelected(newSelected);
-    };
-
-    const isSelected = (id: number) => selected.indexOf(id) !== -1;
-
     // Avoid a layout jump when reaching the last page with empty rows.
-    const emptyRows = page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    const emptyRows = rows.length < rowsPerPage ? Math.max(0, rowsPerPage - rows.length) : 0;
 
     const visibleRows = React.useMemo(
-        () =>
-            stableSort(rows, getComparator(order, orderBy)).slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage),
+        () => stableSort(rows, getComparator(order, orderBy)),
         [order, orderBy, page, rowsPerPage],
     );
 
@@ -153,26 +131,14 @@ const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange }) 
                     <Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size={dense ? 'small' : 'medium'}>
                         <EnhancedTableHead
                             headers={headers}
-                            numSelected={selected.length}
                             order={order}
                             orderBy={orderBy}
                             onRequestSort={onRequestSort}
-                            rowCount={rows.length}
                         />
                         <TableBody>
                             {visibleRows.map((row, index) => {
-                                const isItemSelected = isSelected(row.id);
-
                                 return (
-                                    <TableRow
-                                        hover
-                                        onClick={(event) => onClick(event, row.id)}
-                                        aria-checked={isItemSelected}
-                                        tabIndex={-1}
-                                        key={`${row.id}_${index}`}
-                                        selected={isItemSelected}
-                                        sx={{ cursor: 'pointer' }}
-                                    >
+                                    <TableRow hover tabIndex={-1} key={`${row.id}_${index}`}>
                                         {headers.map((header, index) => (
                                             <TableCell key={index} align='right'>
                                                 {row[header] &&

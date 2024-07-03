@@ -89,7 +89,6 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setBioprojectID, set
             const [ne, sw] = [mlglMap.getBounds().getNorthEast(), mlglMap.getBounds().getSouthWest()];
 
             const center = mlglMap.getCenter();
-            console.log(center);
             const neswPolygon =
                 'POLYGON((' +
                 [

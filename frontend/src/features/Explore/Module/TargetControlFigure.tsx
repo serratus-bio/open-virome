@@ -28,8 +28,6 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             ids: identifiers ? identifiers['run'].single : [],
             idRanges: identifiers ? identifiers['run'].range : [],
             groupBy: moduleConfig[moduleKey].groupByKey,
-            sortByColumn: 'count',
-            sortByDirection: 'desc',
         },
         {
             skip: shouldDisableFigureView(identifiers),
@@ -46,8 +44,6 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             ids: identifiers ? identifiers['bioproject'].single : [],
             idRanges: identifiers ? identifiers['bioproject'].range : [],
             groupBy: moduleConfig[moduleKey].groupByKey,
-            sortByColumn: 'count',
-            sortByDirection: 'desc',
         },
         {
             skip: shouldDisableFigureView(identifiers),

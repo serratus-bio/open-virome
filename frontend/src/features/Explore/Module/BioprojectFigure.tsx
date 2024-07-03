@@ -31,8 +31,6 @@ const BioprojectFigure = ({ identifiers }) => {
             ids: identifiers ? identifiers['run'].single : [],
             idRanges: identifiers ? identifiers['run'].range : [],
             groupBy: moduleConfig['bioproject'].groupByKey,
-            sortByColumn: 'count',
-            sortByDirection: 'desc',
         },
         {
             skip: shouldDisableFigureView(identifiers),
@@ -49,8 +47,6 @@ const BioprojectFigure = ({ identifiers }) => {
             ids: identifiers ? identifiers['bioproject'].single : [],
             idRanges: identifiers ? identifiers['bioproject'].range : [],
             groupBy: moduleConfig['bioproject'].groupByKey,
-            sortByColumn: 'count',
-            sortByDirection: 'desc',
         },
         {
             skip: shouldDisableFigureView(identifiers),
