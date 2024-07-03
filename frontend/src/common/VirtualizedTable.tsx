@@ -48,7 +48,7 @@ const VirtuosoTableComponents: TableComponents<Data> = {
 };
 
 const fixedHeaderContent = (columns: ColumnData[], rows, onSelectAllClick) => {
-    const disableSelectAll = rows.length === 0 || rows.length > 1000;
+    const disableSelectAll = rows.length === 0 || rows.length > 100;
     const isChecked = !disableSelectAll && rows.length > 0 && rows.every((row) => row.selected);
 
     return (

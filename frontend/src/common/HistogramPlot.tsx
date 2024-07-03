@@ -37,7 +37,6 @@ const HistogramPlot = ({ plotData = {}, styles = {} }) => {
 
     options.series.forEach((obj) => {
         obj.barWidth = '101%';
-        obj.barMaxWidth = 10;
     });
 
     return <ReactEcharts option={options} style={styles} />;
