@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAllFilters, removeFilter } from './slice.ts';
 import { setActiveView, setActiveModule } from '../../app/slice.ts';
-import { moduleConfig } from '../Explore/Module/constants.ts';
+import { moduleConfig } from '../Explore/constants.ts';
 
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';

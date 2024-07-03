@@ -2,7 +2,7 @@ import { truncate } from './textFormatting.ts';
 import { histogram } from 'echarts-stat';
 
 export const shouldDisableFigureView = (identifiers) => {
-    return identifiers && (identifiers?.run?.totalCount === -1 || identifiers?.run?.totalCount > 10000);
+    return identifiers && (identifiers?.run?.totalCount === -1 || identifiers?.run?.totalCount > 100000);
 };
 
 // https://github.com/ecomfe/echarts-stat?tab=readme-ov-file#return-value-only-for-standalone-usage
@@ -128,7 +128,7 @@ export const getBioprojectSizePlotData = (controlRows = []) => {
     const values = controlRows.map((row) => parseInt(row['count']));
     const bins = histogramBins(values);
 
-    const maxRuns = Math.max(...bins.data.map((bin) => bin[1]));
+    const maxRuns = Math.max(...bins.data.map((bin) => bin[3]));
     const maxCount = Math.max(...bins.data.map((bin) => bin[1]));
 
     const tooltipFormatter = (args) => {
@@ -141,8 +141,9 @@ export const getBioprojectSizePlotData = (controlRows = []) => {
         xAxis: {
             name: 'Runs (n)',
             nameLocation: 'middle',
-            nameGap: 25,
+            nameGap: 24,
             boundaryGap: ['0%', '5%'],
+            max: maxRuns,
             // type: maxRuns > 1000 ? 'log' : 'value',
         },
         yAxis: {

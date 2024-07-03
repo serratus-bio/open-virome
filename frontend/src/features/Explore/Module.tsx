@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { selectAllFilters } from '../../Query/slice.ts';
+import { selectAllFilters } from '../Query/slice.ts';
 import { sectionConfig } from './constants.ts';
-import { getFilterQuery } from '../../../common/utils/queryHelpers.ts';
-import { useGetIdentifiersQuery } from '../../../api/client.ts';
+import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
+import { shouldDisableFigureView } from '../../common/utils/plotHelpers.ts';
+import { useGetIdentifiersQuery } from '../../api/client.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import SRARunLayout from './SRARunLayout.tsx';
-import EnvironmentLayout from './EnvironmentLayout.tsx';
+import SRARunLayout from './Figures/SRARunLayout.tsx';
+import EnvironmentLayout from './Figures/EnvironmentLayout.tsx';
 import IconButton from '@mui/material/IconButton';
 import TableIcon from '@mui/icons-material/TableRows';
 import PlotIcon from '@mui/icons-material/InsertChart';
@@ -22,10 +23,6 @@ const Module = ({ sectionKey }) => {
     const isTableView = () => moduleDisplay === 'table';
     const isFigureView = () => moduleDisplay === 'figure';
 
-    const shouldDisableFigureView = () => {
-        return filters.length === 0 || (identifiersData && identifiersData['run'].totalCount > 10000);
-    };
-
     const {
         data: identifiersData,
         error: identifiersError,
@@ -35,7 +32,7 @@ const Module = ({ sectionKey }) => {
     });
 
     useEffect(() => {
-        if (shouldDisableFigureView()) {
+        if (shouldDisableFigureView(identifiersData)) {
             setModuleDisplay('table');
         }
     }, [identifiersData]);
@@ -51,6 +48,11 @@ const Module = ({ sectionKey }) => {
         if (sectionKey === 'Environment') {
             return <EnvironmentLayout identifiers={identifiersData} />;
         }
+        return (
+            <Box>
+                <Typography variant='h6'>Coming soon!</Typography>
+            </Box>
+        )
     };
 
     return (
@@ -64,7 +66,7 @@ const Module = ({ sectionKey }) => {
                         sx={{ mt: -0.5, height: 30, width: 30 }}
                         color={isFigureView() ? 'primary' : 'default'}
                         onClick={() => onViewChange('figure')}
-                        disabled={shouldDisableFigureView()}
+                        disabled={shouldDisableFigureView(identifiersData)}
                     >
                         <PlotIcon fontSize='medium' />
                     </IconButton>
@@ -88,7 +90,10 @@ const Module = ({ sectionKey }) => {
                     mt: 4,
                 }}
             >
-                {isTableView() ? (
+                {identifiersFetching || !identifiersData ?
+                    null
+                :
+                isTableView() ? (
                     <ResultsTable
                         identifiersData={identifiersData}
                         sectionKey={sectionKey}

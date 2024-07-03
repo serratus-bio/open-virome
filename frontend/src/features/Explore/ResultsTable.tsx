@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { sectionConfig } from './constants.ts';
-import { handleIdKeyIrregularities } from '../../../common/utils/queryHelpers.ts';
+import { handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
 
-import PagedTable from '../../../common/PagedTable.tsx';
-import { useGetResultQuery, useGetCountsQuery } from '../../../api/client.ts';
+import PagedTable from '../../common/PagedTable.tsx';
+import { useGetResultQuery, useGetCountsQuery } from '../../api/client.ts';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
@@ -42,6 +42,7 @@ const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
     } = useGetCountsQuery(
         {
             idColumn: sectionConfig[sectionKey].resultsIdColumn,
+            table: sectionConfig[sectionKey].resultsTable,
             ids: identifiersData
                 ? identifiersData[handleIdKeyIrregularities(sectionConfig[sectionKey].resultsIdColumn)].single
                 : [],

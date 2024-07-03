@@ -1,4 +1,4 @@
-import { moduleConfig } from '../../features/Explore/Module/constants.ts';
+import { moduleConfig } from '../../features/Explore/constants.ts';
 
 export const getFilterQuery = ({ filters, excludeType = '' }) => {
     return filters
