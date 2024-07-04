@@ -47,6 +47,7 @@ app.post('/counts', async (req, res) => {
     const idRanges = body?.idRanges || [];
 
     const filters = body?.filters || [];
+    const table = body?.table || 'srarun';
     const groupBy = body?.groupBy || undefined;
     const sortByColumn = body?.sortByColumn || undefined;
     const sortByDirection = body?.sortByDirection || undefined;
@@ -67,7 +68,7 @@ app.post('/counts', async (req, res) => {
             ids,
             idRanges,
             idColumn,
-            table: 'srarun',
+            table: table,
         });
     } else if (idColumn) {
         query = getGroupedCountsByIdentifiers({
@@ -75,7 +76,7 @@ app.post('/counts', async (req, res) => {
             idRanges,
             idColumn,
             groupBy,
-            table: 'srarun',
+            table: table,
         });
     } else {
         query = getGroupedCountsByFilters({
@@ -92,6 +93,7 @@ app.post('/counts', async (req, res) => {
     const result = await runQuery(query);
     if (result.error) {
         console.error(result.error);
+        console.error(query);
         return res.status(500).json({ error: result.error });
     }
     return res.json(result);
@@ -119,6 +121,7 @@ app.post('/identifiers', async (req, res) => {
 
     if (result.error) {
         console.error(result.error);
+        console.error(query);
         return res.status(500).json({ error: result.error });
     }
 
@@ -135,7 +138,7 @@ app.post('/results', async (req, res) => {
     const idColumn = body?.idColumn || 'run_id';
     const ids = body?.ids || [];
     const idRanges = body?.idRanges || [];
-    const table = body?.table || 'rfamily2';
+    const table = body?.table || 'srarun';
     const columns = body?.columns || '*';
     const pageStart = body?.pageStart || 0;
     const pageEnd = body?.pageEnd || 10;
@@ -151,6 +154,7 @@ app.post('/results', async (req, res) => {
     const result = await runQuery(query);
     if (result.error) {
         console.error(result.error);
+        console.error(query);
         return res.status(500).json({ error: result.error });
     }
     return res.json(result);

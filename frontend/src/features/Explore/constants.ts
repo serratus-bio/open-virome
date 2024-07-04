@@ -3,38 +3,29 @@ export const sectionConfig = {
         modules: ['host', 'seqType', 'bioproject', 'date'],
         resultsTable: 'srarun',
         resultsIdColumn: 'run',
-        defaultDisplay: 'table',
-    },
-    'Virus family': {
-        modules: ['family'],
-        resultsTable: 'rfamily2',
-        resultsIdColumn: 'run_id',
-        defaultDisplay: 'table',
+        defaultDisplay: 'figure',
     },
     'Palmdb': {
-        modules: ['palmdb'],
-        resultsTable: 'palm_sra2',
-        resultsIdColumn: 'run_id',
+        modules: ['sotu', 'family', 'species'],
+        resultsTable: 'palm_virome',
+        resultsIdColumn: 'run',
         defaultDisplay: 'table',
     },
     'Environment': {
         modules: ['geography'],
         resultsTable: 'biosample_geo_coordinates',
-        resultsIdColumn: 'biosample_id',
+        resultsIdColumn: 'biosample',
         defaultDisplay: 'table',
     },
-    'Host': {
-        modules: ['statHost'],
+    'Other': {
+        modules: ['statHost', 'tissue'],
         resultsTable: 'sra_stat',
         resultsIdColumn: 'run',
         defaultDisplay: 'table',
-    },
-    'Tissue': {
-        modules: ['tissue'],
-        resultsTable: 'biosample_tissue',
-        resultsIdColumn: 'biosample_id',
-        defaultDisplay: 'table',
-    },
+        // resultsTable: 'biosample_tissue',
+        // resultsIdColumn: 'biosample',
+        // defaultDisplay: 'table',
+    }
 };
 
 export const moduleConfig = {
@@ -58,15 +49,20 @@ export const moduleConfig = {
         tag: 'Date',
         groupByKey: 'release_date',
     },
-    family: {
-        title: 'Family',
-        tag: 'Family',
-        groupByKey: 'family_name',
-    },
-    palmdb: {
-        title: 'Palmdb',
-        tag: 'Palmdb',
+    sotu: {
+        title: 'sOTU',
+        tag: 'sOTU',
         groupByKey: 'sotu',
+    },
+    family: {
+        title: 'Virus Family',
+        tag: 'Virus Family',
+        groupByKey: 'tax_family',
+    },
+    species: {
+        title: 'Virus Species',
+        tag: 'Virus Species',
+        groupByKey: 'tax_species',
     },
     geography: {
         title: 'Geography',

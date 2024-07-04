@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { setActiveModule, setActiveView } from '../../../app/slice.ts';
-import { moduleConfig } from './constants.ts';
+import { moduleConfig } from '../constants.ts';
 import { shouldDisableFigureView, getControlTargetPlotData } from '../../../common/utils/plotHelpers.ts';
 import { useGetCountsQuery } from '../../../api/client.ts';
 

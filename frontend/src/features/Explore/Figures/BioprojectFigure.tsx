@@ -8,7 +8,7 @@ import {
     getBioprojectSizeVsPercentagePlotData,
 } from '../../../common/utils/plotHelpers.ts';
 import { useGetCountsQuery } from '../../../api/client.ts';
-import { moduleConfig } from './constants.ts';
+import { moduleConfig } from '../constants.ts';
 
 import HistogramPlot from '../../../common/HistogramPlot.tsx';
 import ScatterPlot from '../../../common/ScatterPlot.tsx';

@@ -9,14 +9,14 @@ export const handleIdKeyIrregularities = (key, table) => {
         sra_stat: {
             run_id: 'run',
         },
-        rfamily2: {
-            run_id: 'run_id',
-        },
         biosample_tissue: {
             biosample: 'biosample_id',
         },
         biosample_geo_coordinates: {
             biosample: 'biosample_id',
+        },
+        palm_virome: {
+            run_id: 'run',
         },
     };
     if (tableToRemappedKey[table] && tableToRemappedKey[table][key]) {
@@ -97,10 +97,9 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
     const tableToInnerSelect = {
         srarun: "run as run_id, to_char(release_date, 'YYYY-MM') as release_date, bio_project as bioproject, bio_sample as biosample, scientific_name as host_label, library_strategy",
         sra_stat: 'run as run_id, name as stat_host_order, kmer_perc as percent_identity_stat',
-        rfamily2: 'run_id, family_name, percent_identity as percent_identity_rfam',
-        palm_sra2: 'run_id, sotu, percent_identity as percent_identity_sotu',
         biosample_tissue: 'biosample_id as biosample, tissue, bto_id',
         biosample_geo_coordinates: 'biosample_id as biosample, from_text as geo',
+        palm_virome: 'run as run_id, sotu, palm_id, tax_species, tax_family, gb_pid, node_pid',
     };
 
     const tableToColumn = {
@@ -114,8 +113,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
             'library_strategy',
         ],
         sra_stat: ['run_id', 'stat_host_order', 'percent_identity_stat'],
-        rfamily2: ['run_id', 'family_name', 'percent_identity_rfam'],
-        palm_sra2: ['run_id', 'sotu', 'percent_identity_sotu', 'qc_pass_sotu'],
+        palm_virome: ['run', 'sotu', 'palm_id', 'tax_species', 'tax_family', 'gb_pid', 'node_pid'],
         biosample_tissue: ['biosample_id', 'tissue', 'bto_id'],
         biosample_geo_coordinates: ['biosample_id', 'geo'],
     };
@@ -123,8 +121,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
     const tableToJoinKey = {
         srarun: 'run_id',
         sra_stat: 'run_id',
-        rfamily2: 'run_id',
-        palm_sra2: 'run_id',
+        palm_virome: 'run_id',
         biosample_tissue: 'biosample',
         biosample_geo_coordinates: 'biosample',
     };

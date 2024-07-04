@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActiveModule, selectActiveModule } from '../../app/slice.ts';
-import { moduleConfig, sectionConfig } from '../Explore/Module/constants.ts';
+import { moduleConfig, sectionConfig } from '../Explore/constants.ts';
 
 import Divider from '@mui/material/Divider';
 import MenuList from '@mui/material/MenuList';

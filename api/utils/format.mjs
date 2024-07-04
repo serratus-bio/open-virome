@@ -21,6 +21,10 @@ const reduceConsecutiveToRange = (ids) => {
         return [[], []];
     }
 
+    if (ids.length < 10000) {
+        return [[], ids];
+    }
+
     const numericToIdMap = getNumericToIdMap(ids);
     const sortedNumericSuffixes = Object.keys(numericToIdMap).sort((a, b) => a - b);
 

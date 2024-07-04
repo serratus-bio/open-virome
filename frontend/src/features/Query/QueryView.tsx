@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectActiveModule, setActiveView } from '../../app/slice.ts';
-import { moduleConfig } from '../Explore/Module/constants.ts';
+import { moduleConfig } from '../Explore/constants.ts';
 import { useGetCountsQuery, useGetIdentifiersQuery } from '../../api/client.ts';
 import { addFilter, removeFilter, selectAllFilters, selectFiltersByType } from './slice.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';

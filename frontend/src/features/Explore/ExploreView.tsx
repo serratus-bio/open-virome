@@ -1,9 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectActiveModule } from '../../app/slice.ts';
-import { sectionConfig } from './Module/constants.ts';
+import { sectionConfig } from './constants.ts';
 
-import Section from './Module/Module.tsx';
+import Module from './Module.tsx';
 import Box from '@mui/material/Box';
 
 const ExploreView = () => {
@@ -17,8 +17,7 @@ const ExploreView = () => {
         'Virus family': useRef(),
         'Palmdb': useRef(),
         'Environment': useRef(),
-        'Host': useRef(),
-        'Tissue': useRef(),
+        'Other': useRef(),
     };
 
     useEffect(() => {
@@ -46,7 +45,7 @@ const ExploreView = () => {
     return (
         <>
             <Box key={activeSection} ref={sectionRefs[activeSection]}>
-                <Section sectionKey={activeSection} />
+                <Module sectionKey={activeSection} />
             </Box>
         </>
     );

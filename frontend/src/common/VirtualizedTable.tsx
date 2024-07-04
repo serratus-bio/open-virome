@@ -37,49 +37,55 @@ const defaultColumns: ColumnData[] = [
     },
 ];
 
-const VirtuosoTableComponents: TableComponents<Data> = {
-    Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
-        <TableContainer component={Paper} {...props} ref={ref} />
-    )),
-    Table: (props) => <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }} />,
-    TableHead,
-    TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
-    TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => <TableBody {...props} ref={ref} />),
-};
-
-const fixedHeaderContent = (columns: ColumnData[], rows, onSelectAllClick) => {
-    const disableSelectAll = rows.length === 0 || rows.length > 100;
-    const isChecked = !disableSelectAll && rows.length > 0 && rows.every((row) => row.selected);
-
-    return (
-        <TableRow>
-            <TableCell padding='checkbox' sx={{ width: '16px', backgroundColor: '#121212' }}>
-                <Checkbox
-                    color='primary'
-                    checked={isChecked}
-                    onChange={onSelectAllClick}
-                    inputProps={{
-                        'aria-label': 'select all rows',
-                    }}
-                    disabled={disableSelectAll}
-                />
-            </TableCell>
-            {columns.map((column) => (
-                <TableCell
-                    key={column.dataKey}
-                    variant='head'
-                    align={column.numeric || false ? 'right' : 'left'}
-                    style={{ width: column.width }}
-                    sx={{ backgroundColor: 'background.paper' }}
-                >
-                    {column.label}
-                </TableCell>
-            ))}
-        </TableRow>
-    );
-};
 
 const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) => {
+
+    const VirtuosoTableComponents: TableComponents<Data> = {
+        Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
+            <TableContainer component={Paper} {...props} ref={ref} />
+        )),
+        Table: (props) => <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }} />,
+        TableHead,
+        TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
+        TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => <TableBody {...props} ref={ref} />),
+    };
+
+    const disableSelectAll = () => rows.length === 0 || rows.length > 100;
+    const hasCheckedRows = () => rows.length > 0 && rows.some((row) => row.selected);
+
+
+    const fixedHeaderContent = (columns: ColumnData[], rows, onSelectAllClick) => {
+        const isChecked = !disableSelectAll() && rows.length > 0 && rows.every((row) => row.selected);
+
+        return (
+            <TableRow>
+                <TableCell padding='checkbox' sx={{ width: '16px', backgroundColor: '#121212' }}>
+                    <Checkbox
+                        color='primary'
+                        checked={isChecked}
+                        onChange={onSelectAllClick}
+                        inputProps={{
+                            'aria-label': 'select all rows',
+                        }}
+                        disabled={!hasCheckedRows() && disableSelectAll()}
+                        indeterminate={hasCheckedRows() && disableSelectAll()}
+                    />
+                </TableCell>
+                {columns.map((column) => (
+                    <TableCell
+                        key={column.dataKey}
+                        variant='head'
+                        align={column.numeric || false ? 'right' : 'left'}
+                        style={{ width: column.width }}
+                        sx={{ backgroundColor: 'background.paper' }}
+                    >
+                        {column.label}
+                    </TableCell>
+                ))}
+            </TableRow>
+        );
+    };
+
     const rowContent = (_index: number, row: Data) => {
         const labelId = `enhanced-table-checkbox-${_index}`;
         return (
@@ -111,7 +117,13 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) =
     };
 
     const onSelectAllClick = (event) => {
-        if (event.target.checked) {
+        if (disableSelectAll()) {
+            const selectedRows = rows.filter((row) => row.selected);
+            selectedRows.forEach((row) => {
+                onRowClick(row);
+            });
+        }
+        else if (event.target.checked) {
             rows.forEach((row) => {
                 if (!row.selected) {
                     onRowClick(row);
@@ -137,9 +149,15 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) =
             return 0;
         });
 
+    const sortRowsByColumn = (rows, column) => {
+        return rows.sort((a, b) =>
+            b[column] - a[column]);
+    }
+
     useEffect(() => {
+        sortRowsByColumn(rows, 'count');
         sortRowsBySelected(rows);
-    }, []);
+    }, [rows.length]);
 
     return (
         <Paper style={{ height: 400, width: '100%', maxWidth: 800 }}>

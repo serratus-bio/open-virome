@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { moduleConfig } from './constants.ts';
+import { moduleConfig } from '../constants.ts';
 import { setActiveModule, setActiveView } from '../../../app/slice.ts';
 
 import Box from '@mui/material/Box';
