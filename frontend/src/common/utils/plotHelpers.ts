@@ -1,5 +1,6 @@
 import { truncate } from './textFormatting.ts';
 import { histogram } from 'echarts-stat';
+import chroma from 'chroma-js';
 
 export const shouldDisableFigureView = (identifiers) => {
     return identifiers && (identifiers?.run?.totalCount === -1 || identifiers?.run?.totalCount > 100000);
@@ -149,7 +150,7 @@ export const getBioprojectSizePlotData = (controlRows = []) => {
         yAxis: {
             name: 'Count',
             nameLocation: 'middle',
-            nameGap: 24,
+            nameGap: 40,
             minInterval: 1,
             boundaryGap: ['0%', '10%'],
             // type: maxCount > 100 ? 'log' : 'value',
@@ -172,13 +173,17 @@ export const getBioprojectSizePlotData = (controlRows = []) => {
             left: 0,
             top: 20,
         },
+        grid: {
+            left: 55,
+            right: 15,
+        },
         series: [
             {
                 name: `BioProjects`,
                 type: 'bar',
                 stack: 'total',
                 label: {
-                    show: true,
+                    show: false,
                     color: 'white',
                 },
                 emphasis: {
@@ -223,10 +228,14 @@ export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRo
         yAxis: {
             name: 'Count',
             nameLocation: 'middle',
-            nameGap: 22,
+            nameGap: 40,
             minInterval: 1,
             boundaryGap: ['0%', '10%'],
             // type: maxCount > 100 ? 'log' : 'value',
+        },
+        grid: {
+            left: 55,
+            right: 15,
         },
         title: {
             text: '% of BioProject in Target set',
@@ -262,7 +271,7 @@ export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRo
                 type: 'bar',
                 stack: 'total',
                 label: {
-                    show: true,
+                    show: false,
                     color: 'white',
                 },
                 emphasis: {
@@ -357,4 +366,82 @@ export const getBioprojectSizeVsPercentagePlotData = (controlRows = [], targetRo
             },
         ],
     };
+};
+
+export const getViromeGraphData = (rows = []) => {
+    let runsToSOTU = {};
+
+    rows.forEach((row) => {
+        const sOTUData = {
+            sOTU: row['sotu'],
+            species: row['tax_species'],
+            family: row['tax_family'],
+            gb: row['gb_acc'],
+            sotuPid: row['node_pid'],
+            gbPid: row['gb_pid'],
+        };
+
+        if (row['run'] in runsToSOTU) {
+            runsToSOTU[row['run']].push(sOTUData);
+        } else {
+            runsToSOTU[row['run']] = [sOTUData];
+        }
+    });
+
+    let sOTUsData = Object.values(runsToSOTU).flat();
+    sOTUsData = sOTUsData.filter((sOTU, index, self) => self.findIndex((t) => t['sOTU'] === sOTU['sOTU']) === index);
+    sOTUsData.sort((a, b) => {
+        if (!a['family'] || !b['family']) {
+            return 0;
+        }
+        if (a['family'] < b['family']) {
+            return -1;
+        }
+        if (a['family'] > b['family']) {
+            return 1;
+        }
+        return 0;
+    });
+    const numSOTUS = sOTUsData.length;
+    const hueStep = 360 / numSOTUS;
+    const colors = Array.from({ length: numSOTUS }, (_, i) => chroma.hsl(hueStep * i, 1, 0.6).hex());
+    const sOTUsToColor = {};
+    sOTUsData.forEach((sOTU, index) => {
+        sOTUsToColor[sOTU['sOTU']] = colors[index];
+    });
+
+    const getEdgeWidth = (sOTU) => {
+        return (parseInt(sOTU['sotuPid']) / 100) * 15;
+    };
+    const getEdgeWeight = (sOTU) => {
+        return parseInt(sOTU['sotuPid']) / 100;
+    };
+
+    const plotData = [];
+    for (const run in runsToSOTU) {
+        plotData.push({ data: { id: run, type: 'run', isNode: true } });
+        runsToSOTU[run].forEach((sOTU) => {
+            plotData.push({
+                data: {
+                    id: sOTU['sOTU'],
+                    type: 'sOTU',
+                    isNode: true,
+                    label: truncate(sOTU['species'], 25),
+                    color: sOTUsToColor[sOTU['sOTU']],
+                },
+            });
+            plotData.push({
+                data: {
+                    source: run,
+                    target: sOTU['sOTU'],
+                    isNode: false,
+                    width: getEdgeWidth(sOTU),
+                    weight: getEdgeWeight(sOTU),
+                    color: sOTUsToColor[sOTU['sOTU']],
+                },
+            });
+        });
+    }
+
+    return plotData;
 };

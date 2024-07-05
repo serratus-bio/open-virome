@@ -116,7 +116,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
         if (targetCountError || controlCountError) {
             return (
                 <Box sx={{ flex: 1 }}>
-                    <Typography variant='body1' sx={{ ...sectionStyle }}>
+                    <Typography variant='h6' sx={{ ...sectionStyle }}>
                         Error loading data
                     </Typography>
                 </Box>
@@ -132,7 +132,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
         ) {
             return (
                 <Box sx={{ flex: 1, height: 100 }}>
-                    <Typography variant='body1' sx={{ ...sectionStyle }}>
+                    <Typography variant='h6' sx={{ ...sectionStyle }}>
                         {`No ${moduleConfig[moduleKey].title.toLowerCase()} data available`}
                     </Typography>
                 </Box>

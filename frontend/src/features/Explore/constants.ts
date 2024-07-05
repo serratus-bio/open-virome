@@ -5,7 +5,7 @@ export const sectionConfig = {
         resultsIdColumn: 'run',
         defaultDisplay: 'figure',
     },
-    'Palmdb': {
+    'Palmdb Virome': {
         modules: ['sotu', 'family', 'species'],
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
@@ -15,7 +15,7 @@ export const sectionConfig = {
         modules: ['geography'],
         resultsTable: 'biosample_geo_coordinates',
         resultsIdColumn: 'biosample',
-        defaultDisplay: 'table',
+        defaultDisplay: 'figure',
     },
     'Other': {
         modules: ['statHost', 'tissue'],
@@ -25,7 +25,7 @@ export const sectionConfig = {
         // resultsTable: 'biosample_tissue',
         // resultsIdColumn: 'biosample',
         // defaultDisplay: 'table',
-    }
+    },
 };
 
 export const moduleConfig = {
@@ -76,7 +76,7 @@ export const moduleConfig = {
     },
     statHost: {
         title: 'STAT Host',
-        tag: 'STAT Host',
+        tag: 'STAT',
         groupByKey: 'stat_host_order',
     },
 };

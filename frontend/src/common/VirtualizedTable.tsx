@@ -15,7 +15,6 @@ interface Data {
     count: number;
     selected?: boolean;
 }
-
 interface ColumnData {
     dataKey: keyof Data;
     label: string;
@@ -37,26 +36,22 @@ const defaultColumns: ColumnData[] = [
     },
 ];
 
+const VirtuosoTableComponents: TableComponents<Data> = {
+    Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
+        <TableContainer component={Paper} {...props} ref={ref} />
+    )),
+    Table: (props) => <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }} />,
+    TableHead,
+    TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
+    TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => <TableBody {...props} ref={ref} />),
+};
 
 const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) => {
-
-    const VirtuosoTableComponents: TableComponents<Data> = {
-        Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
-            <TableContainer component={Paper} {...props} ref={ref} />
-        )),
-        Table: (props) => <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }} />,
-        TableHead,
-        TableRow: ({ item: _item, ...props }) => <TableRow {...props} />,
-        TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => <TableBody {...props} ref={ref} />),
-    };
-
-    const disableSelectAll = () => rows.length === 0 || rows.length > 100;
-    const hasCheckedRows = () => rows.length > 0 && rows.some((row) => row.selected);
-
+    const disableSelectAll = (rows) => rows.length === 0 || rows.length > 100;
+    const hasCheckedRows = (rows) => rows.length > 0 && rows.some((row) => row.selected);
 
     const fixedHeaderContent = (columns: ColumnData[], rows, onSelectAllClick) => {
-        const isChecked = !disableSelectAll() && rows.length > 0 && rows.every((row) => row.selected);
-
+        const isChecked = !disableSelectAll(rows) && rows.length > 0 && rows.every((row) => row.selected);
         return (
             <TableRow>
                 <TableCell padding='checkbox' sx={{ width: '16px', backgroundColor: '#121212' }}>
@@ -67,8 +62,8 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) =
                         inputProps={{
                             'aria-label': 'select all rows',
                         }}
-                        disabled={!hasCheckedRows() && disableSelectAll()}
-                        indeterminate={hasCheckedRows() && disableSelectAll()}
+                        disabled={!hasCheckedRows(rows) && disableSelectAll(rows)}
+                        indeterminate={hasCheckedRows(rows) && disableSelectAll(rows)}
                     />
                 </TableCell>
                 {columns.map((column) => (
@@ -117,13 +112,12 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) =
     };
 
     const onSelectAllClick = (event) => {
-        if (disableSelectAll()) {
+        if (disableSelectAll(rows)) {
             const selectedRows = rows.filter((row) => row.selected);
             selectedRows.forEach((row) => {
                 onRowClick(row);
             });
-        }
-        else if (event.target.checked) {
+        } else if (event.target.checked) {
             rows.forEach((row) => {
                 if (!row.selected) {
                     onRowClick(row);
@@ -150,9 +144,8 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) =
         });
 
     const sortRowsByColumn = (rows, column) => {
-        return rows.sort((a, b) =>
-            b[column] - a[column]);
-    }
+        return rows.sort((a, b) => b[column] - a[column]);
+    };
 
     useEffect(() => {
         sortRowsByColumn(rows, 'count');
