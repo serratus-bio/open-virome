@@ -15,7 +15,7 @@ const ExploreView = () => {
     const sectionRefs = {
         'SRA Run': useRef(),
         'Virus family': useRef(),
-        'Palmdb': useRef(),
+        'Palmdb Virome': useRef(),
         'Environment': useRef(),
         'Other': useRef(),
     };

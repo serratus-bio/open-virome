@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
 import SRARunLayout from './Figures/SRARunLayout.tsx';
 import EnvironmentLayout from './Figures/EnvironmentLayout.tsx';
+import ViromeLayout from './Figures/ViromeLayout.tsx';
 import IconButton from '@mui/material/IconButton';
 import TableIcon from '@mui/icons-material/TableRows';
 import PlotIcon from '@mui/icons-material/InsertChart';
@@ -48,11 +49,14 @@ const Module = ({ sectionKey }) => {
         if (sectionKey === 'Environment') {
             return <EnvironmentLayout identifiers={identifiersData} />;
         }
+        if (sectionKey === 'Palmdb Virome') {
+            return <ViromeLayout identifiers={identifiersData} />;
+        }
         return (
             <Box>
                 <Typography variant='h6'>Coming soon!</Typography>
             </Box>
-        )
+        );
     };
 
     return (
@@ -90,10 +94,7 @@ const Module = ({ sectionKey }) => {
                     mt: 4,
                 }}
             >
-                {identifiersFetching || !identifiersData ?
-                    null
-                :
-                isTableView() ? (
+                {identifiersFetching || !identifiersData ? null : isTableView() ? (
                     <ResultsTable
                         identifiersData={identifiersData}
                         sectionKey={sectionKey}

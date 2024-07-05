@@ -5,7 +5,7 @@ import { moduleConfig } from '../Explore/constants.ts';
 import { useGetCountsQuery, useGetIdentifiersQuery } from '../../api/client.ts';
 import { addFilter, removeFilter, selectAllFilters, selectFiltersByType } from './slice.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
-import { formatNumber } from '../../common/utils/textFormatting.ts';
+import { formatNumber, removeEmptyRows } from '../../common/utils/textFormatting.ts';
 
 import SearchBar from '../../common/SearchBar.tsx';
 import VirtualizedTable from '../../common/VirtualizedTable.tsx';
@@ -80,8 +80,8 @@ const QueryView = () => {
         if (!countData) {
             return [];
         }
-
-        let rows = addFilterState(countData);
+        let rows = removeEmptyRows(countData, moduleConfig[activeModule].groupByKey);
+        rows = addFilterState(countData);
         if (!searchString) {
             return rows;
         }

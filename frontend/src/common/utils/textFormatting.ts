@@ -8,5 +8,17 @@ export const formatNumber = (n: number) => {
 };
 
 export const truncate = (s: string, n: number = 10) => {
+    if (!s || s.length <= n) {
+        return s;
+    }
     return s.length > n ? s.substring(0, n - 1) + '...' : s;
+};
+
+export const removeEmptyRows = (obj: any, key: any) => {
+    return Object.keys(obj).reduce((acc, key) => {
+        if (obj[key]) {
+            acc[key] = obj[key];
+        }
+        return acc;
+    }, {});
 };

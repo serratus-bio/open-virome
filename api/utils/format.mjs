@@ -21,7 +21,7 @@ const reduceConsecutiveToRange = (ids) => {
         return [[], []];
     }
 
-    if (ids.length < 10000) {
+    if (ids.length < 5000) {
         return [[], ids];
     }
 

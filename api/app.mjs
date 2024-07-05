@@ -15,11 +15,10 @@ import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware.js
 const app = express();
 const port = 8000;
 
+app.use(express.json({ limit: '100mb' }));
 app.use(cors());
-
 app.use(awsServerlessExpressMiddleware.eventContext());
 app.use(bodyParser.json());
-app.use(express.json({ limit: '100mb' }));
 app.use(
     bodyParser.urlencoded({
         extended: true,
@@ -141,7 +140,7 @@ app.post('/results', async (req, res) => {
     const table = body?.table || 'srarun';
     const columns = body?.columns || '*';
     const pageStart = body?.pageStart || 0;
-    const pageEnd = body?.pageEnd || 10;
+    const pageEnd = body?.pageEnd || undefined;
 
     const clauses = getIdClauses(ids, idRanges, idColumn, table);
 
@@ -149,7 +148,7 @@ app.post('/results', async (req, res) => {
         SELECT ${columns}
         FROM ${table}
         ${clauses.length > 0 ? `WHERE ${clauses.join(' OR ')}` : ''}
-        LIMIT ${pageEnd - pageStart} OFFSET ${pageStart}
+        ${pageEnd !== undefined ? `LIMIT ${pageEnd - pageStart} OFFSET ${pageStart}` : 'LIMIT 20000'}
     `;
     const result = await runQuery(query);
     if (result.error) {

@@ -166,7 +166,7 @@ const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange }) 
                 <TablePagination
                     rowsPerPageOptions={[10]}
                     component='div'
-                    count={total}
+                    count={total ?? 0}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={onPageChange}

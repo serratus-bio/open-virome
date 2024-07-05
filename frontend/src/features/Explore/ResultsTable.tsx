@@ -79,7 +79,7 @@ const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
         if (resultError) {
             return (
                 <Box sx={{ flex: 1 }}>
-                    <Typography variant='body1' sx={{ ...sectionStyle }}>
+                    <Typography variant='h6' sx={{ ...sectionStyle }}>
                         Error loading data
                     </Typography>
                 </Box>
@@ -88,7 +88,7 @@ const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
         if (resultData && resultData.length === 0 && !resultIsFetching) {
             return (
                 <Box sx={{ flex: 1, height: 100 }}>
-                    <Typography variant='body1' sx={{ ...sectionStyle }}>
+                    <Typography variant='h6' sx={{ ...sectionStyle }}>
                         {`No data available`}
                     </Typography>
                 </Box>
