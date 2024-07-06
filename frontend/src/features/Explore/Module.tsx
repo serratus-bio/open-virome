@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectAllFilters } from '../Query/slice.ts';
-import { sectionConfig } from './constants.ts';
+import { selectActiveSection, selectActiveModule } from '../../app/slice.ts';
+import { moduleConfig } from './constants.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
 import { shouldDisableFigureView } from '../../common/utils/plotHelpers.ts';
 import { useGetIdentifiersQuery } from '../../api/client.ts';
@@ -15,14 +16,18 @@ import ViromeLayout from './Figures/ViromeLayout.tsx';
 import IconButton from '@mui/material/IconButton';
 import TableIcon from '@mui/icons-material/TableRows';
 import PlotIcon from '@mui/icons-material/InsertChart';
+import TuneIcon from '@mui/icons-material/Tune';
 import ResultsTable from './ResultsTable.tsx';
 
-const Module = ({ sectionKey }) => {
+const Module = () => {
     const filters = useSelector(selectAllFilters);
+    const activeSection = useSelector(selectActiveSection);
+    const activeModule = useSelector(selectActiveModule);
 
-    const [moduleDisplay, setModuleDisplay] = useState(sectionConfig[sectionKey]?.defaultDisplay);
+    const [moduleDisplay, setModuleDisplay] = useState(moduleConfig[activeModule]?.defaultDisplay);
     const isTableView = () => moduleDisplay === 'table';
     const isFigureView = () => moduleDisplay === 'figure';
+    const isFilterView = () => moduleDisplay === 'filter';
 
     const {
         data: identifiersData,
@@ -33,7 +38,7 @@ const Module = ({ sectionKey }) => {
     });
 
     useEffect(() => {
-        if (shouldDisableFigureView(identifiersData)) {
+        if (shouldDisableFigureView(identifiersData, activeSection)) {
             setModuleDisplay('table');
         }
     }, [identifiersData]);
@@ -42,14 +47,14 @@ const Module = ({ sectionKey }) => {
         setModuleDisplay(view);
     };
 
-    const getModuleFigureLayout = (sectionKey) => {
-        if (sectionKey === 'SRA Run') {
+    const getModuleFigureLayout = () => {
+        if (activeSection === 'SRA Experiment') {
             return <SRARunLayout identifiers={identifiersData} />;
         }
-        if (sectionKey === 'Environment') {
+        if (activeSection === 'Environment') {
             return <EnvironmentLayout identifiers={identifiersData} />;
         }
-        if (sectionKey === 'Palmdb Virome') {
+        if (activeSection === 'Palmdb Virome') {
             return <ViromeLayout identifiers={identifiersData} />;
         }
         return (
@@ -63,14 +68,22 @@ const Module = ({ sectionKey }) => {
         <Box sx={{ maxWidth: '70vw' }}>
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography component={'div'} variant='h4'>
-                    {sectionKey}
+                    {activeSection}
                 </Typography>
                 <Box>
+
+                   <IconButton
+                        sx={{ mt: -0.5, height: 30, width: 30 }}
+                        color={isFilterView() ? 'primary' : 'default'}
+                        onClick={() => onViewChange('filter')}
+                    >
+                        <TuneIcon fontSize='medium' />
+                    </IconButton>
                     <IconButton
                         sx={{ mt: -0.5, height: 30, width: 30 }}
                         color={isFigureView() ? 'primary' : 'default'}
                         onClick={() => onViewChange('figure')}
-                        disabled={shouldDisableFigureView(identifiersData)}
+                        disabled={shouldDisableFigureView(identifiersData, activeSection)}
                     >
                         <PlotIcon fontSize='medium' />
                     </IconButton>
@@ -97,11 +110,11 @@ const Module = ({ sectionKey }) => {
                 {identifiersFetching || !identifiersData ? null : isTableView() ? (
                     <ResultsTable
                         identifiersData={identifiersData}
-                        sectionKey={sectionKey}
+                        moduleKey={activeModule}
                         shouldSkipFetching={identifiersFetching || !isTableView()}
                     />
                 ) : (
-                    getModuleFigureLayout(sectionKey)
+                    getModuleFigureLayout()
                 )}
             </Box>
         </Box>

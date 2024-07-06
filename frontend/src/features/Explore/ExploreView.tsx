@@ -1,34 +1,24 @@
 import React, { useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
-import { selectActiveModule } from '../../app/slice.ts';
-import { sectionConfig } from './constants.ts';
+import { selectActiveSection } from '../../app/slice.ts';
 
 import Module from './Module.tsx';
 import Box from '@mui/material/Box';
 
 const ExploreView = () => {
-    const activeModule = useSelector(selectActiveModule);
-    const activeSection = Object.keys(sectionConfig).find((section) =>
-        sectionConfig[section].modules.includes(activeModule),
-    );
+    const activeSection = useSelector(selectActiveSection);
 
     const sectionRefs = {
-        'SRA Run': useRef(),
-        'Virus family': useRef(),
+        'SRA Experiment': useRef(),
         'Palmdb Virome': useRef(),
-        'Environment': useRef(),
-        'Other': useRef(),
+        'Context': useRef(),
     };
 
     useEffect(() => {
-        const activeSection = Object.keys(sectionConfig).find((section) =>
-            sectionConfig[section].modules.includes(activeModule),
-        );
-
         if (!activeSection) {
             return;
         }
-        if (activeSection === 'SRA Run') {
+        if (activeSection === 'SRA Experiment') {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
             const sectionRef = sectionRefs[activeSection].current;
@@ -40,12 +30,12 @@ const ExploreView = () => {
             sectionRef.style.top = top;
             sectionRef.style.position = pos;
         }
-    }, [activeModule, sectionRefs]);
+    }, [activeSection, sectionRefs]);
 
     return (
         <>
             <Box key={activeSection} ref={sectionRefs[activeSection]}>
-                <Module sectionKey={activeSection} />
+                <Module />
             </Box>
         </>
     );

@@ -1,5 +1,6 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
 import { RootState } from './store';
+import { sectionConfig } from '../features/Explore/constants.ts';
 
 /* Reducers */
 
@@ -48,3 +49,8 @@ export const selectSidebarOpen = createSelector([selectApp], (app: AppState) => 
 export const selectDarkMode = createSelector([selectApp], (app: AppState) => app.darkMode);
 export const selectActiveView = createSelector([selectApp], (app: AppState) => app.activeView);
 export const selectActiveModule = createSelector([selectApp], (app: AppState) => app.activeModule);
+
+
+export const  selectActiveSection = createSelector([selectActiveModule], (activeModule) => Object.keys(sectionConfig).find((section) =>
+    sectionConfig[section].modules.includes(activeModule),
+));

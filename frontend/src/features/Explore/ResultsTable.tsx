@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { sectionConfig } from './constants.ts';
+import { moduleConfig } from './constants.ts';
 import { handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
 
 import PagedTable from '../../common/PagedTable.tsx';
@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
 
-const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
+const ResultsTable = ({ identifiersData, moduleKey, shouldSkipFetching }) => {
     const [page, setPage] = useState(0);
 
     const {
@@ -17,15 +17,15 @@ const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
         isFetching: resultIsFetching,
     } = useGetResultQuery(
         {
-            idColumn: sectionConfig[sectionKey].resultsIdColumn,
+            idColumn: moduleConfig[moduleKey].resultsIdColumn,
             ids: identifiersData
-                ? identifiersData[handleIdKeyIrregularities(sectionConfig[sectionKey].resultsIdColumn)].single
+                ? identifiersData[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].single
                 : [],
             idRanges: identifiersData
-                ? identifiersData[handleIdKeyIrregularities(sectionConfig[sectionKey].resultsIdColumn)].range
+                ? identifiersData[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].range
                 : [],
-            table: sectionConfig[sectionKey].resultsTable,
-            sortByColumn: sectionConfig[sectionKey].resultsIdColumn,
+            table: moduleConfig[moduleKey].resultsTable,
+            sortByColumn: moduleConfig[moduleKey].resultsIdColumn,
             sortByDirection: 'asc',
             pageStart: page * 10,
             pageEnd: (page + 1) * 10,
@@ -41,13 +41,13 @@ const ResultsTable = ({ identifiersData, sectionKey, shouldSkipFetching }) => {
         isFetching: totalCountIsFetching,
     } = useGetCountsQuery(
         {
-            idColumn: sectionConfig[sectionKey].resultsIdColumn,
-            table: sectionConfig[sectionKey].resultsTable,
+            idColumn: moduleConfig[moduleKey].resultsIdColumn,
+            table: moduleConfig[moduleKey].resultsTable,
             ids: identifiersData
-                ? identifiersData[handleIdKeyIrregularities(sectionConfig[sectionKey].resultsIdColumn)].single
+                ? identifiersData[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].single
                 : [],
             idRanges: identifiersData
-                ? identifiersData[handleIdKeyIrregularities(sectionConfig[sectionKey].resultsIdColumn)].range
+                ? identifiersData[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].range
                 : [],
         },
         {

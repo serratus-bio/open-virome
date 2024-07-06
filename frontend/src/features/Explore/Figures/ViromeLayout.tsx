@@ -1,7 +1,9 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
+import { selectActiveModule } from '../../../app/slice.ts';
 import { getViromeGraphData } from '../../../common/utils/plotHelpers.ts';
 import { useGetResultQuery } from '../../../api/client.ts';
-import { sectionConfig } from '../constants.ts';
+import { moduleConfig } from '../constants.ts';
 import { handleIdKeyIrregularities } from '../../../common/utils/queryHelpers.ts';
 
 import Box from '@mui/material/Box';
@@ -10,7 +12,9 @@ import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 
 const ViromeLayout = ({ identifiers }) => {
-    const config = sectionConfig['Palmdb Virome'];
+    const activeModule = useSelector(selectActiveModule);
+
+    const config = moduleConfig[activeModule];
     const {
         data: resultData,
         error: resultError,

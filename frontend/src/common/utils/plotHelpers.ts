@@ -2,8 +2,17 @@ import { truncate } from './textFormatting.ts';
 import { histogram } from 'echarts-stat';
 import chroma from 'chroma-js';
 
-export const shouldDisableFigureView = (identifiers) => {
-    return identifiers && (identifiers?.run?.totalCount === -1 || identifiers?.run?.totalCount > 100000);
+export const shouldDisableFigureView = (identifiers, sectionKey = '') => {
+    if (!identifiers) {
+        return true;
+    }
+    if (identifiers?.run?.totalCount === -1) {
+        return true;
+    }
+    if (sectionKey === 'Palmdb Virome') {
+        return identifiers?.run?.totalCount > 10000;
+    }
+    return identifiers?.run?.totalCount > 100000;
 };
 
 // https://github.com/ecomfe/echarts-stat?tab=readme-ov-file#return-value-only-for-standalone-usage
@@ -22,13 +31,13 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
         } else if (countKey === 'percent') {
             return parseInt(value);
         } else if (countKey === 'gbp') {
-            return parseFloat(value).toFixed(1);
+            return parseFloat(parseFloat(value).toFixed(1));
         }
         return value;
     };
 
     const mergedRows = targetRows
-        .map((row) => ({ name: row['name'], target: parseCount(row[countKey]), control: 0.0 }))
+        .map((row) => ({ name: row['name'], target: parseCount(row[countKey]), control: 0 }))
         .concat(controlRows.map((row) => ({ name: row['name'], target: 0.0, control: parseCount(row[countKey]) })))
         .reduce((acc, row) => {
             const existingRow = acc.find((existing) => existing.name === row.name);
@@ -43,12 +52,12 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
         .map((row) => {
             return {
                 name: row.name ? row.name : 'N/A',
-                target: parseCount(row.target),
-                control: parseCount(Math.abs(row.control - row.target)),
+                target: row.target,
+                control: Math.abs(row.control - row.target),
             };
         });
     mergedRows.sort((a, b) => {
-        return a.target + a.control - (b.target + b.control);
+        return (a.target + a.control) - (b.target + b.control);
     });
     // mergedRows.sort((a, b) => a.target - b.target)
 
@@ -426,7 +435,7 @@ export const getViromeGraphData = (rows = []) => {
                     id: sOTU['sOTU'],
                     type: 'sOTU',
                     isNode: true,
-                    label: truncate(sOTU['species'], 25),
+                    label: truncate(sOTU['species'], 25) ?? 'N/A',
                     color: sOTUsToColor[sOTU['sOTU']],
                 },
             });

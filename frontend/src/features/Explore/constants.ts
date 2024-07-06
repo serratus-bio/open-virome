@@ -1,30 +1,12 @@
 export const sectionConfig = {
-    'SRA Run': {
-        modules: ['host', 'seqType', 'bioproject', 'date'],
-        resultsTable: 'srarun',
-        resultsIdColumn: 'run',
-        defaultDisplay: 'figure',
+    'SRA Experiment': {
+        modules: ['host', 'seqType', 'bioproject'],
     },
     'Palmdb Virome': {
         modules: ['sotu', 'family', 'species'],
-        resultsTable: 'palm_virome',
-        resultsIdColumn: 'run',
-        defaultDisplay: 'table',
     },
-    'Environment': {
-        modules: ['geography'],
-        resultsTable: 'biosample_geo_coordinates',
-        resultsIdColumn: 'biosample',
-        defaultDisplay: 'figure',
-    },
-    'Other': {
-        modules: ['statHost', 'tissue'],
-        resultsTable: 'sra_stat',
-        resultsIdColumn: 'run',
-        defaultDisplay: 'table',
-        // resultsTable: 'biosample_tissue',
-        // resultsIdColumn: 'biosample',
-        // defaultDisplay: 'table',
+    'Context': {
+        modules: ['geography', 'statHost', 'tissue'],
     },
 };
 
@@ -33,50 +15,73 @@ export const moduleConfig = {
         title: 'Organism label',
         tag: 'Organism',
         groupByKey: 'host_label',
+        resultsTable: 'srarun',
+        resultsIdColumn: 'run',
+        defaultDisplay: 'figure',
     },
     bioproject: {
         title: 'Bioproject',
         tag: 'Bioproject',
         groupByKey: 'bioproject',
+        resultsTable: 'srarun',
+        resultsIdColumn: 'run',
+        defaultDisplay: 'figure',
     },
     seqType: {
         title: 'Dataset type',
         tag: 'Dataset type',
         groupByKey: 'library_strategy',
-    },
-    date: {
-        title: 'Collection date',
-        tag: 'Date',
-        groupByKey: 'release_date',
+        resultsTable: 'srarun',
+        resultsIdColumn: 'run',
+        defaultDisplay: 'figure',
     },
     sotu: {
         title: 'sOTU',
         tag: 'sOTU',
         groupByKey: 'sotu',
-    },
-    family: {
-        title: 'Virus Family',
-        tag: 'Virus Family',
-        groupByKey: 'tax_family',
+        resultsTable: 'palm_virome',
+        resultsIdColumn: 'run',
+        defaultDisplay: 'figure',
     },
     species: {
         title: 'Virus Species',
         tag: 'Virus Species',
         groupByKey: 'tax_species',
+        resultsTable: 'palm_virome',
+        resultsIdColumn: 'run',
+        defaultDisplay: 'figure',
+    },
+    family: {
+        title: 'Virus Family',
+        tag: 'Virus Family',
+        groupByKey: 'tax_family',
+        resultsTable: 'palm_virome',
+        resultsIdColumn: 'run',
+        defaultDisplay: 'figure',
     },
     geography: {
         title: 'Geography',
         tag: 'Geography',
         groupByKey: 'geo',
+        resultsIdColumn: 'biosample',
+        resultsTable: 'biosample_geo_coordinates',
+        defaultDisplay: 'figure',
     },
     tissue: {
         title: 'Tissue',
         tag: 'Tissue',
         groupByKey: 'tissue',
+        resultsTable: 'biosample_tissue',
+        resultsIdColumn: 'biosample',
+        defaultDisplay: 'table',
+
     },
     statHost: {
         title: 'STAT Host',
         tag: 'STAT',
         groupByKey: 'stat_host_order',
+        resultsTable: 'sra_stat',
+        resultsIdColumn: 'run',
+        defaultDisplay: 'table',
     },
 };
