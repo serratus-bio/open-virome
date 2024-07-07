@@ -68,7 +68,7 @@ const Module = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: 1000, ml: 8, mt: 4, flexGrow: 1 }}>
+        <Box sx={{ maxWidth: 1000, ml: 8, mt: 4, mb: 8, flexGrow: 1 }}>
             <Toolbar />
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography component={'div'} variant='h4'>

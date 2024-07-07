@@ -10,21 +10,25 @@ cytoscape.use(fcose);
 
 const NetworkPlot = ({ plotData = [] }) => {
     const [cy, setCy] = useState(null);
+    const [activeSubgraph, setActiveSubgraph] = useState(0);
     const [headlessCy, setHeadlessCy] = useState(
         cytoscape({
             headless: true,
             elements: plotData,
         }),
     );
-    const [activeSubgraph, setActiveSubgraph] = useState(0);
 
     useEffect(() => {
-        if (cy){
+        if (cy && headlessCy) {
             headlessCy.json({ elements: plotData });
-            cy.json({ elements: getActiveComponent() });
-            cy.layout(layouts[1]).run();
+            headlessCy.ready(() => {
+                cy.json({ elements: getActiveComponent() });
+                cy.ready(() => {
+                    cy.layout(layouts[1]).run();
+                });
+            });
         }
-    }, [plotData]);
+    }, [plotData, activeSubgraph]);
 
     const stylesheet = [
         {
@@ -114,7 +118,7 @@ const NetworkPlot = ({ plotData = [] }) => {
             nodeRepulsion: (node) => 450000,
             // Ideal edge (non nested) length
             idealEdgeLength: (edge) => {
-                return edge.data().weight * edge.data().numSOTUS * 1.5;
+                return Math.max(edge.data().weight * edge.data().numSOTUS * 1.5, 100);
             },
             // Divisor to compute edge forces
             edgeElasticity: (edge) => {
@@ -174,7 +178,7 @@ const NetworkPlot = ({ plotData = [] }) => {
 
     const getComponentOptions = () => {
         const components = headlessCy.elements().components();
-        return components.map((component, index) => index);
+        return components.map((_, index) => index);
     };
 
     return (

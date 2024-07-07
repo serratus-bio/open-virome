@@ -83,12 +83,12 @@ export const getGroupedCountsByIdentifiers = ({ ids, idRanges, idColumn, groupBy
     `;
 };
 
-const shouldIncludeCounts = (filters, groupBy) => {
-    return filters.filter((filter) => filter.filterType !== groupBy).length > 0;
+const hasNoGroupByFilters = (filters, groupBy) => {
+    return !filters.filter((filter) => filter.filterType !== groupBy).length > 0;
 };
 
 export const getCachedCountsResults = (filters, groupBy) => {
-    if (!shouldIncludeCounts(filters, groupBy)) {
+    if (hasNoGroupByFilters(filters, groupBy)) {
         return groupByToCounts[groupBy];
     }
 };
@@ -96,7 +96,7 @@ export const getCachedCountsResults = (filters, groupBy) => {
 export const getGroupedCountsByFilters = ({ filters, groupBy }) => {
     const tableJoin = getMinimalJoinSubQuery(filters, groupBy);
     return `
-        SELECT ${groupBy} as name${shouldIncludeCounts(filters, groupBy) ? `, COUNT(*) as count` : ''}
+        SELECT ${groupBy} as name${hasNoGroupByFilters(filters, groupBy) ? '' : `, COUNT(*) as count`}
         FROM (${tableJoin}) as open_virome
         GROUP BY ${groupBy}
     `;

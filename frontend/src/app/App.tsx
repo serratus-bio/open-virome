@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Provider, useSelector, useDispatch } from 'react-redux';
+import React from 'react';
+import { Provider, useSelector } from 'react-redux';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { selectDarkMode } from './slice.ts';
@@ -19,7 +19,6 @@ const AppWrapper = () => {
 };
 
 const App = () => {
-    const dispatch = useDispatch();
     const darkMode = useSelector(selectDarkMode);
 
     const theme = createTheme({

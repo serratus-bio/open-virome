@@ -51,6 +51,27 @@ const QueryView = ({ identifiers, identifiersFetching }) => {
         }
     };
 
+    const stringSearch = (rows = []) => {
+        const searchStrings = searchString
+            .split(/[,\s]/)
+            .map((substring) => substring.trim())
+            .filter(Boolean);
+        return rows
+            .filter((row) => !!row.name)
+            .filter((row) =>
+                searchStrings.some((searchString) => row.name.toLowerCase().includes(searchString.toLowerCase())),
+            )
+            .sort((a, b) => {
+                const aMatches = searchStrings.filter((searchString) =>
+                    a.name.toLowerCase().includes(searchString.toLowerCase()),
+                ).length;
+                const bMatches = searchStrings.filter((searchString) =>
+                    b.name.toLowerCase().includes(searchString.toLowerCase()),
+                ).length;
+                return bMatches - aMatches;
+            });
+    };
+
     const getRows = (countData, searchString, moduleFilters) => {
         const addFilterState = (rows) => {
             return rows.map((row) => {
@@ -69,7 +90,7 @@ const QueryView = ({ identifiers, identifiersFetching }) => {
         if (!searchString) {
             return rows;
         }
-        return rows.filter((row) => row?.name && row.name.toLowerCase().includes(searchString.toLowerCase()));
+        return stringSearch(rows);
     };
 
     return (
@@ -104,15 +125,20 @@ const QueryView = ({ identifiers, identifiersFetching }) => {
                     {!identifiers || identifiersFetching || countIsFetching ? (
                         <Skeleton variant='rounded' height={20} />
                     ) : (
-                        <Typography component={'div'} variant='h6' sx={{ mt: 2, textAlign: 'left' }}>
-                            {`${moduleConfig[activeModule].tag}: ${countData ? formatNumber(countData.length) : ''}${
-                                identifiers &&
-                                identifiers?.run?.totalCount >= 0 &&
-                                identifiers?.bioproject?.totalCount >= 0
-                                    ? `, Bioprojects: ${identifiers?.bioproject ? formatNumber(identifiers.bioproject.totalCount) : ''}, Sequences: ${identifiers?.run ? formatNumber(identifiers.run.totalCount) : ''}`
-                                    : ''
-                            }`}
-                        </Typography>
+                        <Box>
+                            <Typography component={'span'} variant='h7' sx={{ mt: 2, textAlign: 'left' }}>
+                                {`Total ${moduleConfig[activeModule].tag}: ${countData ? formatNumber(countData.length) : ''}.`}
+                            </Typography>
+                            <Typography component={'span'} variant='h7' sx={{ mt: 1, ml: 1, textAlign: 'left' }}>
+                                {`${
+                                    identifiers &&
+                                    identifiers?.run?.totalCount >= 0 &&
+                                    identifiers?.bioproject?.totalCount >= 0
+                                        ? `Matching BioProjects: ${identifiers?.bioproject ? formatNumber(identifiers.bioproject.totalCount) : ''}. Matching Sequences: ${identifiers?.run ? formatNumber(identifiers.run.totalCount) : ''}.`
+                                        : ''
+                                }`}
+                            </Typography>
+                        </Box>
                     )}
                 </Box>
             </Box>

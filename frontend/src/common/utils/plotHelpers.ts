@@ -388,7 +388,7 @@ const getRandomSubarray = (arr, size) => {
     return shuffled.slice(0, size);
 };
 
-export const getViromeGraphData = (rows = [], groupBy='sotu') => {
+export const getViromeGraphData = (rows = [], groupBy = 'sotu') => {
     let runsToRowData = {};
     let data;
     if (rows.length > 1000) {
@@ -450,7 +450,6 @@ export const getViromeGraphData = (rows = [], groupBy='sotu') => {
     sOTUsData.forEach((sOTU, index) => {
         sOTUsToColor[sOTU['sotu']] = colors[index];
     });
-
     const getEdgeWidth = (sOTU) => {
         return (parseInt(sOTU['node_pid']) / 100) * 15;
     };

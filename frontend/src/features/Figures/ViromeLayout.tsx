@@ -23,8 +23,12 @@ const ViromeLayout = ({ identifiers }) => {
     } = useGetResultQuery(
         {
             idColumn: moduleConfig[activeModule].resultsIdColumn,
-            ids: identifiers ? identifiers[handleIdKeyIrregularities(moduleConfig[activeModule].resultsIdColumn)].single : [],
-            idRanges: identifiers ? identifiers[handleIdKeyIrregularities(moduleConfig[activeModule].resultsIdColumn)].range : [],
+            ids: identifiers
+                ? identifiers[handleIdKeyIrregularities(moduleConfig[activeModule].resultsIdColumn)].single
+                : [],
+            idRanges: identifiers
+                ? identifiers[handleIdKeyIrregularities(moduleConfig[activeModule].resultsIdColumn)].range
+                : [],
             table: moduleConfig[activeModule].resultsTable,
             // sortByColumn: moduleConfig[activeModule].resultsIdColumn,
             // sortByDirection: 'asc',
@@ -74,11 +78,11 @@ const ViromeLayout = ({ identifiers }) => {
     return (
         <Box sx={{ width: '100%', height: '100%' }}>
             {
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                <Typography component={'div'} variant='h6' sx={{ mt: 2, mb: 2, mr: 2 }}>
-                    {moduleConfig[activeModule].title}
-                </Typography>
-            </Box>
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
+                    <Typography component={'div'} variant='h6' sx={{ mt: 2, mb: 2, mr: 2 }}>
+                        {moduleConfig[activeModule].title}
+                    </Typography>
+                </Box>
             }
             {shouldRenderPlaceholder(resultError, resultIsFetching, resultData)
                 ? renderPlaceholder()
