@@ -8,6 +8,7 @@ import {
     getTotalCountsQuery,
     getGroupedCountsByIdentifiers,
     getGroupedCountsByFilters,
+    getCachedCountsResults,
 } from './utils/queryBuilder.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware.js';
@@ -78,6 +79,10 @@ app.post('/counts', async (req, res) => {
             table: table,
         });
     } else {
+        const cachedResults = getCachedCountsResults(filters, groupBy);
+        if (cachedResults) {
+            return res.json(cachedResults);
+        }
         query = getGroupedCountsByFilters({
             filters,
             groupBy,
