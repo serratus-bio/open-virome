@@ -1,21 +1,16 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setActiveModule, setActiveView } from '../../../app/slice.ts';
-import { moduleConfig } from '../constants.ts';
-import { shouldDisableFigureView, getControlTargetPlotData } from '../../../common/utils/plotHelpers.ts';
-import { useGetCountsQuery } from '../../../api/client.ts';
+import { moduleConfig } from '../Module/constants.ts';
+import { shouldDisableFigureView, getControlTargetPlotData } from '../../common/utils/plotHelpers.ts';
+import { useGetCountsQuery } from '../../api/client.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import TuneIcon from '@mui/icons-material/Tune';
 import Skeleton from '@mui/material/Skeleton';
-import BarPlot from '../../../common/BarPlot.tsx';
-import PolarBarPlot from '../../../common/PolarBarPlot.tsx';
-import RadioButtonsGroup from '../../../common/RadioButtonsGroup.tsx';
+import BarPlot from '../../common/BarPlot.tsx';
+import PolarBarPlot from '../../common/PolarBarPlot.tsx';
+import RadioButtonsGroup from '../../common/RadioButtonsGroup.tsx';
 
 const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
-    const dispatch = useDispatch();
     const [activeCountKey, setActiveCountKey] = useState('count');
 
     const {
@@ -49,11 +44,6 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             skip: shouldDisableFigureView(identifiers),
         },
     );
-
-    const handleFilterClick = (moduleKey) => {
-        dispatch(setActiveModule(moduleKey));
-        dispatch(setActiveView('query'));
-    };
 
     const sectionStyle = {
         mt: 2,
@@ -155,11 +145,6 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
                 <Typography component={'div'} variant='h6' sx={{ ...sectionStyle, mr: 2 }}>
                     {moduleConfig[moduleKey].title}
                 </Typography>
-                <Box>
-                    <IconButton sx={{ mt: -0.5, height: 30, width: 30 }} onClick={() => handleFilterClick(moduleKey)}>
-                        <TuneIcon fontSize='small' />
-                    </IconButton>
-                </Box>
             </Box>
             <Box
                 sx={{

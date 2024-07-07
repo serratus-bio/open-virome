@@ -18,6 +18,14 @@ const NetworkPlot = ({ plotData = [] }) => {
     );
     const [activeSubgraph, setActiveSubgraph] = useState(0);
 
+    useEffect(() => {
+        if (cy){
+            headlessCy.json({ elements: plotData });
+            cy.json({ elements: getActiveComponent() });
+            cy.layout(layouts[1]).run();
+        }
+    }, [plotData]);
+
     const stylesheet = [
         {
             selector: 'node[type="sOTU"]',
@@ -71,7 +79,7 @@ const NetworkPlot = ({ plotData = [] }) => {
             // if this is set to false, then quality option must be "proof"
             randomize: true,
             // Whether or not to animate the layout
-            animate: 'true',
+            animate: true,
             // Duration of animation in ms, if enabled
             animationDuration: 500,
             // Easing of animation, if enabled
@@ -106,7 +114,7 @@ const NetworkPlot = ({ plotData = [] }) => {
             nodeRepulsion: (node) => 450000,
             // Ideal edge (non nested) length
             idealEdgeLength: (edge) => {
-                return edge.data().weight * 100;
+                return edge.data().weight * edge.data().numSOTUS * 1.5;
             },
             // Divisor to compute edge forces
             edgeElasticity: (edge) => {
@@ -161,7 +169,6 @@ const NetworkPlot = ({ plotData = [] }) => {
             return [];
         }
 
-        console.log(components[activeSubgraph].length)
         return components[activeSubgraph].jsons();
     };
 

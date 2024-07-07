@@ -10,14 +10,16 @@ import { useGetIdentifiersQuery } from '../../api/client.ts';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Divider from '@mui/material/Divider';
-import SRARunLayout from './Figures/SRARunLayout.tsx';
-import EnvironmentLayout from './Figures/EnvironmentLayout.tsx';
-import ViromeLayout from './Figures/ViromeLayout.tsx';
+import SRARunLayout from '../Figures/SRARunLayout.tsx';
+import EnvironmentLayout from '../Figures/EnvironmentLayout.tsx';
+import ViromeLayout from '../Figures/ViromeLayout.tsx';
 import IconButton from '@mui/material/IconButton';
 import TableIcon from '@mui/icons-material/TableRows';
 import PlotIcon from '@mui/icons-material/InsertChart';
 import TuneIcon from '@mui/icons-material/Tune';
-import ResultsTable from './ResultsTable.tsx';
+import ResultsTable from '../Results/ResultsTable.tsx';
+import QueryView from '../Query/QueryView.tsx';
+import Toolbar from '@mui/material/Toolbar';
 
 const Module = () => {
     const filters = useSelector(selectAllFilters);
@@ -25,6 +27,7 @@ const Module = () => {
     const activeModule = useSelector(selectActiveModule);
 
     const [moduleDisplay, setModuleDisplay] = useState(moduleConfig[activeModule]?.defaultDisplay);
+
     const isTableView = () => moduleDisplay === 'table';
     const isFigureView = () => moduleDisplay === 'figure';
     const isFilterView = () => moduleDisplay === 'filter';
@@ -39,7 +42,7 @@ const Module = () => {
 
     useEffect(() => {
         if (shouldDisableFigureView(identifiersData, activeSection)) {
-            setModuleDisplay('table');
+            setModuleDisplay('filter');
         }
     }, [identifiersData]);
 
@@ -51,11 +54,11 @@ const Module = () => {
         if (activeSection === 'SRA Experiment') {
             return <SRARunLayout identifiers={identifiersData} />;
         }
-        if (activeSection === 'Environment') {
-            return <EnvironmentLayout identifiers={identifiersData} />;
-        }
         if (activeSection === 'Palmdb Virome') {
             return <ViromeLayout identifiers={identifiersData} />;
+        }
+        if (activeSection === 'Context' && activeModule === 'geography') {
+            return <EnvironmentLayout identifiers={identifiersData} />;
         }
         return (
             <Box>
@@ -65,14 +68,14 @@ const Module = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: '70vw' }}>
+        <Box sx={{ maxWidth: 1000, ml: 8, mt: 4, flexGrow: 1 }}>
+            <Toolbar />
             <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography component={'div'} variant='h4'>
                     {activeSection}
                 </Typography>
                 <Box>
-
-                   <IconButton
+                    <IconButton
                         sx={{ mt: -0.5, height: 30, width: 30 }}
                         color={isFilterView() ? 'primary' : 'default'}
                         onClick={() => onViewChange('filter')}
@@ -107,9 +110,11 @@ const Module = () => {
                     mt: 4,
                 }}
             >
-                {identifiersFetching || !identifiersData ? null : isTableView() ? (
+                {isFilterView() ? (
+                    <QueryView identifiers={identifiersData} identifiersFetching={identifiersFetching} />
+                ) : isTableView() ? (
                     <ResultsTable
-                        identifiersData={identifiersData}
+                        identifiers={identifiersData}
                         moduleKey={activeModule}
                         shouldSkipFetching={identifiersFetching || !isTableView()}
                     />

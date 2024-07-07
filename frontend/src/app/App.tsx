@@ -1,5 +1,5 @@
-import React from 'react';
-import { Provider, useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { Provider, useSelector, useDispatch } from 'react-redux';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { selectDarkMode } from './slice.ts';
@@ -7,8 +7,8 @@ import { store } from './store.ts';
 
 import SidePanel from '../features/Query/SidePanel.tsx';
 import AppToolbar from './Toolbar.tsx';
-import Tabs from './Tabs.tsx';
 import Box from '@mui/material/Box';
+import Module from '../features/Module/Module.tsx';
 
 const AppWrapper = () => {
     return (
@@ -19,6 +19,7 @@ const AppWrapper = () => {
 };
 
 const App = () => {
+    const dispatch = useDispatch();
     const darkMode = useSelector(selectDarkMode);
 
     const theme = createTheme({
@@ -33,7 +34,7 @@ const App = () => {
                 <CssBaseline />
                 <AppToolbar />
                 <SidePanel />
-                <Tabs />
+                <Module />
             </Box>
         </ThemeProvider>
     );

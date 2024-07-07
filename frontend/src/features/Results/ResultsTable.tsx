@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { moduleConfig } from './constants.ts';
+import { moduleConfig } from '../Module/constants.ts';
 import { handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
 
 import PagedTable from '../../common/PagedTable.tsx';
@@ -8,7 +8,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
 
-const ResultsTable = ({ identifiersData, moduleKey, shouldSkipFetching }) => {
+const ResultsTable = ({ identifiers, moduleKey, shouldSkipFetching }) => {
     const [page, setPage] = useState(0);
 
     const {
@@ -18,11 +18,11 @@ const ResultsTable = ({ identifiersData, moduleKey, shouldSkipFetching }) => {
     } = useGetResultQuery(
         {
             idColumn: moduleConfig[moduleKey].resultsIdColumn,
-            ids: identifiersData
-                ? identifiersData[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].single
+            ids: identifiers
+                ? identifiers[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].single
                 : [],
-            idRanges: identifiersData
-                ? identifiersData[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].range
+            idRanges: identifiers
+                ? identifiers[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].range
                 : [],
             table: moduleConfig[moduleKey].resultsTable,
             sortByColumn: moduleConfig[moduleKey].resultsIdColumn,
@@ -43,11 +43,11 @@ const ResultsTable = ({ identifiersData, moduleKey, shouldSkipFetching }) => {
         {
             idColumn: moduleConfig[moduleKey].resultsIdColumn,
             table: moduleConfig[moduleKey].resultsTable,
-            ids: identifiersData
-                ? identifiersData[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].single
+            ids: identifiers
+                ? identifiers[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].single
                 : [],
-            idRanges: identifiersData
-                ? identifiersData[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].range
+            idRanges: identifiers
+                ? identifiers[handleIdKeyIrregularities(moduleConfig[moduleKey].resultsIdColumn)].range
                 : [],
         },
         {

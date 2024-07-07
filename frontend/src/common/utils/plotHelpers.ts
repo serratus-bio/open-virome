@@ -9,9 +9,6 @@ export const shouldDisableFigureView = (identifiers, sectionKey = '') => {
     if (identifiers?.run?.totalCount === -1) {
         return true;
     }
-    if (sectionKey === 'Palmdb Virome') {
-        return identifiers?.run?.totalCount > 10000;
-    }
     return identifiers?.run?.totalCount > 100000;
 };
 
@@ -57,7 +54,7 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
             };
         });
     mergedRows.sort((a, b) => {
-        return (a.target + a.control) - (b.target + b.control);
+        return a.target + a.control - (b.target + b.control);
     });
     // mergedRows.sort((a, b) => a.target - b.target)
 
@@ -377,36 +374,71 @@ export const getBioprojectSizeVsPercentagePlotData = (controlRows = [], targetRo
     };
 };
 
-export const getViromeGraphData = (rows = []) => {
-    let runsToSOTU = {};
+const getRandomSubarray = (arr, size) => {
+    var shuffled = arr.slice(0),
+        i = arr.length,
+        temp,
+        index;
+    while (i--) {
+        index = Math.floor((i + 1) * Math.random());
+        temp = shuffled[index];
+        shuffled[index] = shuffled[i];
+        shuffled[i] = temp;
+    }
+    return shuffled.slice(0, size);
+};
 
-    rows.forEach((row) => {
-        const sOTUData = {
-            sOTU: row['sotu'],
-            species: row['tax_species'],
-            family: row['tax_family'],
-            gb: row['gb_acc'],
-            sotuPid: row['node_pid'],
-            gbPid: row['gb_pid'],
+export const getViromeGraphData = (rows = [], groupBy='sotu') => {
+    let runsToRowData = {};
+    let data;
+    if (rows.length > 1000) {
+        data = getRandomSubarray(rows, 1000);
+    } else {
+        data = rows;
+    }
+
+    data.forEach((row) => {
+        const rowData = {
+            sotu: row['sotu'],
+            tax_species: row['tax_species'],
+            tax_family: row['tax_family'],
+            gb_acc: row['gb_acc'],
+            node_pid: row['node_pid'],
+            gb_pid: row['gb_pid'],
+            label: groupBy === 'family' ? row['tax_family'] : groupBy === 'sotu' ? row['sotu'] : row['tax_species'],
         };
 
-        if (row['run'] in runsToSOTU) {
-            runsToSOTU[row['run']].push(sOTUData);
+        if (row['run'] in runsToRowData) {
+            runsToRowData[row['run']].push(rowData);
         } else {
-            runsToSOTU[row['run']] = [sOTUData];
+            runsToRowData[row['run']] = [rowData];
         }
     });
 
-    let sOTUsData = Object.values(runsToSOTU).flat();
-    sOTUsData = sOTUsData.filter((sOTU, index, self) => self.findIndex((t) => t['sOTU'] === sOTU['sOTU']) === index);
+    // reduce to groupBy level
+    const runsToGroupedRowData = {};
+    for (const run in runsToRowData) {
+        const groupedRowData = runsToRowData[run].reduce((acc, row) => {
+            if (row[groupBy] in acc) {
+                acc[row[groupBy]].push(row);
+            } else {
+                acc[row[groupBy]] = [row];
+            }
+            return acc;
+        }, {});
+        runsToGroupedRowData[run] = groupedRowData;
+    }
+
+    let sOTUsData = Object.values(runsToRowData).flat();
+    sOTUsData = sOTUsData.filter((sOTU, index, self) => self.findIndex((t) => t['sotu'] === sOTU['sotu']) === index);
     sOTUsData.sort((a, b) => {
-        if (!a['family'] || !b['family']) {
+        if (!a['tax_family'] || !b['tax_family']) {
             return 0;
         }
-        if (a['family'] < b['family']) {
+        if (a['tax_family'] < b['tax_family']) {
             return -1;
         }
-        if (a['family'] > b['family']) {
+        if (a['tax_family'] > b['tax_family']) {
             return 1;
         }
         return 0;
@@ -416,41 +448,44 @@ export const getViromeGraphData = (rows = []) => {
     const colors = Array.from({ length: numSOTUS }, (_, i) => chroma.hsl(hueStep * i, 1, 0.6).hex());
     const sOTUsToColor = {};
     sOTUsData.forEach((sOTU, index) => {
-        sOTUsToColor[sOTU['sOTU']] = colors[index];
+        sOTUsToColor[sOTU['sotu']] = colors[index];
     });
 
     const getEdgeWidth = (sOTU) => {
-        return (parseInt(sOTU['sotuPid']) / 100) * 15;
+        return (parseInt(sOTU['node_pid']) / 100) * 15;
     };
     const getEdgeWeight = (sOTU) => {
-        return parseInt(sOTU['sotuPid']) / 100;
+        return parseInt(sOTU['node_pid']) / 100;
     };
 
     const plotData = [];
-    for (const run in runsToSOTU) {
+    for (const run in runsToGroupedRowData) {
         plotData.push({ data: { id: run, type: 'run', isNode: true } });
-        runsToSOTU[run].forEach((sOTU) => {
+        // runsToRowData[run].forEach((sOTU) => {
+        Object.keys(runsToGroupedRowData[run]).forEach((groupByKey) => {
+            const sOTU = runsToGroupedRowData[run][groupByKey][0];
             plotData.push({
                 data: {
-                    id: sOTU['sOTU'],
+                    id: sOTU['sotu'],
                     type: 'sOTU',
                     isNode: true,
-                    label: truncate(sOTU['species'], 25) ?? 'N/A',
-                    color: sOTUsToColor[sOTU['sOTU']],
+                    label: truncate(sOTU['label'], 40) ?? 'N/A',
+                    color: sOTUsToColor[sOTU['sotu']],
+                    numSOTUS: numSOTUS,
                 },
             });
             plotData.push({
                 data: {
                     source: run,
-                    target: sOTU['sOTU'],
+                    target: sOTU['sotu'],
                     isNode: false,
                     width: getEdgeWidth(sOTU),
                     weight: getEdgeWeight(sOTU),
-                    color: sOTUsToColor[sOTU['sOTU']],
+                    color: sOTUsToColor[sOTU['sotu']],
+                    numSOTUS: numSOTUS,
                 },
             });
         });
     }
-
     return plotData;
 };

@@ -104,7 +104,7 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) =
                             cursor: 'pointer',
                         }}
                     >
-                        {row[column.dataKey]}
+                        {row[column.dataKey] ?? 'N/A'}
                     </TableCell>
                 ))}
             </React.Fragment>
@@ -153,7 +153,7 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) =
     }, [rows.length]);
 
     return (
-        <Paper style={{ height: 400, width: '100%', maxWidth: 800 }}>
+        <Paper style={{ height: 400, width: '100%' }}>
             <TableVirtuoso
                 data={rows}
                 components={VirtuosoTableComponents}

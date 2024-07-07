@@ -1,12 +1,11 @@
 import { createSlice, createSelector } from '@reduxjs/toolkit';
 import { RootState } from './store';
-import { sectionConfig } from '../features/Explore/constants.ts';
+import { sectionConfig } from '../features/Module/constants.ts';
 
 /* Reducers */
 
 type AppState = {
     sidebarOpen: boolean;
-    activeView: string;
     activeModule: string;
     darkMode: boolean;
 };
@@ -15,7 +14,6 @@ const appSlice = createSlice({
     name: 'app',
     initialState: {
         sidebarOpen: true,
-        activeView: 'query',
         activeModule: 'host',
         darkMode: true,
     },
@@ -25,9 +23,6 @@ const appSlice = createSlice({
         },
         toggleDarkMode: (state) => {
             state.darkMode = !state.darkMode;
-        },
-        setActiveView: (state, action) => {
-            state.activeView = action.payload;
         },
         setActiveModule: (state, action) => {
             state.activeModule = action.payload;
@@ -39,7 +34,7 @@ export default appSlice.reducer;
 
 /* Actions */
 
-export const { toggleSidebar, toggleDarkMode, setActiveView, setActiveModule } = appSlice.actions;
+export const { toggleSidebar, toggleDarkMode, setActiveModule } = appSlice.actions;
 
 /* Selectors */
 
@@ -47,10 +42,7 @@ export const selectApp = (state: RootState) => state.app;
 
 export const selectSidebarOpen = createSelector([selectApp], (app: AppState) => app.sidebarOpen);
 export const selectDarkMode = createSelector([selectApp], (app: AppState) => app.darkMode);
-export const selectActiveView = createSelector([selectApp], (app: AppState) => app.activeView);
 export const selectActiveModule = createSelector([selectApp], (app: AppState) => app.activeModule);
-
-
-export const  selectActiveSection = createSelector([selectActiveModule], (activeModule) => Object.keys(sectionConfig).find((section) =>
-    sectionConfig[section].modules.includes(activeModule),
-));
+export const selectActiveSection = createSelector([selectActiveModule], (activeModule) =>
+    Object.keys(sectionConfig).find((section) => sectionConfig[section].modules.includes(activeModule)),
+);

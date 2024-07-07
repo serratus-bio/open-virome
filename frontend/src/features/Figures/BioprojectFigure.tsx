@@ -1,26 +1,20 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { setActiveModule, setActiveView } from '../../../app/slice.ts';
 import {
     shouldDisableFigureView,
     getBioprojectSizePlotData,
     getBioprojectTargetPercentagePlotData,
     getBioprojectSizeVsPercentagePlotData,
-} from '../../../common/utils/plotHelpers.ts';
-import { useGetCountsQuery } from '../../../api/client.ts';
-import { moduleConfig } from '../constants.ts';
+} from '../../common/utils/plotHelpers.ts';
+import { useGetCountsQuery } from '../../api/client.ts';
+import { moduleConfig } from '../Module/constants.ts';
 
-import HistogramPlot from '../../../common/HistogramPlot.tsx';
-import ScatterPlot from '../../../common/ScatterPlot.tsx';
+import HistogramPlot from '../../common/HistogramPlot.tsx';
+import ScatterPlot from '../../common/ScatterPlot.tsx';
 import Skeleton from '@mui/material/Skeleton';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import IconButton from '@mui/material/IconButton';
-import TuneIcon from '@mui/icons-material/Tune';
 
 const BioprojectFigure = ({ identifiers }) => {
-    const dispatch = useDispatch();
-
     const {
         data: targetCountData,
         error: targetCountError,
@@ -84,10 +78,6 @@ const BioprojectFigure = ({ identifiers }) => {
         );
     };
 
-    const handleFilterClick = () => {
-        dispatch(setActiveModule('bioproject'));
-        dispatch(setActiveView('query'));
-    };
     const sectionStyle = {
         mt: 2,
         mb: 2,
@@ -99,11 +89,6 @@ const BioprojectFigure = ({ identifiers }) => {
                 <Typography component={'div'} variant='h6' sx={{ ...sectionStyle, mr: 2 }}>
                     {moduleConfig['bioproject'].title}
                 </Typography>
-                <Box>
-                    <IconButton sx={{ mt: -0.5, height: 30, width: 30 }} onClick={handleFilterClick}>
-                        <TuneIcon fontSize='small' />
-                    </IconButton>
-                </Box>
             </Box>
             <Box
                 sx={{

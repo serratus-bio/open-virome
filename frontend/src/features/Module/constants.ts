@@ -3,7 +3,7 @@ export const sectionConfig = {
         modules: ['host', 'seqType', 'bioproject'],
     },
     'Palmdb Virome': {
-        modules: ['sotu', 'family', 'species'],
+        modules: ['sotu', 'species', 'family'],
     },
     'Context': {
         modules: ['geography', 'statHost', 'tissue'],
@@ -17,7 +17,7 @@ export const moduleConfig = {
         groupByKey: 'host_label',
         resultsTable: 'srarun',
         resultsIdColumn: 'run',
-        defaultDisplay: 'figure',
+        defaultDisplay: 'filter',
     },
     bioproject: {
         title: 'Bioproject',
@@ -25,7 +25,7 @@ export const moduleConfig = {
         groupByKey: 'bioproject',
         resultsTable: 'srarun',
         resultsIdColumn: 'run',
-        defaultDisplay: 'figure',
+        defaultDisplay: 'filter',
     },
     seqType: {
         title: 'Dataset type',
@@ -33,7 +33,7 @@ export const moduleConfig = {
         groupByKey: 'library_strategy',
         resultsTable: 'srarun',
         resultsIdColumn: 'run',
-        defaultDisplay: 'figure',
+        defaultDisplay: 'filter',
     },
     sotu: {
         title: 'sOTU',
@@ -41,7 +41,7 @@ export const moduleConfig = {
         groupByKey: 'sotu',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
-        defaultDisplay: 'figure',
+        defaultDisplay: 'filter',
     },
     species: {
         title: 'Virus Species',
@@ -49,7 +49,7 @@ export const moduleConfig = {
         groupByKey: 'tax_species',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
-        defaultDisplay: 'figure',
+        defaultDisplay: 'filter',
     },
     family: {
         title: 'Virus Family',
@@ -57,7 +57,7 @@ export const moduleConfig = {
         groupByKey: 'tax_family',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
-        defaultDisplay: 'figure',
+        defaultDisplay: 'filter',
     },
     geography: {
         title: 'Geography',
@@ -65,7 +65,7 @@ export const moduleConfig = {
         groupByKey: 'geo',
         resultsIdColumn: 'biosample',
         resultsTable: 'biosample_geo_coordinates',
-        defaultDisplay: 'figure',
+        defaultDisplay: 'filter',
     },
     tissue: {
         title: 'Tissue',
@@ -74,7 +74,6 @@ export const moduleConfig = {
         resultsTable: 'biosample_tissue',
         resultsIdColumn: 'biosample',
         defaultDisplay: 'table',
-
     },
     statHost: {
         title: 'STAT Host',

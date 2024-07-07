@@ -25,7 +25,6 @@ const PolarBarPlot = ({ plotData = {}, styles = {} }) => {
                 type: 'shadow',
             },
         },
-
         animation: true,
         angleAxis: {
             type: 'category',
