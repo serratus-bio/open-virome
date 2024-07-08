@@ -13,12 +13,3 @@ export const truncate = (s: string, n: number = 10) => {
     }
     return s.length > n ? s.substring(0, n - 1) + '...' : s;
 };
-
-export const removeEmptyRows = (obj: any, key: any) => {
-    return Object.keys(obj).reduce((acc, key) => {
-        if (obj[key]) {
-            acc[key] = obj[key];
-        }
-        return acc;
-    }, {});
-};

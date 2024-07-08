@@ -1,15 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import cytoscape from 'cytoscape';
 import fcose from 'cytoscape-fcose';
-import cise from 'cytoscape-cise';
+
 import CytoscapeComponent from 'react-cytoscapejs';
+import Box from '@mui/material/Box';
+import DropDownSelect from './DropdownSelect.tsx';
 
 cytoscape.use(fcose);
-cytoscape.use(cise);
 
 const NetworkPlot = ({ plotData = [] }) => {
     const [cy, setCy] = useState(null);
     const [activeSubgraph, setActiveSubgraph] = useState(0);
+    const [headlessCy, setHeadlessCy] = useState(
+        cytoscape({
+            headless: true,
+            elements: plotData,
+        }),
+    );
+
+    useEffect(() => {
+        if (cy && headlessCy) {
+            headlessCy.json({ elements: plotData });
+            headlessCy.ready(() => {
+                cy.json({ elements: getActiveComponent() });
+                cy.ready(() => {
+                    cy.layout(layouts[1]).run();
+                });
+            });
+        }
+    }, [plotData, activeSubgraph]);
 
     const stylesheet = [
         {
@@ -29,7 +48,6 @@ const NetworkPlot = ({ plotData = [] }) => {
             selector: 'node[type="run"]',
             style: {
                 backgroundColor: 'grey',
-                // label: 'data(label)',
                 color: 'white',
                 shape: 'ellipse',
                 opacity: 0.7,
@@ -47,37 +65,12 @@ const NetworkPlot = ({ plotData = [] }) => {
         },
     ];
 
-    useEffect(() => {
-        if (cy) {
-            cy.elements().markovClustering({ expandFactor: 10 });
-        }
-    }, [cy]);
-
-    const getCluserInfo = (node) => {
-        if (!cy || !node.data('clusterID')) {
-            return '';
-        }
-        return node.data('clusterID');
-    };
-
-    useEffect(() => {
-        if (!cy) {
-            return;
-        }
-        console.log('^^^^', cy.elements());
-        // const other_elements = cy.elements().not(`[clusterID = ${activeSubgraph}]`)
-
-        // cy.remove(other_elements)
-
-        // const subgraph =  plotData.filter(
-        //     (data) => (data.isNode && data.data('clusterID') === activeSubgraph) || data.isEdge
-        // );
-        // return subgraph;
-    }, []);
-
     const layouts = [
         {
-            name: 'cose',
+            name: 'breadthfirst',
+            animate: true,
+            animationDuration: 500,
+            circle: true,
         },
         {
             name: 'fcose',
@@ -92,9 +85,9 @@ const NetworkPlot = ({ plotData = [] }) => {
             // Whether or not to animate the layout
             animate: true,
             // Duration of animation in ms, if enabled
-            animationDuration: 1000,
+            animationDuration: 500,
             // Easing of animation, if enabled
-            animationEasing: undefined,
+            animationEasing: 'ease-out',
             // Fit the viewport to the repositioned nodes
             fit: true,
             // Padding around layout
@@ -125,11 +118,11 @@ const NetworkPlot = ({ plotData = [] }) => {
             nodeRepulsion: (node) => 450000,
             // Ideal edge (non nested) length
             idealEdgeLength: (edge) => {
-                return edge.data().weight * 300;
+                return Math.max(edge.data().weight * edge.data().numSOTUS * 1.5, 100);
             },
             // Divisor to compute edge forces
             edgeElasticity: (edge) => {
-                return edge.data().weight * 0.15;
+                return edge.data().weight * 0.45;
             },
             // Nesting factor (multiplier) to compute ideal edge length for nested edges
             nestingFactor: 0.1,
@@ -171,85 +164,42 @@ const NetworkPlot = ({ plotData = [] }) => {
             // [{top: 'n1', bottom: 'n2', gap: 100}, {left: 'n3', right: 'n4', gap: 75}, {...}]
             relativePlacementConstraint: undefined,
         },
-        {
-            name: 'cise',
-            clusters: getCluserInfo,
-            // -------- Optional parameters --------
-
-            // Use random node positions at beginning of layout
-            // if this is set to false, the layout will be incremental
-            randomize: true,
-
-            // Whether to animate the layout
-            // - true : Animate while the layout is running
-            // - false : Just show the end result
-            // - 'end' : Animate directly to the end result
-            animate: 'end',
-
-            // number of ticks per frame; higher is faster but more jerky
-            refresh: 10,
-
-            // Animation duration used for animate:'end'
-            animationDuration: undefined,
-
-            // Easing for animate:'end'
-            animationEasing: undefined,
-
-            // Whether to fit the viewport to the repositioned graph
-            // true : Fits at end of layout for animate:false or animate:'end'
-            fit: true,
-
-            // Padding in rendered co-ordinates around the layout
-            padding: 30,
-
-            // Whether to include labels in node dimensions
-            nodeDimensionsIncludeLabels: false,
-
-            // separation amount between nodes in a cluster
-            // note: increasing this amount will also increase the simulation time
-            nodeSeparation: 12.5,
-
-            // Inter-cluster edge length factor
-            // (2.0 means inter-cluster edges should be twice as long as intra-cluster edges)
-            idealInterClusterEdgeLengthCoefficient: 3,
-
-            // Whether to pull on-circle nodes inside of the circle
-            allowNodesInsideCircle: true,
-
-            // Max percentage of the nodes in a circle that can move inside the circle
-            maxRatioOfNodesInsideCircle: 0.1,
-
-            // - Lower values give looser springs
-            // - Higher values give tighter springs
-            springCoeff: (edge) => edge.data().weight,
-
-            // Node repulsion (non overlapping) multiplier
-            nodeRepulsion: (node) => 4500,
-
-            // Gravity force (constant)
-            gravity: 0.25,
-
-            // Gravity range (constant)
-            gravityRange: 3.8,
-
-            // whether to pack components of the graph, if set to true, you should import cytoscape.js-layout-utilities
-            packComponents: false,
-        },
-        {
-            name: 'breadthfirst',
-            circle: true,
-            spacingFactor: 4,
-        },
     ];
 
+    const getActiveComponent = () => {
+        const components = headlessCy.elements().components();
+        components.sort((a, b) => b.length - a.length);
+        if (!components[activeSubgraph]) {
+            return [];
+        }
+
+        return components[activeSubgraph].jsons();
+    };
+
+    const getComponentOptions = () => {
+        const components = headlessCy.elements().components();
+        return components.map((_, index) => index);
+    };
+
     return (
-        <CytoscapeComponent
-            cy={setCy}
-            stylesheet={stylesheet}
-            elements={plotData}
-            style={{ width: '100%', height: '100%', minHeight: '70vh' }}
-            layout={layouts[1]}
-        />
+        <Box>
+            <Box sx={{ position: 'absolute', zIndex: 10 }}>
+                <DropDownSelect
+                    options={getComponentOptions()}
+                    activeOption={activeSubgraph}
+                    setActiveOption={(event) => setActiveSubgraph(event.target.value)}
+                    label='Component'
+                />
+            </Box>
+
+            <CytoscapeComponent
+                cy={setCy}
+                stylesheet={stylesheet}
+                elements={getActiveComponent()}
+                style={{ width: '100%', height: '100%', minHeight: '70vh' }}
+                layout={layouts[1]}
+            />
+        </Box>
     );
 };
 

@@ -10,7 +10,6 @@
         "@reduxjs/toolkit": "^2.2.5",
         "chroma-js": "^2.4.2",
         "cytoscape": "^3.30.0",
-        "cytoscape-cise": "^2.0.0",
         "cytoscape-fcose": "^2.2.0",
         "echarts": "^5.5.0",
         "echarts-for-react": "^3.0.2",

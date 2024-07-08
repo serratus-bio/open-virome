@@ -1,3 +1,5 @@
+import { groupByToCounts } from '../cache/countsCache.mjs';
+
 export const handleIdKeyIrregularities = (key, table) => {
     const tableToRemappedKey = {
         srarun: {
@@ -81,11 +83,20 @@ export const getGroupedCountsByIdentifiers = ({ ids, idRanges, idColumn, groupBy
     `;
 };
 
+const hasNoGroupByFilters = (filters, groupBy) => {
+    return !filters.filter((filter) => filter.filterType !== groupBy).length > 0;
+};
+
+export const getCachedCountsResults = (filters, groupBy) => {
+    if (hasNoGroupByFilters(filters, groupBy)) {
+        return groupByToCounts[groupBy];
+    }
+};
+
 export const getGroupedCountsByFilters = ({ filters, groupBy }) => {
     const tableJoin = getMinimalJoinSubQuery(filters, groupBy);
-    const includeCounts = filters.filter((filter) => filter.filterType !== groupBy).length > 0;
     return `
-        SELECT ${groupBy} as name${includeCounts ? `, COUNT(*) as count` : ''}
+        SELECT ${groupBy} as name${hasNoGroupByFilters(filters, groupBy) ? '' : `, COUNT(*) as count`}
         FROM (${tableJoin}) as open_virome
         GROUP BY ${groupBy}
     `;

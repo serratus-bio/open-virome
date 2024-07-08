@@ -7,8 +7,8 @@ import { store } from './store.ts';
 
 import SidePanel from '../features/Query/SidePanel.tsx';
 import AppToolbar from './Toolbar.tsx';
-import Tabs from './Tabs.tsx';
 import Box from '@mui/material/Box';
+import Module from '../features/Module/Module.tsx';
 
 const AppWrapper = () => {
     return (
@@ -33,7 +33,7 @@ const App = () => {
                 <CssBaseline />
                 <AppToolbar />
                 <SidePanel />
-                <Tabs />
+                <Module />
             </Box>
         </ThemeProvider>
     );

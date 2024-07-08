@@ -120,19 +120,24 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setBioprojectID, set
 
             const identifierClauses = getIdClauses(identifiers?.biosample?.single, identifiers?.biosample?.range);
 
-            const response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
-                body: JSON.stringify({
-                    SELECT: `accession, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, FLOOR(RANDOM()*2) as class
-                        FROM biosample_geographical_location
-                        WHERE ST_Intersects(lat_lon, ST_SetSRID(ST_GeomFromText('${neswPolygon}'), 4326))
-                        ${identifierClauses.length > 0 ? `AND ${identifierClauses.join(' OR ')}` : ''}
-                        LIMIT 8192;`,
-                }),
-                headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
-                method: 'POST',
-            });
+            let response;
+            try {
+                response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
+                    body: JSON.stringify({
+                        SELECT: `accession, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, FLOOR(RANDOM()*2) as class
+                            FROM biosample_geographical_location
+                            WHERE ST_Intersects(lat_lon, ST_SetSRID(ST_GeomFromText('${neswPolygon}'), 4326))
+                            ${identifierClauses.length > 0 ? `AND ${identifierClauses.join(' OR ')}` : ''}
+                            LIMIT 8192;`,
+                    }),
+                    headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
+                    method: 'POST',
+                });
+            } catch (error) {
+                console.error(error);
+            }
 
-            if (response.status === 200) {
+            if (response && response.status === 200) {
                 const zoomDriftFactor = Math.pow(2, (16 - mlglMap.getZoom()) / 8) / 8000;
 
                 mbOverlay.setProps({

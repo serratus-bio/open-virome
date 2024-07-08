@@ -1,8 +1,8 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAllFilters, removeFilter } from './slice.ts';
-import { setActiveView, setActiveModule } from '../../app/slice.ts';
-import { moduleConfig } from '../Explore/constants.ts';
+import { setActiveModule } from '../../app/slice.ts';
+import { moduleConfig } from '../Module/constants.ts';
 
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
@@ -22,19 +22,18 @@ const FilterTags = () => {
 
     const onFilterClick = (filterType) => {
         dispatch(setActiveModule(filterType));
-        dispatch(setActiveView('query'));
     };
 
     return (
         <Box
             sx={{
-                ml: 8,
+                ml: 4,
                 flexGrow: 1,
                 display: 'flex',
                 justifyContent: 'left',
                 flexWrap: 'nowrap',
                 overflow: 'auto',
-                maxWidth: '50%',
+                maxWidth: 970,
                 borderRadius: 2,
             }}
         >
