@@ -43,6 +43,6 @@ jobs:
           aws_region: us-east-1
           function_name: open-virome-api
           zip_file: api/build.zip
-          memory_size: 128
+          memory_size: 512
           timeout: 500
           runtime: nodejs16.x

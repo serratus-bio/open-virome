@@ -49,8 +49,8 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
         .map((row) => {
             return {
                 name: row.name ? row.name : 'N/A',
-                target: row.target,
-                control: Math.abs(row.control - row.target),
+                target: parseCount(row.target),
+                control: parseCount(Math.abs(row.control - row.target)),
             };
         });
     mergedRows.sort((a, b) => {

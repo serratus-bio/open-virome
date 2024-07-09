@@ -35,6 +35,10 @@ const PolarBarPlot = ({ plotData = {}, styles = {} }) => {
         radiusAxis: {},
     };
 
+    const maxVal =
+        Math.max(...plotData.dataset.source.map((d) => d.target), ...plotData.dataset.source.map((d) => d.control)) *
+        1.1;
+
     const options = {
         ...defaultConfig,
         ...plotData,
@@ -48,6 +52,9 @@ const PolarBarPlot = ({ plotData = {}, styles = {} }) => {
                 ...plotData.series[1],
             },
         ],
+        radiusAxis: {
+            max: parseFloat(maxVal.toFixed(0)),
+        },
     };
 
     return <ReactEcharts option={options} style={styles} />;

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { moduleConfig } from '../Module/constants.ts';
 import { shouldDisableFigureView, getControlTargetPlotData } from '../../common/utils/plotHelpers.ts';
 import { useGetCountsQuery } from '../../api/client.ts';
+import { formatNumber } from '../../common/utils/textFormatting.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -58,19 +59,10 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
 
     const renderFigure = (seriesName) => {
         const plotData = getControlTargetPlotData(targetCountData, controlCountData, activeCountKey);
-        // const totalCount = plotData.dataset.source.reduce((acc, row) => acc + row[seriesName.toLowerCase()], 0);
+        let totalRuns = seriesName === 'Target' ? targetCountData : controlCountData;
+        totalRuns = formatNumber(totalRuns.reduce((acc, curr) => acc + parseInt(curr.count), 0));
         const filteredPlotData = {
             ...plotData,
-            title: {
-                text: `${seriesName} set`,
-                textStyle: {
-                    color: 'white',
-                    fontSize: 14,
-                    fontWeight: 'normal',
-                    fontStyle: 'italic',
-                },
-                left: 0,
-            },
             legend: {
                 show: false,
                 selected: {
@@ -85,6 +77,9 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
         if (figureType === 'polar') {
             return (
                 <Box sx={{ minWidth: 400 }}>
+                    <Typography variant='body2' sx={{ fontStyle: 'italic' }}>
+                        {`${seriesName} set (n = ${totalRuns})`}
+                    </Typography>
                     <PolarBarPlot plotData={filteredPlotData} />
                 </Box>
             );
@@ -92,6 +87,9 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
         if (figureType === 'bar') {
             return (
                 <Box sx={{ minWidth: 400 }}>
+                    <Typography variant='body2' sx={{ position: 'absolute', fontStyle: 'italic' }}>
+                        {`${seriesName} set (n = ${totalRuns})`}
+                    </Typography>
                     <BarPlot plotData={filteredPlotData} />
                 </Box>
             );
