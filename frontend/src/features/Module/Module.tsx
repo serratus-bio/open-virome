@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectAllFilters } from '../Query/slice.ts';
 import { selectActiveSection, selectActiveModule } from '../../app/slice.ts';
-import { moduleConfig } from './constants.ts';
+import { sectionConfig, moduleConfig } from './constants.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
 import { shouldDisableFigureView } from '../../common/utils/plotHelpers.ts';
 import { useGetIdentifiersQuery } from '../../api/client.ts';
@@ -51,13 +51,13 @@ const Module = () => {
     };
 
     const getModuleFigureLayout = () => {
-        if (activeSection === 'SRA Experiment') {
+        if (activeSection === 'sra') {
             return <SRARunLayout identifiers={identifiersData} />;
         }
-        if (activeSection === 'Palmdb Virome') {
+        if (activeSection === 'palmdb') {
             return <ViromeLayout identifiers={identifiersData} />;
         }
-        if (activeSection === 'Context' && activeModule === 'geography') {
+        if (activeSection === 'context' && activeModule === 'geography') {
             return <EnvironmentLayout identifiers={identifiersData} />;
         }
         return (
@@ -70,9 +70,17 @@ const Module = () => {
     return (
         <Box sx={{ maxWidth: 1000, ml: 8, mt: 4, mb: 8, flexGrow: 1 }}>
             <Toolbar />
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography component={'div'} variant='h4'>
-                    {activeSection}
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    mb: 2,
+                }}
+            >
+                <Typography component={'div'} variant='h4' sx={{ mr: 4 }}>
+                    {sectionConfig[activeSection]?.title}
                 </Typography>
                 <Box>
                     <IconButton
