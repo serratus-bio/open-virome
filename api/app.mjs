@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import compression from 'compression';
 import * as db from './db/index.mjs';
 import {
     getIdClauses,
@@ -26,6 +27,7 @@ app.use(
         extended: true,
     }),
 );
+app.use(compression());
 
 const runQuery = async (query) => {
     try {
