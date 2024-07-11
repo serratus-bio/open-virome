@@ -29,7 +29,7 @@ const defaultColumns: ColumnData[] = [
         dataKey: 'name',
     },
     {
-        width: 120,
+        width: 40,
         label: 'Count',
         dataKey: 'count',
         numeric: true,
@@ -153,7 +153,7 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick, sea
     }, [rows.length]);
 
     return (
-        <Paper style={{ height: 400, width: '100%' }}>
+        <Paper style={{ height: '70vh', width: '100%' }}>
             <TableVirtuoso
                 data={rows}
                 components={VirtuosoTableComponents}

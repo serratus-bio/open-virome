@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { selectAllFilters } from '../Query/slice.ts';
-import { selectActiveSection, selectActiveModule } from '../../app/slice.ts';
+import { selectActiveModuleBySection, setActiveModule, selectSidebarOpen } from '../../app/slice.ts';
 import { sectionConfig, moduleConfig } from './constants.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
 import { shouldDisableFigureView } from '../../common/utils/plotHelpers.ts';
 import { useGetIdentifiersQuery } from '../../api/client.ts';
+import { store } from '../../app/store.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -16,33 +17,40 @@ import ViromeLayout from '../Figures/ViromeLayout.tsx';
 import IconButton from '@mui/material/IconButton';
 import TableIcon from '@mui/icons-material/TableRows';
 import PlotIcon from '@mui/icons-material/InsertChart';
-import TuneIcon from '@mui/icons-material/Tune';
 import ResultsTable from '../Results/ResultsTable.tsx';
-import QueryView from '../Query/QueryView.tsx';
-import Toolbar from '@mui/material/Toolbar';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import Tooltip from '@mui/material/Tooltip';
+import Skeleton from '@mui/material/Skeleton';
 
-const Module = () => {
+const Module = ({ sectionKey }) => {
+    const dispatch = useDispatch();
     const filters = useSelector(selectAllFilters);
-    const activeSection = useSelector(selectActiveSection);
-    const activeModule = useSelector(selectActiveModule);
-
-    const [moduleDisplay, setModuleDisplay] = useState(moduleConfig[activeModule]?.defaultDisplay);
+    const activeModule = useSelector((state) => selectActiveModuleBySection(state, sectionKey));
+    const sidebarOpen = useSelector(selectSidebarOpen);
+    const [moduleDisplay, setModuleDisplay] = useState(moduleConfig[activeModule].defaultDisplay);
 
     const isTableView = () => moduleDisplay === 'table';
     const isFigureView = () => moduleDisplay === 'figure';
-    const isFilterView = () => moduleDisplay === 'filter';
 
     const {
         data: identifiersData,
         error: identifiersError,
         isFetching: identifiersFetching,
-    } = useGetIdentifiersQuery({
-        filters: getFilterQuery({ filters }),
-    });
+    } = useGetIdentifiersQuery(
+        {
+            filters: getFilterQuery({ filters }),
+        },
+        {
+            skip: sidebarOpen,
+        },
+    );
 
     useEffect(() => {
-        if (shouldDisableFigureView(identifiersData, activeSection)) {
-            setModuleDisplay('filter');
+        if (!identifiersFetching && shouldDisableFigureView(identifiersData, sectionKey)) {
+            setModuleDisplay('table');
+        } else {
+            setModuleDisplay(moduleConfig[activeModule].defaultDisplay);
         }
     }, [identifiersData]);
 
@@ -51,25 +59,36 @@ const Module = () => {
     };
 
     const getModuleFigureLayout = () => {
-        if (activeSection === 'sra') {
-            return <SRARunLayout identifiers={identifiersData} />;
+        if (!identifiersData || identifiersFetching) {
+            return (
+                <Box sx={{ height: 400, width: '100%' }}>
+                    <Skeleton variant='rectangular' width={'100%'} height={'100%'} />
+                </Box>
+            );
         }
-        if (activeSection === 'palmdb') {
+
+        if (sectionKey === 'sra') {
+            return <SRARunLayout identifiers={identifiersData} activeModule={activeModule} />;
+        }
+        if (sectionKey === 'palmdb') {
             return <ViromeLayout identifiers={identifiersData} />;
         }
-        if (activeSection === 'context' && activeModule === 'geography') {
+        if (sectionKey === 'context' && activeModule === 'geography') {
             return <EnvironmentLayout identifiers={identifiersData} />;
         }
         return (
-            <Box>
+            <Box sx={{ height: 400, width: 400 }}>
                 <Typography variant='h6'>Coming soon!</Typography>
             </Box>
         );
     };
 
+    const onModuleChange = (event) => {
+        dispatch(setActiveModule({ sectionKey, moduleKey: event.target.value }));
+    };
+
     return (
-        <Box sx={{ maxWidth: 1000, ml: 8, mt: 4, mb: 8, flexGrow: 1 }}>
-            <Toolbar />
+        <Box sx={{ width: '80vw', maxWidth: 1500, ml: '10%', mt: 4, flexGrow: 1 }}>
             <Box
                 sx={{
                     display: 'flex',
@@ -79,52 +98,75 @@ const Module = () => {
                     mb: 2,
                 }}
             >
-                <Typography component={'div'} variant='h4' sx={{ mr: 4 }}>
-                    {sectionConfig[activeSection]?.title}
-                </Typography>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'flex-start',
+                        alignItems: 'center',
+                    }}
+                >
+                    <Typography component={'div'} variant='h4' sx={{ mr: 8 }}>
+                        {sectionConfig[sectionKey]?.title}
+                    </Typography>
+                    <Box sx={{ mb: 0 }}>
+                        <Select value={activeModule} onChange={onModuleChange} variant='outlined'>
+                            {sectionConfig[sectionKey]?.modules.map((module) => (
+                                <MenuItem key={module} value={module} sx={{ pr: 2 }}>
+                                    {moduleConfig[module]?.title}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </Box>
+                </Box>
+
                 <Box>
-                    <IconButton
-                        sx={{ mt: -0.5, height: 30, width: 30 }}
-                        color={isFilterView() ? 'primary' : 'default'}
-                        onClick={() => onViewChange('filter')}
+                    <Tooltip
+                        placement='top'
+                        title={
+                            shouldDisableFigureView(identifiersData, sectionKey)
+                                ? 'Figure view disabled. Add more filters.'
+                                : 'Figures'
+                        }
                     >
-                        <TuneIcon fontSize='medium' />
-                    </IconButton>
-                    <IconButton
-                        sx={{ mt: -0.5, height: 30, width: 30 }}
-                        color={isFigureView() ? 'primary' : 'default'}
-                        onClick={() => onViewChange('figure')}
-                        disabled={shouldDisableFigureView(identifiersData, activeSection)}
-                    >
-                        <PlotIcon fontSize='medium' />
-                    </IconButton>
-                    <IconButton
-                        sx={{ mt: -0.5, height: 30, width: 30 }}
-                        color={isTableView() ? 'primary' : 'default'}
-                        onClick={() => onViewChange('table')}
-                    >
-                        <TableIcon fontSize='medium' />
-                    </IconButton>
+                        <span>
+                            <IconButton
+                                sx={{ mt: -0.5, height: 30, width: 30 }}
+                                color={isFigureView() ? 'primary' : 'default'}
+                                onClick={() => onViewChange('figure')}
+                                disabled={shouldDisableFigureView(identifiersData, sectionKey)}
+                            >
+                                <PlotIcon fontSize='medium' />
+                            </IconButton>
+                        </span>
+                    </Tooltip>
+                    <Tooltip title='Table' placement='top'>
+                        <IconButton
+                            sx={{ mt: -0.5, height: 30, width: 30 }}
+                            color={isTableView() ? 'primary' : 'default'}
+                            onClick={() => onViewChange('table')}
+                        >
+                            <TableIcon fontSize='medium' />
+                        </IconButton>
+                    </Tooltip>
                 </Box>
             </Box>
-            <Divider />
+            <Divider sx={{ borderBottomWidth: 3 }} />
             <Box
                 sx={{
                     display: 'flex',
-                    flexDirection: 'row',
+                    flexDirection: 'column',
                     justifyContent: 'flex-start',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     flexWrap: 'wrap',
                     mt: 4,
                 }}
             >
-                {isFilterView() ? (
-                    <QueryView identifiers={identifiersData} identifiersFetching={identifiersFetching} />
-                ) : isTableView() ? (
+                {isTableView() ? (
                     <ResultsTable
                         identifiers={identifiersData}
                         moduleKey={activeModule}
-                        shouldSkipFetching={identifiersFetching || !isTableView()}
+                        shouldSkipFetching={identifiersFetching || !isTableView() || sidebarOpen}
                     />
                 ) : (
                     getModuleFigureLayout()

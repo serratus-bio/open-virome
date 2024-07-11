@@ -26,6 +26,7 @@ export const apiSlice = createApi({
                 }
             }),
     }),
+    keepUnusedDataFor: 10,
     tagTypes: ['Counts', 'Identifiers', 'Results'],
     endpoints: (build) => ({
         getCounts: build.query({

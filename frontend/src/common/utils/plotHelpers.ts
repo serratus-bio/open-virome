@@ -2,11 +2,12 @@ import { truncate } from './textFormatting.ts';
 import { histogram } from 'echarts-stat';
 import chroma from 'chroma-js';
 
+export const isSummaryView = (identifiers) => {
+    return identifiers && identifiers.run.totalCount === -1;
+};
+
 export const shouldDisableFigureView = (identifiers, sectionKey = '') => {
     if (!identifiers) {
-        return true;
-    }
-    if (identifiers?.run?.totalCount === -1) {
         return true;
     }
     return identifiers?.run?.totalCount > 100000;
@@ -21,78 +22,87 @@ export function histogramBins(values) {
     return bins;
 }
 
-export const getControlTargetPlotData = (targetRows = [], controlRows = [], countKey = 'count') => {
+export const getControlTargetPlotData = (targetRows = [], controlRows = [], countKey = 'count', maxRows) => {
     const parseCount = (value) => {
-        if (countKey === 'count') {
-            return parseInt(value);
-        } else if (countKey === 'percent') {
-            return parseInt(value);
-        } else if (countKey === 'gbp') {
-            return parseFloat(parseFloat(value).toFixed(1));
+        switch (countKey) {
+            case 'gbp':
+                return parseFloat(parseFloat(value).toFixed(1));
+            case 'count':
+            case 'percent':
+            default:
+                return parseInt(value);
         }
-        return value;
     };
 
-    const mergedRows = targetRows
-        .map((row) => ({ name: row['name'], target: parseCount(row[countKey]), control: 0 }))
-        .concat(controlRows.map((row) => ({ name: row['name'], target: 0.0, control: parseCount(row[countKey]) })))
-        .reduce((acc, row) => {
-            const existingRow = acc.find((existing) => existing.name === row.name);
-            if (existingRow) {
-                existingRow.target += row.target;
-                existingRow.control += row.control;
+    const mergedRows = [...targetRows, ...controlRows].reduce((acc, row) => {
+        const name = row.name || 'N/A';
+        const count = parseCount(row[countKey]);
+        const existingRow = acc.find((r) => r.name === name);
+        const isInTarget = targetRows.includes(row);
+        if (existingRow) {
+            if (isInTarget) {
+                existingRow.target += count;
             } else {
-                acc.push(row);
+                existingRow.control += count;
             }
-            return acc;
-        }, [])
-        .map((row) => {
-            return {
-                name: row.name ? row.name : 'N/A',
-                target: parseCount(row.target),
-                control: parseCount(Math.abs(row.control - row.target)),
-            };
-        });
-    mergedRows.sort((a, b) => {
-        return a.target + a.control - (b.target + b.control);
-    });
-    // mergedRows.sort((a, b) => a.target - b.target)
-
-    const getPercentageFromRows = (desiredRows, totalRows) => {
-        if (totalRows <= desiredRows) {
-            return 0;
+        } else {
+            acc.push({
+                name,
+                target: isInTarget ? count : 0,
+                control: !isInTarget ? count : 0,
+            });
         }
-        const endPercentage = (1 - desiredRows / totalRows) * 100;
-        return Math.floor(endPercentage);
-    };
+
+        return acc;
+    }, []);
+
+    mergedRows.forEach((row) => {
+        row.target = parseCount(row.target);
+        row.control = parseCount(Math.abs(row.control - row.target));
+    });
+
+    mergedRows.sort((a, b) => a.target + a.control - (b.target + b.control));
+
+    if (maxRows && mergedRows.length > maxRows) {
+        const others = mergedRows.slice(0, mergedRows.length - maxRows).reduce(
+            (acc, row) => {
+                acc.target += row.target;
+                acc.control += row.control;
+                return acc;
+            },
+            { name: 'Other', target: 0, control: 0 },
+        );
+
+        mergedRows.splice(0, mergedRows.length - maxRows, others);
+    }
+
+    const getZoomPercentage = (desiredRows, totalRows) =>
+        totalRows <= desiredRows ? 0 : Math.floor((1 - desiredRows / totalRows) * 100);
 
     const dataZoom = [
         {
-            // scroll zoom
             type: 'inside',
             id: 'insideY',
             yAxisIndex: 0,
             start: 100,
-            end: getPercentageFromRows(10, mergedRows.length),
+            end: getZoomPercentage(10, mergedRows.length),
             zoomOnMouseWheel: false,
             moveOnMouseMove: true,
             moveOnMouseWheel: true,
         },
     ];
 
-    const maxCount = Math.max(...mergedRows.reduce((acc, cur) => acc.concat([cur.target, cur.control]), []));
+    const maxCount = Math.max(...mergedRows.flatMap((row) => [row.target, row.control]));
+
     return {
         xAxis: {
             type: 'value',
             max: maxCount,
-            // max: 'dataMax',
         },
         yAxis: {
             type: 'category',
             axisLabel: {
-                formatter: (value) => {
-                    return truncate(value, 20);
-                },
+                formatter: (value) => truncate(value, 20),
             },
         },
         dataset: {
@@ -101,7 +111,7 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
         },
         series: [
             {
-                name: `Target`,
+                name: 'Target',
                 type: 'bar',
                 stack: 'total',
                 label: {
@@ -114,7 +124,7 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
                 color: 'cornflowerblue',
             },
             {
-                name: `Control`,
+                name: 'Control',
                 type: 'bar',
                 stack: 'total',
                 label: {
@@ -318,7 +328,7 @@ export const getBioprojectSizeVsPercentagePlotData = (controlRows = [], targetRo
             type: 'value',
             name: 'Target (%)',
             nameLocation: 'middle',
-            nameGap: 25,
+            nameGap: 20,
             minInterval: 1,
             boundaryGap: ['5%', '5%'],
         },

@@ -63,7 +63,7 @@ app.post('/counts', async (req, res) => {
 
     let query = ``;
 
-    if (groupBy === undefined) {
+    if (!groupBy) {
         if (!idColumn) {
             return res.status(400).json({ error: 'groupBy is required!' });
         }
@@ -73,7 +73,7 @@ app.post('/counts', async (req, res) => {
             idColumn,
             table: table,
         });
-    } else if (idColumn) {
+    } else if (idColumn && ids.length > 0) {
         query = getGroupedCountsByIdentifiers({
             ids,
             idRanges,
@@ -84,7 +84,19 @@ app.post('/counts', async (req, res) => {
     } else {
         const cachedResults = getCachedCountsResults(filters, groupBy);
         if (cachedResults) {
-            return res.json(cachedResults);
+            let result = cachedResults;
+            if (sortByColumn !== undefined) {
+                result.sort((a, b) => {
+                    if (sortByDirection === 'asc') {
+                        return a[sortByColumn] - b[sortByColumn];
+                    }
+                    return b[sortByColumn] - a[sortByColumn];
+                });
+            }
+            if (pageEnd !== undefined) {
+                result = result.slice(pageStart, pageEnd);
+            }
+            return res.json(result);
         }
         query = getGroupedCountsByFilters({
             filters,

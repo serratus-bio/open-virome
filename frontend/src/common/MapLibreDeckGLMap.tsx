@@ -8,7 +8,7 @@ const LOGAN_RDS_PROXY_LAMBDA_ENDPOINT = 'https://omdmrhz5lb2nrbmodjtm5fxhqq0uevz
 const MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE = false;
 
 // SEND TO UTIL FUNCTIONS
-const bioprojectIDFromBiosample: any = async biosample => {
+const bioprojectIDFromBiosample: any = async (biosample) => {
     if (!bioprojectIDFromBiosample._) bioprojectIDFromBiosample._ = {};
 
     if (!bioprojectIDFromBiosample._[biosample])
@@ -16,7 +16,7 @@ const bioprojectIDFromBiosample: any = async biosample => {
             const response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
                 body: JSON.stringify({ SELECT: "bioproject FROM sra WHERE biosample = '" + biosample + "' LIMIT 1;" }),
                 headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
-                method: 'POST'
+                method: 'POST',
             });
 
             if (response.status === 200) {
@@ -28,7 +28,7 @@ const bioprojectIDFromBiosample: any = async biosample => {
 
     return bioprojectIDFromBiosample._[biosample];
 };
-const selectBiosample: any = async accession => {
+const selectBiosample: any = async (accession) => {
     if (!selectBiosample._) selectBiosample._ = {};
 
     if (!selectBiosample._[accession])
@@ -36,7 +36,7 @@ const selectBiosample: any = async accession => {
             const response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
                 body: JSON.stringify({ SELECT: "* FROM biosample WHERE accession = '" + accession + "' LIMIT 1;" }),
                 headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
-                method: 'POST'
+                method: 'POST',
             });
 
             if (response.status === 200) {
@@ -48,11 +48,9 @@ const selectBiosample: any = async accession => {
 
     return selectBiosample._[accession];
 };
-const trimTextEllipsis = (s, n) => s.length > n
-    ? s.substring(0, n) + '...'
-    : s;
+const trimTextEllipsis = (s, n) => (s.length > n ? s.substring(0, n) + '...' : s);
 
-const cyrb128 = str => {
+const cyrb128 = (str) => {
     let h1 = 1779033703;
     let h2 = 3144134277;
     let h3 = 1013904242;
@@ -79,7 +77,7 @@ const cyrb128 = str => {
     return [h1 >>> 0, h2 >>> 0, h3 >>> 0, h4 >>> 0];
 };
 
-const gaussianRandom = prng => {
+const gaussianRandom = (prng) => {
     const MEAN = 0;
     const STDEV = 1;
 
@@ -89,7 +87,7 @@ const gaussianRandom = prng => {
     return z * STDEV + MEAN;
 };
 
-const splitmix32 = a => () => {
+const splitmix32 = (a) => () => {
     a = (a | 0) + (0x9e3779b9 | 0);
 
     let t = a ^ (a >>> 16);
@@ -99,7 +97,15 @@ const splitmix32 = a => () => {
     return ((t = t ^ (t >>> 15)) >>> 0) / 4294967296;
 };
 
-const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setAttributeName, setAttributeValue, setBiosampleID, setLatLon, identifiers }) => {
+const DeckGLRenderScatterplot: any = ({
+    mbOverlay,
+    mlglMap,
+    setAttributeName,
+    setAttributeValue,
+    setBiosampleID,
+    setLatLon,
+    identifiers,
+}) => {
     if (!DeckGLRenderScatterplot.n) DeckGLRenderScatterplot.n = 0;
 
     ++DeckGLRenderScatterplot.n;
@@ -120,7 +126,7 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setAttributeName, se
                     [ne.lng, sw.lat],
                     [ne.lng, ne.lat],
                 ]
-                    .map(v => v.join(' '))
+                    .map((v) => v.join(' '))
                     .join(',') +
                 '))';
 
@@ -132,7 +138,7 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setAttributeName, se
                     clauses.push(`${idColumn} IN (${ids.map((id) => `'${id}'`).join(',')})`);
                 }
                 if (idRanges.length > 0) {
-                    idRanges.forEach(range => {
+                    idRanges.forEach((range) => {
                         const [start, end] = range;
                         clauses.push(`${idColumn} BETWEEN '${start}' AND '${end}'`);
                     });
@@ -145,21 +151,19 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setAttributeName, se
             const SELECT = `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, FLOOR(RANDOM()*2) as class
                 FROM biosample_geographical_location
                 WHERE
-                ${MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE
-                    ? 'ST_Intersects(lat_lon, ST_SetSRID(ST_GeomFromText(' + neswPolygon + '), 4326))'
-                    : 'TRUE'
+                ${
+                    MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE
+                        ? 'ST_Intersects(lat_lon, ST_SetSRID(ST_GeomFromText(' + neswPolygon + '), 4326))'
+                        : 'TRUE'
                 }
-                ${identifierClauses.length > 0
-                    ? `AND ${identifierClauses.join(' OR ')}`
-                    : ''
-                }
+                ${identifierClauses.length > 0 ? `AND ${identifierClauses.join(' OR ')}` : ''}
                 LIMIT 32768;`;
             const responseMs = Date.now();
 
             let response;
             try {
                 // console.debug('[DEBUG]', 'DeckGLRenderScatterplot.SELECT', SELECT);
-                
+
                 response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
                     body: JSON.stringify({ SELECT }),
                     headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
@@ -173,15 +177,20 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setAttributeName, se
                 const json = await response.json();
                 const zoomDriftFactor = Math.pow(2, (16 - mlglMap.getZoom()) / 8) / 8000;
 
-                console.debug('[DEBUG]', 'DeckGLRenderScatterplot.json', json.length.toLocaleString() + ' points', (Date.now()-responseMs).toLocaleString() + ' ms');
+                console.debug(
+                    '[DEBUG]',
+                    'DeckGLRenderScatterplot.json',
+                    json.length.toLocaleString() + ' points',
+                    (Date.now() - responseMs).toLocaleString() + ' ms',
+                );
 
                 mbOverlay.setProps({
                     interleaved: true,
                     layers: [
                         new (globalThis as any).deck.ScatterplotLayer({
                             data: json,
-                            getFillColor: d => (d.class === 1 ? [0, 128, 255] : [255, 0, 128]),
-                            getPosition: d => {
+                            getFillColor: (d) => (d.class === 1 ? [0, 128, 255] : [255, 0, 128]),
+                            getPosition: (d) => {
                                 const prng = splitmix32(cyrb128(d.accession)[0]);
 
                                 return [
@@ -233,7 +242,7 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
     const [latLon, setLatLon] = useState('');
 
     useEffect(() => {
-        if (mapRef.current) {
+        if (mapRef.current && globalThis.maplibregl && globalThis.deck) {
             const mapRefCurrentUnsafe = mapRef.current as any;
 
             const mapDiv = mapRefCurrentUnsafe.appendChild(document.createElement('div'));
@@ -258,10 +267,18 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
             mlglMap.addControl(mbOverlay);
 
             const renderScatterplot = () =>
-                DeckGLRenderScatterplot({ mbOverlay, mlglMap, setAttributeName, setAttributeValue, setBioprojectID, setBiosampleID, setLatLon, identifiers });
+                DeckGLRenderScatterplot({
+                    mbOverlay,
+                    mlglMap,
+                    setAttributeName,
+                    setAttributeValue,
+                    setBioprojectID,
+                    setBiosampleID,
+                    setLatLon,
+                    identifiers,
+                });
 
-            if(MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE)
-                mlglMap.on('moveend', renderScatterplot);
+            if (MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE) mlglMap.on('moveend', renderScatterplot);
             renderScatterplot();
 
             return () => {
@@ -273,7 +290,7 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
     }, []);
 
     useEffect(() => {
-        if(bioprojectID) {
+        if (bioprojectID) {
             // ...
 
             setBioprojectName('<BIOPROJECT_NAME>');
@@ -283,12 +300,10 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
     }, [bioprojectID]);
 
     useEffect(() => {
-        if(biosampleID) {
-            bioprojectIDFromBiosample(biosampleID)
-                .then(setBioprojectID);
-            
-            selectBiosample(biosampleID)
-                .then(data => setBiosampleTitle(data.title));
+        if (biosampleID) {
+            bioprojectIDFromBiosample(biosampleID).then(setBioprojectID);
+
+            selectBiosample(biosampleID).then((data) => setBiosampleTitle(data.title));
         } else {
             setBioprojectID('');
             setBiosampleTitle('');
@@ -297,7 +312,10 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
 
     return (
         <div style={style}>
-            <div ref={mapRef} style={{ height: 'calc(100% - 64px)', position: 'relative', width: '100%' }} />
+            <div
+                ref={mapRef}
+                style={{ height: 'calc(100% - 64px)', position: 'relative', width: '100%', minHeight: 500 }}
+            />
 
             {/* Tooltip */}
             <div style={{ color: '#FFF', margin: '24px 0 0 0', padding: '0 8px 0 8px' }}>
@@ -319,8 +337,8 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                     <div style={{ flex: '1 0' }}>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>BIOSAMPLE</div>
                         <div>
-                            {biosampleID
-                                ? <>
+                            {biosampleID ? (
+                                <>
                                     <a
                                         href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID}
                                         style={{ color: 'inherit', fontSize: '18px', textDecoration: 'none' }}
@@ -330,14 +348,16 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                                     </a>
                                     <div style={{ fontSize: '14px' }}>{biosampleTitle}</div>
                                 </>
-                                : '\u200B'}
+                            ) : (
+                                '\u200B'
+                            )}
                         </div>
                     </div>
                     <div style={{ flex: '1 0' }}>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>BIOPROJECT</div>
                         <div>
-                            {bioprojectID
-                                ? <>
+                            {bioprojectID ? (
+                                <>
                                     <a
                                         href={'https://www.ncbi.nlm.nih.gov/bioproject/?term=' + bioprojectID}
                                         style={{ color: 'inherit', fontSize: '18px', textDecoration: 'none' }}
@@ -347,7 +367,9 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                                     </a>
                                     <div style={{ fontSize: '14px' }}>{bioprojectName}</div>
                                 </>
-                                : '\u200B'}
+                            ) : (
+                                '\u200B'
+                            )}
                         </div>
                     </div>
                 </div>

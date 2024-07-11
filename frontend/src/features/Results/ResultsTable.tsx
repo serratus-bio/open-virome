@@ -96,7 +96,7 @@ const ResultsTable = ({ identifiers, moduleKey, shouldSkipFetching }) => {
         }
         return (
             <Box sx={{ flex: 1 }}>
-                <Skeleton width='90%' height={300} />
+                <Skeleton width={'80vw'} height={400} />
             </Box>
         );
     };
