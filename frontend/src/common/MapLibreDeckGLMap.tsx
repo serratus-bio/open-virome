@@ -120,6 +120,7 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setBioprojectID, set
 
             const identifierClauses = getIdClauses(identifiers?.biosample?.single, identifiers?.biosample?.range);
 
+            const responseMs = Date.now();
             let response;
             try {
                 response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
@@ -138,7 +139,10 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setBioprojectID, set
             }
 
             if (response && response.status === 200) {
+                const json = await response.json();
                 const zoomDriftFactor = Math.pow(2, (16 - mlglMap.getZoom()) / 8) / 8000;
+
+                console.debug('[DEBUG]', 'DeckGLRenderScatterplot.fetch', json.length.toLocaleString() + ' points', (Date.now()-responseMs).toLocaleString() + ' ms');
 
                 mbOverlay.setProps({
                     interleaved: true,
