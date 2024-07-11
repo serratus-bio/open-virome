@@ -106,9 +106,6 @@ const QueryView = ({ identifiers, identifiersFetching }) => {
                 <Typography component={'div'} variant='h5' sx={{ mr: 8 }}>
                     {moduleConfig[activeModule].title}
                 </Typography>
-                <Box sx={{ width: '50%', mr: 0 }}>
-                    <SearchBar query={searchString} setQuery={setSearchString} />
-                </Box>
             </Box>
             <Box sx={{ width: 1000 }}>
                 <Box>
@@ -118,6 +115,7 @@ const QueryView = ({ identifiers, identifiersFetching }) => {
                         <VirtualizedTable
                             rows={getRows(countData, searchString, moduleFilters)}
                             onRowClick={onRowClick}
+                            searchBar={<SearchBar query={searchString} setQuery={setSearchString} />}
                         />
                     )}
                 </Box>

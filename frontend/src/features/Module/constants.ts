@@ -1,12 +1,15 @@
 export const sectionConfig = {
-    'SRA Experiment': {
+    sra: {
         modules: ['host', 'seqType', 'bioproject'],
+        title: 'SRA Experiment',
     },
-    'Palmdb Virome': {
+    palmdb: {
         modules: ['sotu', 'species', 'family'],
+        title: 'Palmdb Virome',
     },
-    'Context': {
+    context: {
         modules: ['geography', 'statHost', 'tissue'],
+        title: 'Context',
     },
 };
 

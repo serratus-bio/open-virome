@@ -46,7 +46,7 @@ const VirtuosoTableComponents: TableComponents<Data> = {
     TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => <TableBody {...props} ref={ref} />),
 };
 
-const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) => {
+const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick, searchBar }) => {
     const disableSelectAll = (rows) => rows.length === 0 || rows.length > 100;
     const hasCheckedRows = (rows) => rows.length > 0 && rows.some((row) => row.selected);
 
@@ -66,7 +66,7 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) =
                         indeterminate={hasCheckedRows(rows) && disableSelectAll(rows)}
                     />
                 </TableCell>
-                {columns.map((column) => (
+                {columns.map((column, index) => (
                     <TableCell
                         key={column.dataKey}
                         variant='head'
@@ -74,7 +74,7 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick }) =
                         style={{ width: column.width }}
                         sx={{ backgroundColor: 'background.paper' }}
                     >
-                        {column.label}
+                        {!!searchBar && index === 0 ? searchBar : column.label}
                     </TableCell>
                 ))}
             </TableRow>

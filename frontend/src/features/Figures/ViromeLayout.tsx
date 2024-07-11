@@ -84,9 +84,6 @@ const ViromeLayout = ({ identifiers }) => {
                     </Typography>
                 </Box>
             }
-            {shouldRenderPlaceholder(resultError, resultIsFetching, resultData)
-                ? renderPlaceholder()
-                : renderNetworkFigure()}
             {resultData && resultData.length > 1000 ? (
                 <Box
                     sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', height: '100%', mb: 2 }}
@@ -102,6 +99,9 @@ const ViromeLayout = ({ identifiers }) => {
                     </Button>
                 </Box>
             ) : null}
+            {shouldRenderPlaceholder(resultError, resultIsFetching, resultData)
+                ? renderPlaceholder()
+                : renderNetworkFigure()}
         </Box>
     );
 };
