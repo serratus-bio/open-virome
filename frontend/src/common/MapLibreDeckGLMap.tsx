@@ -5,19 +5,18 @@ const AMAZON_LOCATION_API_KEY =
     'v1.public.eyJqdGkiOiJmZmZkN2UwNC0wNmRmLTQ4OTctOWEzOC00NTA5N2NiODY5MGIifSUgWkDQ2dkshoBIAo_0q3syXuabEaV9KFm9vj6iO5WvXML2A0HDkRXoETBgOzQjQiygufvZfAzJWw4d0FX9rOzRLpTcqr3CoNuolH7JBn3y4SKcRwk4pf-g-LD6tUtYpYgv5UPSx2SjVzTJIgC7hVte0qV7AY6_bptW_8pkfVnbKo_S5LBVxWB2dPDKc_6tiqYllOjOtmugN23b1Qdkhj5Pm5xgBWMQvHhjhNodXIkrYy5RvCE0vvzqd4uD_4bmj45OjXVAu_SO7xyPmV-77gtWSgj5it44McnP40jhBc-GNtMYrGZlyItIrKpbUUslAPCsgVzXVpAN8uF89rec9ko.ZWU0ZWIzMTktMWRhNi00Mzg0LTllMzYtNzlmMDU3MjRmYTkx';
 const LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER = 'Bearer 20240516';
 const LOGAN_RDS_PROXY_LAMBDA_ENDPOINT = 'https://omdmrhz5lb2nrbmodjtm5fxhqq0uevzh.lambda-url.us-east-1.on.aws';
+const MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE = false;
 
-// SEND TO UTIL FUNCTIONS FOR QUERYING DATA
-const bioprojectIDFromBiosampleID: any = async (biosampleID) => {
-    if (!bioprojectIDFromBiosampleID._) bioprojectIDFromBiosampleID._ = {};
+// SEND TO UTIL FUNCTIONS
+const bioprojectIDFromBiosample: any = async biosample => {
+    if (!bioprojectIDFromBiosample._) bioprojectIDFromBiosample._ = {};
 
-    if (!bioprojectIDFromBiosampleID._[biosampleID])
-        bioprojectIDFromBiosampleID._[biosampleID] = (async () => {
+    if (!bioprojectIDFromBiosample._[biosample])
+        bioprojectIDFromBiosample._[biosample] = (async () => {
             const response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
-                body: JSON.stringify({
-                    SELECT: "bioproject FROM sra WHERE biosample = '" + biosampleID + "' LIMIT 1;",
-                }),
+                body: JSON.stringify({ SELECT: "bioproject FROM sra WHERE biosample = '" + biosample + "' LIMIT 1;" }),
                 headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
-                method: 'POST',
+                method: 'POST'
             });
 
             if (response.status === 200) {
@@ -27,10 +26,33 @@ const bioprojectIDFromBiosampleID: any = async (biosampleID) => {
             }
         })();
 
-    return bioprojectIDFromBiosampleID._[biosampleID];
+    return bioprojectIDFromBiosample._[biosample];
 };
+const selectBiosample: any = async accession => {
+    if (!selectBiosample._) selectBiosample._ = {};
 
-const cyrb128 = (str) => {
+    if (!selectBiosample._[accession])
+        selectBiosample._[accession] = (async () => {
+            const response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
+                body: JSON.stringify({ SELECT: "* FROM biosample WHERE accession = '" + accession + "' LIMIT 1;" }),
+                headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
+                method: 'POST'
+            });
+
+            if (response.status === 200) {
+                const json = await response.json();
+
+                if (json.length) return json[0];
+            }
+        })();
+
+    return selectBiosample._[accession];
+};
+const trimTextEllipsis = (s, n) => s.length > n
+    ? s.substring(0, n) + '...'
+    : s;
+
+const cyrb128 = str => {
     let h1 = 1779033703;
     let h2 = 3144134277;
     let h3 = 1013904242;
@@ -57,7 +79,7 @@ const cyrb128 = (str) => {
     return [h1 >>> 0, h2 >>> 0, h3 >>> 0, h4 >>> 0];
 };
 
-const gaussianRandom = (prng) => {
+const gaussianRandom = prng => {
     const MEAN = 0;
     const STDEV = 1;
 
@@ -67,7 +89,7 @@ const gaussianRandom = (prng) => {
     return z * STDEV + MEAN;
 };
 
-const splitmix32 = (a) => () => {
+const splitmix32 = a => () => {
     a = (a | 0) + (0x9e3779b9 | 0);
 
     let t = a ^ (a >>> 16);
@@ -77,7 +99,7 @@ const splitmix32 = (a) => () => {
     return ((t = t ^ (t >>> 15)) >>> 0) / 4294967296;
 };
 
-const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setBioprojectID, setBiosampleID, identifiers }) => {
+const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setAttributeName, setAttributeValue, setBiosampleID, setLatLon, identifiers }) => {
     if (!DeckGLRenderScatterplot.n) DeckGLRenderScatterplot.n = 0;
 
     ++DeckGLRenderScatterplot.n;
@@ -98,7 +120,7 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setBioprojectID, set
                     [ne.lng, sw.lat],
                     [ne.lng, ne.lat],
                 ]
-                    .map((v) => v.join(' '))
+                    .map(v => v.join(' '))
                     .join(',') +
                 '))';
 
@@ -110,7 +132,7 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setBioprojectID, set
                     clauses.push(`${idColumn} IN (${ids.map((id) => `'${id}'`).join(',')})`);
                 }
                 if (idRanges.length > 0) {
-                    idRanges.forEach((range) => {
+                    idRanges.forEach(range => {
                         const [start, end] = range;
                         clauses.push(`${idColumn} BETWEEN '${start}' AND '${end}'`);
                     });
@@ -120,17 +142,26 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setBioprojectID, set
 
             const identifierClauses = getIdClauses(identifiers?.biosample?.single, identifiers?.biosample?.range);
 
+            const SELECT = `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, FLOOR(RANDOM()*2) as class
+                FROM biosample_geographical_location
+                WHERE
+                ${MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE
+                    ? 'ST_Intersects(lat_lon, ST_SetSRID(ST_GeomFromText(' + neswPolygon + '), 4326))'
+                    : 'TRUE'
+                }
+                ${identifierClauses.length > 0
+                    ? `AND ${identifierClauses.join(' OR ')}`
+                    : ''
+                }
+                LIMIT 32768;`;
             const responseMs = Date.now();
+
             let response;
             try {
+                // console.debug('[DEBUG]', 'DeckGLRenderScatterplot.SELECT', SELECT);
+                
                 response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
-                    body: JSON.stringify({
-                        SELECT: `accession, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, FLOOR(RANDOM()*2) as class
-                            FROM biosample_geographical_location
-                            WHERE ST_Intersects(lat_lon, ST_SetSRID(ST_GeomFromText('${neswPolygon}'), 4326))
-                            ${identifierClauses.length > 0 ? `AND ${identifierClauses.join(' OR ')}` : ''}
-                            LIMIT 8192;`,
-                    }),
+                    body: JSON.stringify({ SELECT }),
                     headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
                     method: 'POST',
                 });
@@ -142,15 +173,15 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setBioprojectID, set
                 const json = await response.json();
                 const zoomDriftFactor = Math.pow(2, (16 - mlglMap.getZoom()) / 8) / 8000;
 
-                console.debug('[DEBUG]', 'DeckGLRenderScatterplot.fetch', json.length.toLocaleString() + ' points', (Date.now()-responseMs).toLocaleString() + ' ms');
+                console.debug('[DEBUG]', 'DeckGLRenderScatterplot.json', json.length.toLocaleString() + ' points', (Date.now()-responseMs).toLocaleString() + ' ms');
 
                 mbOverlay.setProps({
                     interleaved: true,
                     layers: [
                         new (globalThis as any).deck.ScatterplotLayer({
-                            data: await response.json(),
-                            getFillColor: (d) => (d.class === 1 ? [0, 128, 255] : [255, 0, 128]),
-                            getPosition: (d) => {
+                            data: json,
+                            getFillColor: d => (d.class === 1 ? [0, 128, 255] : [255, 0, 128]),
+                            getPosition: d => {
                                 const prng = splitmix32(cyrb128(d.accession)[0]);
 
                                 return [
@@ -162,13 +193,15 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setBioprojectID, set
                             id: 'scatterplotLayer',
                             onHover: (info, event) => {
                                 if (info.object) {
-                                    setBiosampleID(info.object.accession);
-                                    setBioprojectID('');
+                                    setAttributeName(info.object.attribute_name);
+                                    setAttributeValue(info.object.attribute_value);
 
-                                    bioprojectIDFromBiosampleID(info.object.accession).then(setBioprojectID);
+                                    setBiosampleID(info.object.accession);
+
+                                    setLatLon([info.object.lat, info.object.lon].join(','));
                                 }
                             },
-                            opacity: 0.2,
+                            opacity: 0.8,
                             pickable: true,
                             radiusMaxPixels: 16,
                             radiusMinPixels: 4,
@@ -184,64 +217,20 @@ const DeckGLRenderScatterplot: any = ({ mbOverlay, mlglMap, setBioprojectID, set
     });
 };
 
-const MapLibreDeckGLMapTooltip = ({ biosampleID, bioprojectID }) => (
-    <div
-        style={{
-            backgroundColor: 'rgba(0,0,0,0.6)',
-            borderRadius: '4px',
-            color: '#FFF',
-            fontFamily: 'sans-serif',
-            fontSize: '16px',
-            fontWeight: '16px',
-            lineHeight: '20px',
-            padding: '8px 8px 8px 8px',
-            position: 'absolute',
-            right: '8px',
-            top: '8px',
-            zIndex: 2,
-        }}
-    >
-        <div style={{ fontSize: '14px', fontWeight: 700 }}>BIOSAMPLE</div>
-        <div>
-            {biosampleID ? (
-                <a
-                    href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID}
-                    style={{ color: 'inherit', textDecoration: 'none' }}
-                    target='_blank'
-                >
-                    {biosampleID}
-                </a>
-            ) : (
-                '\u200B'
-            )}
-        </div>
-        <br />
-        <div style={{ fontSize: '14px', fontWeight: 700 }}>BIOPROJECT</div>
-        <div>
-            {bioprojectID ? (
-                <a
-                    href={'https://www.ncbi.nlm.nih.gov/bioproject/?term=' + bioprojectID}
-                    style={{ color: 'inherit', textDecoration: 'none' }}
-                    target='_blank'
-                >
-                    {bioprojectID}
-                </a>
-            ) : (
-                '\u200B'
-            )}
-        </div>
-    </div>
-);
-
 const MapLibreDeckGLMap = ({ style, identifiers }) => {
     style = {
-        ...{ position: 'relative' },
+        ...{ height: '100%', position: 'relative', width: '100%' },
         ...style,
     };
 
     const mapRef = useRef(null);
+    const [attributeName, setAttributeName] = useState('');
+    const [attributeValue, setAttributeValue] = useState('');
     const [bioprojectID, setBioprojectID] = useState('');
+    const [bioprojectName, setBioprojectName] = useState('');
     const [biosampleID, setBiosampleID] = useState('');
+    const [biosampleTitle, setBiosampleTitle] = useState('');
+    const [latLon, setLatLon] = useState('');
 
     useEffect(() => {
         if (mapRef.current) {
@@ -250,9 +239,6 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
             const mapDiv = mapRefCurrentUnsafe.appendChild(document.createElement('div'));
             Object.assign(mapDiv.style, {
                 height: '100%',
-                left: 0,
-                position: 'absolute',
-                top: 0,
                 width: '100%',
                 borderRadius: '8px',
             });
@@ -261,7 +247,7 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                 container: mapDiv,
                 style:
                     // OpenDataStandardDarkMap, OpenDataVisualizationLightMap, OpenDataVisualizationDarkMap
-                    'https://maps.geo.us-east-1.amazonaws.com/maps/v0/maps/OpenDataStandardDarkMap/style-descriptor?key=' +
+                    'https://maps.geo.us-east-1.amazonaws.com/maps/v0/maps/OpenDataVisualizationLightMap/style-descriptor?key=' +
                     AMAZON_LOCATION_API_KEY,
                 zoom: 0.8,
             });
@@ -272,9 +258,10 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
             mlglMap.addControl(mbOverlay);
 
             const renderScatterplot = () =>
-                DeckGLRenderScatterplot({ mbOverlay, mlglMap, setBioprojectID, setBiosampleID, identifiers });
+                DeckGLRenderScatterplot({ mbOverlay, mlglMap, setAttributeName, setAttributeValue, setBioprojectID, setBiosampleID, setLatLon, identifiers });
 
-            mlglMap.on('moveend', renderScatterplot);
+            if(MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE)
+                mlglMap.on('moveend', renderScatterplot);
             renderScatterplot();
 
             return () => {
@@ -285,9 +272,86 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
         }
     }, []);
 
+    useEffect(() => {
+        if(bioprojectID) {
+            // ...
+
+            setBioprojectName('<BIOPROJECT_NAME>');
+        } else {
+            setBioprojectName('');
+        }
+    }, [bioprojectID]);
+
+    useEffect(() => {
+        if(biosampleID) {
+            bioprojectIDFromBiosample(biosampleID)
+                .then(setBioprojectID);
+            
+            selectBiosample(biosampleID)
+                .then(data => setBiosampleTitle(data.title));
+        } else {
+            setBioprojectID('');
+            setBiosampleTitle('');
+        }
+    }, [biosampleID]);
+
     return (
-        <div ref={mapRef} style={style}>
-            <MapLibreDeckGLMapTooltip biosampleID={biosampleID} bioprojectID={bioprojectID} />
+        <div style={style}>
+            <div ref={mapRef} style={{ height: 'calc(100% - 64px)', position: 'relative', width: '100%' }} />
+
+            {/* Tooltip */}
+            <div style={{ color: '#FFF', margin: '24px 0 0 0', padding: '0 8px 0 8px' }}>
+                <div style={{ display: 'flex' }}>
+                    <div style={{ flex: '1 0' }}>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>ATTRIBUTE NAME</div>
+                        <div style={{ fontSize: '18px' }}>{attributeName}</div>
+                    </div>
+                    <div style={{ flex: '2 0' }}>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>ATTRIBUTE VALUE</div>
+                        <div style={{ fontSize: '18px' }}>{trimTextEllipsis(attributeValue, 40)}</div>
+                    </div>
+                    <div style={{ flex: '1 0' }}>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>LAT / LON</div>
+                        <div style={{ fontSize: '18px' }}>{latLon}</div>
+                    </div>
+                </div>
+                <div style={{ display: 'flex', margin: '16px 0 0 0' }}>
+                    <div style={{ flex: '1 0' }}>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>BIOSAMPLE</div>
+                        <div>
+                            {biosampleID
+                                ? <>
+                                    <a
+                                        href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID}
+                                        style={{ color: 'inherit', fontSize: '18px', textDecoration: 'none' }}
+                                        target='_blank'
+                                    >
+                                        {biosampleID}
+                                    </a>
+                                    <div style={{ fontSize: '14px' }}>{biosampleTitle}</div>
+                                </>
+                                : '\u200B'}
+                        </div>
+                    </div>
+                    <div style={{ flex: '1 0' }}>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>BIOPROJECT</div>
+                        <div>
+                            {bioprojectID
+                                ? <>
+                                    <a
+                                        href={'https://www.ncbi.nlm.nih.gov/bioproject/?term=' + bioprojectID}
+                                        style={{ color: 'inherit', fontSize: '18px', textDecoration: 'none' }}
+                                        target='_blank'
+                                    >
+                                        {bioprojectID}
+                                    </a>
+                                    <div style={{ fontSize: '14px' }}>{bioprojectName}</div>
+                                </>
+                                : '\u200B'}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
