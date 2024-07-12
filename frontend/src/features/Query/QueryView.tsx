@@ -124,20 +124,32 @@ const QueryView = () => {
                             top: 60,
                             left: 240,
                             backgroundColor: '#252427',
-                            pl: 4,
-                            pr: 4,
                         }}
                     >
-                        <Typography variant='h6' sx={{ textAlign: 'left', mt: 4, mb: 2 }}>
-                            {moduleConfig[activeModule].title}
-                        </Typography>
-                        <Box sx={{ mb: 2 }}>
+                        <Box>
+                            {countIsFetching || !countData ? (
+                                <Skeleton variant='rounded' height={'70vh'} />
+                            ) : (
+                                <VirtualizedTable
+                                    rows={getRows(countData, searchString, moduleFilters)}
+                                    onRowClick={onRowClick}
+                                    searchBar={
+                                        <SearchBar
+                                            placeholder={`Search ${moduleConfig[activeModule].title.toLowerCase()}`}
+                                            query={searchString}
+                                            setQuery={setSearchString}
+                                        />
+                                    }
+                                />
+                            )}
+                        </Box>
+                        <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
                             {!identifiersData || identifiersFetching || countIsFetching ? (
                                 <Skeleton variant='rounded' height={20} width={'80%'} />
                             ) : (
                                 <Box>
                                     <Typography component={'span'} variant='body2' sx={{ textAlign: 'left' }}>
-                                        {`Total ${countData ? formatNumber(countData.length) : ''}.`}
+                                        {`Total rows: ${countData ? formatNumber(countData.length) : ''}.`}
                                     </Typography>
                                     <Typography component={'span'} variant='body2' sx={{ mt: 1, textAlign: 'left' }}>
                                         {`${
@@ -149,17 +161,6 @@ const QueryView = () => {
                                         }`}
                                     </Typography>
                                 </Box>
-                            )}
-                        </Box>
-                        <Box>
-                            {countIsFetching || !countData ? (
-                                <Skeleton variant='rounded' height={'70vh'} />
-                            ) : (
-                                <VirtualizedTable
-                                    rows={getRows(countData, searchString, moduleFilters)}
-                                    onRowClick={onRowClick}
-                                    searchBar={<SearchBar query={searchString} setQuery={setSearchString} />}
-                                />
                             )}
                         </Box>
                     </Box>

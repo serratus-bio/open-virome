@@ -6,11 +6,9 @@ import { sectionConfig, moduleConfig } from './constants.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
 import { shouldDisableFigureView } from '../../common/utils/plotHelpers.ts';
 import { useGetIdentifiersQuery } from '../../api/client.ts';
-import { store } from '../../app/store.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import Divider from '@mui/material/Divider';
 import SRARunLayout from '../Figures/SRARunLayout.tsx';
 import EnvironmentLayout from '../Figures/EnvironmentLayout.tsx';
 import ViromeLayout from '../Figures/ViromeLayout.tsx';
@@ -106,11 +104,30 @@ const Module = ({ sectionKey }) => {
                         alignItems: 'center',
                     }}
                 >
-                    <Typography component={'div'} variant='h4' sx={{ mr: 8 }}>
-                        {sectionConfig[sectionKey]?.title}
-                    </Typography>
                     <Box sx={{ mb: 0 }}>
-                        <Select value={activeModule} onChange={onModuleChange} variant='outlined'>
+                        <Select
+                            sx={{
+                                'backgroundColor': '#28282887',
+                                'fontSize': 38,
+                                '.MuiOutlinedInput-notchedOutline': {
+                                    borderColor: '#40a9ff',
+                                },
+                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                    borderColor: '#40a9ff',
+                                    borderWidth: '0.15rem',
+                                },
+                                'borderColor': '#40a9ff',
+                                '&:before': {
+                                    borderColor: '#40a9ff',
+                                },
+                                '&:after': {
+                                    borderColor: '#40a9ff',
+                                },
+                            }}
+                            value={activeModule}
+                            onChange={onModuleChange}
+                            variant='standard'
+                        >
                             {sectionConfig[sectionKey]?.modules.map((module) => (
                                 <MenuItem key={module} value={module} sx={{ pr: 2 }}>
                                     {moduleConfig[module]?.title}
@@ -151,7 +168,6 @@ const Module = ({ sectionKey }) => {
                     </Tooltip>
                 </Box>
             </Box>
-            <Divider sx={{ borderBottomWidth: 3 }} />
             <Box
                 sx={{
                     display: 'flex',
