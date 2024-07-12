@@ -54,6 +54,9 @@ const PolarBarPlot = ({ plotData = {}, styles = {} }) => {
         ],
         radiusAxis: {
             max: parseFloat(maxVal.toFixed(0)),
+            axisLabel: {
+                show: false,
+            },
         },
     };
 

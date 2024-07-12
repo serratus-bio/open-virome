@@ -10,7 +10,7 @@ cytoscape.use(fcose);
 
 const NetworkPlot = ({ plotData = [] }) => {
     const [cy, setCy] = useState(null);
-    const [activeSubgraph, setActiveSubgraph] = useState(0);
+    const [activeSubgraph, setActiveSubgraph] = useState(1);
     const [headlessCy, setHeadlessCy] = useState(
         cytoscape({
             headless: true,
@@ -22,13 +22,22 @@ const NetworkPlot = ({ plotData = [] }) => {
         if (cy && headlessCy) {
             headlessCy.json({ elements: plotData });
             headlessCy.ready(() => {
-                cy.json({ elements: getActiveComponent() });
+                cy.json({ elements: getPlotData() });
                 cy.ready(() => {
-                    cy.layout(layouts[1]).run();
+                    cy.layout({
+                        ...layouts[1],
+                    }).run();
                 });
             });
         }
     }, [plotData, activeSubgraph]);
+
+    useEffect(() => {
+        const componentLabels = getComponentOptions();
+        if (componentLabels[0] === 'All' && activeSubgraph !== 'All') {
+            setActiveSubgraph('All');
+        }
+    }, [plotData]);
 
     const stylesheet = [
         {
@@ -115,10 +124,10 @@ const NetworkPlot = ({ plotData = [] }) => {
             /* incremental layout options */
 
             // Node repulsion (non overlapping) multiplier
-            nodeRepulsion: (node) => 450000,
+            nodeRepulsion: (node) => 400000,
             // Ideal edge (non nested) length
             idealEdgeLength: (edge) => {
-                return Math.max(edge.data().weight * edge.data().numSOTUS * 1.5, 100);
+                return Math.max(edge.data().weight * edge.data().numSOTUS * 0.8, 100);
             },
             // Divisor to compute edge forces
             edgeElasticity: (edge) => {
@@ -166,19 +175,36 @@ const NetworkPlot = ({ plotData = [] }) => {
         },
     ];
 
-    const getActiveComponent = () => {
+    const getPlotData = () => {
+        if (activeSubgraph === 'All') {
+            return plotData;
+        }
+
         const components = headlessCy.elements().components();
         components.sort((a, b) => b.length - a.length);
-        if (!components[activeSubgraph]) {
+        if (!components[activeSubgraph - 1]) {
             return [];
         }
 
-        return components[activeSubgraph].jsons();
+        return components[activeSubgraph - 1].jsons();
     };
 
     const getComponentOptions = () => {
-        const components = headlessCy.elements().components();
-        return components.map((_, index) => index);
+        const numComponents = headlessCy.elements().components().length;
+        let componentLabels;
+        if (headlessCy.elements().length < 500) {
+            componentLabels = Array.from({ length: numComponents }, (_, i) => {
+                if (i === 0) {
+                    return 'All';
+                }
+                return i.toString();
+            });
+        } else {
+            componentLabels = Array.from({ length: numComponents - 1 }, (_, i) => {
+                return (i + 1).toString();
+            });
+        }
+        return componentLabels;
     };
 
     return (
@@ -187,7 +213,9 @@ const NetworkPlot = ({ plotData = [] }) => {
                 <DropDownSelect
                     options={getComponentOptions()}
                     activeOption={activeSubgraph}
-                    setActiveOption={(event) => setActiveSubgraph(event.target.value)}
+                    setActiveOption={(event) => {
+                        setActiveSubgraph(event.target.value);
+                    }}
                     label='Component'
                 />
             </Box>
@@ -195,11 +223,13 @@ const NetworkPlot = ({ plotData = [] }) => {
             <CytoscapeComponent
                 cy={setCy}
                 stylesheet={stylesheet}
-                elements={getActiveComponent()}
+                elements={getPlotData()}
                 style={{ width: '60%', height: 600 }}
                 layout={layouts[1]}
-                minZoom={0.05}
+                minZoom={0.1}
                 maxZoom={1}
+                userZoomingEnabled={true}
+                // wheelSensitivity={0.3}
             />
         </Box>
     );

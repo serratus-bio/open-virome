@@ -55,7 +55,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
     const countKeys = {
         count: 'Run Count (n)',
         gbp: 'Gigabasepairs (Gbp)',
-        percent: 'Percent runs (%)',
+        percent: 'Percent of set (%)',
     };
 
     const getTotalRuns = (seriesName) => {
@@ -91,7 +91,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             return (
                 <Box sx={{ minWidth: 400 }}>
                     <Typography variant='body2' sx={{ fontStyle: 'italic' }}>
-                        {`${seriesName} set ${totalRuns ? `(runs = ${totalRuns})` : ''}`}
+                        {`${seriesName} set ${totalRuns ? `(n = ${totalRuns})` : ''}`}
                     </Typography>
                     <PolarBarPlot plotData={filteredPlotData} />
                 </Box>
@@ -101,7 +101,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             return (
                 <Box sx={{ minWidth: 400 }}>
                     <Typography variant='body2' sx={{ position: 'absolute', fontStyle: 'italic' }}>
-                        {`${seriesName} set ${totalRuns ? `(runs = ${totalRuns})` : ''}`}
+                        {`${seriesName} set ${totalRuns ? `(n = ${totalRuns})` : ''}`}
                     </Typography>
                     <BarPlot plotData={filteredPlotData} />
                 </Box>

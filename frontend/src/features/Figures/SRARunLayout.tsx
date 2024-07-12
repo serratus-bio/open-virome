@@ -28,7 +28,7 @@ const SRARunLayout = ({ identifiers, activeModule }) => {
                         alignSelf: 'flex-start',
                     }}
                 >
-                    {'Dataset too large, displaying top rows.'}
+                    {'Dataset is too large, try adding filters in the query builder.'}
                 </Typography>
             ) : null}
             <Box sx={{ flex: 1, width: '100%' }}>{getFigure()}</Box>

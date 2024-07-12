@@ -1,22 +1,22 @@
 export const sectionConfig = {
     sra: {
         modules: ['host', 'seqType', 'bioproject'],
-        title: 'Run Module',
+        title: 'Run',
     },
     palmdb: {
-        modules: ['sotu', 'species', 'family'],
-        title: 'Virome Module',
+        modules: ['species', 'family', 'sotu'],
+        title: 'Virome',
     },
     context: {
         modules: ['geography', 'statHost', 'tissue'],
-        title: 'Metadata Module',
+        title: 'Metadata',
     },
 };
 
 export const moduleConfig = {
     host: {
-        title: 'Run label',
-        tag: 'Run label',
+        title: 'Run Label',
+        tag: 'Run Label',
         groupByKey: 'host_label',
         resultsTable: 'srarun',
         resultsIdColumn: 'run',

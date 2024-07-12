@@ -25,7 +25,7 @@ const BioprojectFigure = ({ identifiers }) => {
             ids: identifiers ? identifiers['run'].single : [],
             idRanges: identifiers ? identifiers['run'].range : [],
             groupBy: moduleConfig['bioproject'].groupByKey,
-            pageEnd: isSummaryView(identifiers) ? 9 : undefined,
+            pageEnd: isSummaryView(identifiers) ? 100 : undefined,
         },
         {
             skip: shouldDisableFigureView(identifiers) || isSummaryView(identifiers),
@@ -42,7 +42,7 @@ const BioprojectFigure = ({ identifiers }) => {
             ids: identifiers ? identifiers['bioproject'].single : [],
             idRanges: identifiers ? identifiers['bioproject'].range : [],
             groupBy: moduleConfig['bioproject'].groupByKey,
-            pageEnd: isSummaryView(identifiers) ? 9 : undefined,
+            pageEnd: isSummaryView(identifiers) ? 1000 : undefined,
         },
         {
             skip: shouldDisableFigureView(identifiers),

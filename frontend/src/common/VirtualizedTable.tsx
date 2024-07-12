@@ -54,7 +54,7 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick, sea
         const isChecked = !disableSelectAll(rows) && rows.length > 0 && rows.every((row) => row.selected);
         return (
             <TableRow>
-                <TableCell padding='checkbox' sx={{ width: '16px', backgroundColor: '#121212' }}>
+                <TableCell padding='checkbox' sx={{ width: 8, pl: 2, backgroundColor: '#121212' }}>
                     <Checkbox
                         color='primary'
                         checked={isChecked}
@@ -72,7 +72,7 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick, sea
                         variant='head'
                         align={column.numeric || false ? 'right' : 'left'}
                         style={{ width: column.width }}
-                        sx={{ backgroundColor: 'background.paper' }}
+                        sx={{ backgroundColor: 'background.paper', pl: 2 }}
                     >
                         {!!searchBar && index === 0 ? searchBar : column.label}
                     </TableCell>
@@ -92,6 +92,7 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick, sea
                         inputProps={{
                             'aria-labelledby': labelId,
                         }}
+                        sx={{ ml: 1.5, mt: 1, mb: 1 }}
                         onChange={() => onRowClick(row)}
                     />
                 </TableCell>
@@ -153,7 +154,7 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick, sea
     }, [rows.length]);
 
     return (
-        <Paper style={{ height: '70vh', width: '100%' }}>
+        <Paper style={{ height: '80vh', width: '100%' }}>
             <TableVirtuoso
                 data={rows}
                 components={VirtuosoTableComponents}

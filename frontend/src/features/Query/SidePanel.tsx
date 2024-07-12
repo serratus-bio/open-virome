@@ -40,6 +40,7 @@ const SidePanel = () => {
                     width: drawerWidth,
                     boxSizing: 'border-box',
                     backgroundColor: 'rgb(40, 40, 40)',
+                    border: 'none',
                 },
             }}
         >

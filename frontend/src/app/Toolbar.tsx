@@ -8,7 +8,7 @@ import Toolbar from '@mui/material/Toolbar';
 import FilterTags from '../features/Query/FilterTags.tsx';
 import IconButton from '@mui/material/IconButton';
 import PageviewIcon from '@mui/icons-material/Pageview';
-import Tooltip from '@mui/material/Tooltip';
+import TuneIcon from '@mui/icons-material/Tune';
 
 const AppToolbar = () => {
     const dispatch = useDispatch();
@@ -45,9 +45,13 @@ const AppToolbar = () => {
                     aria-label='open drawer'
                     onClick={handleDrawerOpen}
                     edge='start'
-                    sx={{ ml: 8, mr: 2, ...(open && { display: 'none' }) }}
+                    sx={{
+                        ml: '9%',
+                        mr: 2,
+                        ...(open && { display: 'none' }),
+                    }}
                 >
-                    <PageviewIcon fontSize='large' />
+                    <TuneIcon fontSize='large' />
                 </IconButton>
                 <FilterTags />
             </Toolbar>

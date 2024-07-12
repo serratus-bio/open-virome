@@ -29,10 +29,9 @@ const ViromeLayout = ({ identifiers }) => {
                 ? identifiers[handleIdKeyIrregularities(moduleConfig[activeModule].resultsIdColumn)].range
                 : [],
             table: moduleConfig[activeModule].resultsTable,
-            // sortByColumn: moduleConfig[activeModule].resultsIdColumn,
-            // sortByDirection: 'asc',
             pageStart: 0,
-            pageEnd: isSummaryView(identifiers) ? 100 : undefined,
+            pageEnd: isSummaryView(identifiers) ? 200 : undefined,
+            sortBy: 'gb_pid',
         },
         {
             skip: !identifiers,
@@ -80,7 +79,7 @@ const ViromeLayout = ({ identifiers }) => {
                 <Box
                     sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', height: '100%', mb: 2 }}
                 >
-                    <Typography variant='h6'>Dataset is too large. Displaying random subgraph. </Typography>
+                    <Typography variant='h6'>Dataset is too large. Displaying components of subsample. </Typography>
                     <Button
                         sx={{ ml: 2 }}
                         onClick={() => {

@@ -37,7 +37,7 @@ const App = () => {
             duration: theme.transitions.duration.leavingScreen,
         }),
         marginLeft: `-240px`,
-        marginBottom: 20,
+        backgroundColor: 'rgb(29, 30, 32, 0.6)',
     });
 
     return (
