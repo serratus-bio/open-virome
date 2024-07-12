@@ -86,7 +86,7 @@ const Module = ({ sectionKey }) => {
     };
 
     return (
-        <Box sx={{ width: '80vw', maxWidth: 1500, ml: '10%', mt: 4, flexGrow: 1 }}>
+        <Box sx={{ width: '80vw', maxWidth: 1500, ml: '10%', mt: 4, mb: 4, flexGrow: 1 }}>
             <Box
                 sx={{
                     display: 'flex',

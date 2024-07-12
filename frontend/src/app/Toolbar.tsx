@@ -46,6 +46,7 @@ const AppToolbar = () => {
                     onClick={handleDrawerOpen}
                     edge='start'
                     sx={{
+                        backgroundColor: 'rgba(86, 86, 86, 0.7)',
                         ml: '9%',
                         mr: 2,
                         ...(open && { display: 'none' }),

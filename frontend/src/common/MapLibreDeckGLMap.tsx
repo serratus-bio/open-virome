@@ -256,7 +256,7 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                 container: mapDiv,
                 style:
                     // OpenDataStandardDarkMap, OpenDataVisualizationLightMap, OpenDataVisualizationDarkMap
-                    'https://maps.geo.us-east-1.amazonaws.com/maps/v0/maps/OpenDataVisualizationLightMap/style-descriptor?key=' +
+                    'https://maps.geo.us-east-1.amazonaws.com/maps/v0/maps/OpenDataStandardDarkMap/style-descriptor?key=' +
                     AMAZON_LOCATION_API_KEY,
                 zoom: 0.8,
             });

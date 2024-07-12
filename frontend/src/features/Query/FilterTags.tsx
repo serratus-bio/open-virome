@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAllFilters, removeFilter } from './slice.ts';
-import { setActiveModule } from '../../app/slice.ts';
+import { setActiveQueryModule, selectSidebarOpen, toggleSidebar } from '../../app/slice.ts';
 import { moduleConfig } from '../Module/constants.ts';
 
 import Chip from '@mui/material/Chip';
@@ -10,6 +10,7 @@ import Box from '@mui/material/Box';
 
 const FilterTags = () => {
     const filters = useSelector(selectAllFilters);
+    const sidebarOpen = useSelector(selectSidebarOpen);
     const dispatch = useDispatch();
 
     const getFilterDisplayText = (filter) => {
@@ -21,7 +22,10 @@ const FilterTags = () => {
     };
 
     const onFilterClick = (filterType) => {
-        dispatch(setActiveModule(filterType));
+        dispatch(setActiveQueryModule(filterType));
+        if (!sidebarOpen) {
+            dispatch(toggleSidebar());
+        }
     };
 
     return (
