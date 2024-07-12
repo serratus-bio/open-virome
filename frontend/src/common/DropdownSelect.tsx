@@ -25,8 +25,12 @@ const DropDownSelect = ({ options = [], activeOption = '', setActiveOption = () 
                 onChange={setActiveOption}
                 MenuProps={menuStyles}
             >
-                {options.map((option) => {
-                    return <MenuItem value={option}>{option}</MenuItem>;
+                {options.map((option, index) => {
+                    return (
+                        <MenuItem key={index} value={option}>
+                            {option}
+                        </MenuItem>
+                    );
                 })}
             </Select>
         </FormControl>

@@ -1,7 +1,7 @@
-import React, { useState, useEffect, act } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import { selectActiveModule } from '../../app/slice.ts';
-import { getViromeGraphData } from '../../common/utils/plotHelpers.ts';
+import { selectActiveModuleBySection } from '../../app/slice.ts';
+import { getViromeGraphData, isSummaryView } from '../../common/utils/plotHelpers.ts';
 import { useGetResultQuery } from '../../api/client.ts';
 import { moduleConfig } from '../Module/constants.ts';
 import { handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
@@ -13,9 +13,8 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 
 const ViromeLayout = ({ identifiers }) => {
-    const activeModule = useSelector(selectActiveModule);
+    const activeModule = useSelector((state) => selectActiveModuleBySection(state, 'palmdb'));
     const [randomized, setRandomized] = useState(0);
-
     const {
         data: resultData,
         error: resultError,
@@ -32,8 +31,8 @@ const ViromeLayout = ({ identifiers }) => {
             table: moduleConfig[activeModule].resultsTable,
             // sortByColumn: moduleConfig[activeModule].resultsIdColumn,
             // sortByDirection: 'asc',
-            // pageStart: page * 10,
-            // pageEnd: (page + 1) * 10,
+            pageStart: 0,
+            pageEnd: isSummaryView(identifiers) ? 100 : undefined,
         },
         {
             skip: !identifiers,
@@ -77,18 +76,11 @@ const ViromeLayout = ({ identifiers }) => {
 
     return (
         <Box sx={{ width: '100%', height: '100%' }}>
-            {
-                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                    <Typography component={'div'} variant='h6' sx={{ mt: 2, mb: 2, mr: 2 }}>
-                        {moduleConfig[activeModule].title}
-                    </Typography>
-                </Box>
-            }
             {resultData && resultData.length > 1000 ? (
                 <Box
                     sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', height: '100%', mb: 2 }}
                 >
-                    <Typography variant='h6'>Dataset is too large. Displaying random subset. </Typography>
+                    <Typography variant='h6'>Dataset is too large. Displaying random subgraph. </Typography>
                     <Button
                         sx={{ ml: 2 }}
                         onClick={() => {
@@ -106,4 +98,4 @@ const ViromeLayout = ({ identifiers }) => {
     );
 };
 
-export default ViromeLayout;
+export default React.memo(ViromeLayout);

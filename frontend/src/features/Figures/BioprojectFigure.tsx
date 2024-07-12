@@ -1,6 +1,7 @@
 import React from 'react';
 import {
     shouldDisableFigureView,
+    isSummaryView,
     getBioprojectSizePlotData,
     getBioprojectTargetPercentagePlotData,
     getBioprojectSizeVsPercentagePlotData,
@@ -12,11 +13,10 @@ import HistogramPlot from '../../common/HistogramPlot.tsx';
 import ScatterPlot from '../../common/ScatterPlot.tsx';
 import Skeleton from '@mui/material/Skeleton';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 
 const BioprojectFigure = ({ identifiers }) => {
     const {
-        data: targetCountData,
+        data: targetCountData = [],
         error: targetCountError,
         isFetching: targetCountIsFetching,
     } = useGetCountsQuery(
@@ -25,9 +25,10 @@ const BioprojectFigure = ({ identifiers }) => {
             ids: identifiers ? identifiers['run'].single : [],
             idRanges: identifiers ? identifiers['run'].range : [],
             groupBy: moduleConfig['bioproject'].groupByKey,
+            pageEnd: isSummaryView(identifiers) ? 9 : undefined,
         },
         {
-            skip: shouldDisableFigureView(identifiers),
+            skip: shouldDisableFigureView(identifiers) || isSummaryView(identifiers),
         },
     );
 
@@ -41,6 +42,7 @@ const BioprojectFigure = ({ identifiers }) => {
             ids: identifiers ? identifiers['bioproject'].single : [],
             idRanges: identifiers ? identifiers['bioproject'].range : [],
             groupBy: moduleConfig['bioproject'].groupByKey,
+            pageEnd: isSummaryView(identifiers) ? 9 : undefined,
         },
         {
             skip: shouldDisableFigureView(identifiers),
@@ -84,12 +86,7 @@ const BioprojectFigure = ({ identifiers }) => {
     };
 
     return (
-        <Box sx={{ flex: 1 }}>
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                <Typography component={'div'} variant='h6' sx={{ ...sectionStyle, mr: 2 }}>
-                    {moduleConfig['bioproject'].title}
-                </Typography>
-            </Box>
+        <Box sx={{ flex: 1, width: '100%' }}>
             <Box
                 sx={{
                     flex: 1,
@@ -98,6 +95,7 @@ const BioprojectFigure = ({ identifiers }) => {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
+                    minWidth: 1000,
                 }}
             >
                 <Box

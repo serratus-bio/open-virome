@@ -1,7 +1,6 @@
 import awsServerlessExpress from 'aws-serverless-express';
 import app from './app.mjs';
 
-
 // Handle ERR_CONTENT_DECODING_FAILED issue:
 // https://github.com/CodeGenieApp/serverless-express/blob/master/examples/basic-starter/lambda.js
 const binaryMimeTypes = [
@@ -21,8 +20,8 @@ const binaryMimeTypes = [
     'text/javascript',
     'text/plain',
     'text/text',
-    'text/xml'
-  ]
+    'text/xml',
+];
 const server = awsServerlessExpress.createServer(app, null, binaryMimeTypes);
 
 export const handler = (event, context) => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { moduleConfig } from '../Module/constants.ts';
-import { shouldDisableFigureView, getControlTargetPlotData } from '../../common/utils/plotHelpers.ts';
+import { shouldDisableFigureView, isSummaryView, getControlTargetPlotData } from '../../common/utils/plotHelpers.ts';
 import { useGetCountsQuery } from '../../api/client.ts';
 import { formatNumber } from '../../common/utils/textFormatting.ts';
 
@@ -13,7 +13,6 @@ import RadioButtonsGroup from '../../common/RadioButtonsGroup.tsx';
 
 const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
     const [activeCountKey, setActiveCountKey] = useState('count');
-
     const {
         data: targetCountData,
         error: targetCountError,
@@ -26,7 +25,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             groupBy: moduleConfig[moduleKey].groupByKey,
         },
         {
-            skip: shouldDisableFigureView(identifiers),
+            skip: shouldDisableFigureView(identifiers) || isSummaryView(identifiers),
         },
     );
 
@@ -40,6 +39,8 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             ids: identifiers ? identifiers['bioproject'].single : [],
             idRanges: identifiers ? identifiers['bioproject'].range : [],
             groupBy: moduleConfig[moduleKey].groupByKey,
+            pageEnd: isSummaryView(identifiers) ? (moduleKey === 'host' ? 10 : 4) : undefined,
+            sortBy: isSummaryView(identifiers) ? activeCountKey : undefined,
         },
         {
             skip: shouldDisableFigureView(identifiers),
@@ -57,10 +58,22 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
         percent: 'Percent runs (%)',
     };
 
+    const getTotalRuns = (seriesName) => {
+        if (!controlCountData || !targetCountData) {
+            return;
+        }
+        let counts;
+        if (seriesName === 'Control' || isSummaryView(identifiers)) {
+            counts = controlCountData.reduce((acc, curr) => acc + parseInt(curr.count), 0);
+        } else {
+            counts = targetCountData.reduce((acc, curr) => acc + parseInt(curr.count), 0);
+        }
+        return formatNumber(counts);
+    };
+
     const renderFigure = (seriesName) => {
         const plotData = getControlTargetPlotData(targetCountData, controlCountData, activeCountKey);
-        let totalRuns = seriesName === 'Target' ? targetCountData : controlCountData;
-        totalRuns = formatNumber(totalRuns.reduce((acc, curr) => acc + parseInt(curr.count), 0));
+        let totalRuns = getTotalRuns(seriesName);
         const filteredPlotData = {
             ...plotData,
             legend: {
@@ -78,7 +91,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             return (
                 <Box sx={{ minWidth: 400 }}>
                     <Typography variant='body2' sx={{ fontStyle: 'italic' }}>
-                        {`${seriesName} set (n = ${totalRuns})`}
+                        {`${seriesName} set ${totalRuns ? `(runs = ${totalRuns})` : ''}`}
                     </Typography>
                     <PolarBarPlot plotData={filteredPlotData} />
                 </Box>
@@ -88,7 +101,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
             return (
                 <Box sx={{ minWidth: 400 }}>
                     <Typography variant='body2' sx={{ position: 'absolute', fontStyle: 'italic' }}>
-                        {`${seriesName} set (n = ${totalRuns})`}
+                        {`${seriesName} set ${totalRuns ? `(runs = ${totalRuns})` : ''}`}
                     </Typography>
                     <BarPlot plotData={filteredPlotData} />
                 </Box>
@@ -139,32 +152,34 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
 
     return (
         <Box sx={{ flex: 1 }}>
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' }}>
-                <Typography component={'div'} variant='h6' sx={{ ...sectionStyle, mr: 2 }}>
-                    {moduleConfig[moduleKey].title}
-                </Typography>
-            </Box>
             <Box
                 sx={{
                     flex: 1,
-                    width: '100%',
+                    width: '80vw',
+                    maxWidth: 1500,
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
+                    mt: 4,
                 }}
             >
                 {shouldRenderPlaceholder(controlCountError, controlCountIsFetching, controlCountData) ? (
                     renderPlaceholder()
                 ) : (
-                    <Box sx={{ flex: 1, width: 400 }}>{renderFigure('Control')}</Box>
+                    <Box sx={{ flex: 1, width: '100%' }}>{renderFigure('Control')}</Box>
                 )}
-                {shouldRenderPlaceholder(targetCountError, targetCountIsFetching, targetCountData) ? (
+                {(isSummaryView(identifiers) &&
+                    shouldRenderPlaceholder(controlCountError, controlCountIsFetching, controlCountData)) ||
+                (!isSummaryView(identifiers) &&
+                    shouldRenderPlaceholder(targetCountError, targetCountIsFetching, targetCountData)) ? (
                     renderPlaceholder()
                 ) : (
-                    <Box sx={{ flex: 1, width: 400 }}>{renderFigure('Target')}</Box>
+                    <Box sx={{ flex: 1, width: '100%' }}>{renderFigure('Target')}</Box>
                 )}
-                <RadioButtonsGroup items={countKeys} selected={activeCountKey} onChange={onCountChange} />
+                {isSummaryView(identifiers) ? null : (
+                    <RadioButtonsGroup items={countKeys} selected={activeCountKey} onChange={onCountChange} />
+                )}
             </Box>
         </Box>
     );

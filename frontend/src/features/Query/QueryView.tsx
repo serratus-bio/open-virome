@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectActiveModule } from '../../app/slice.ts';
+import { selectSidebarOpen, toggleSidebar, selectActiveQueryModule } from '../../app/slice.ts';
 import { moduleConfig } from '../Module/constants.ts';
-import { useGetCountsQuery } from '../../api/client.ts';
+import { useGetCountsQuery, useGetIdentifiersQuery } from '../../api/client.ts';
 import { addFilter, removeFilter, selectAllFilters, selectFiltersByType } from './slice.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
 import { formatNumber } from '../../common/utils/textFormatting.ts';
@@ -12,14 +12,24 @@ import VirtualizedTable from '../../common/VirtualizedTable.tsx';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
+import Modal from '@mui/material/Modal';
+import Slide from '@mui/material/Slide';
 
-const QueryView = ({ identifiers, identifiersFetching }) => {
+const QueryView = () => {
     const dispatch = useDispatch();
     const [searchString, setSearchString] = useState('');
-    const activeModule = useSelector(selectActiveModule);
-
+    const activeModule = useSelector(selectActiveQueryModule);
     const filters = useSelector(selectAllFilters);
     const moduleFilters = useSelector((state) => selectFiltersByType(state, activeModule));
+    const sidebarOpen = useSelector(selectSidebarOpen);
+
+    const {
+        data: identifiersData,
+        error: identifiersError,
+        isFetching: identifiersFetching,
+    } = useGetIdentifiersQuery({
+        filters: getFilterQuery({ filters }),
+    });
 
     const {
         data: countData,
@@ -94,53 +104,68 @@ const QueryView = ({ identifiers, identifiersFetching }) => {
     };
 
     return (
-        <Box>
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    mb: 2,
-                }}
-            >
-                <Typography component={'div'} variant='h5' sx={{ mr: 8 }}>
-                    {moduleConfig[activeModule].title}
-                </Typography>
-            </Box>
-            <Box sx={{ width: 1000 }}>
-                <Box>
-                    {countIsFetching || !countData ? (
-                        <Skeleton variant='rounded' height={400} />
-                    ) : (
-                        <VirtualizedTable
-                            rows={getRows(countData, searchString, moduleFilters)}
-                            onRowClick={onRowClick}
-                            searchBar={<SearchBar query={searchString} setQuery={setSearchString} />}
-                        />
-                    )}
-                </Box>
-                <Box sx={{ mt: 4 }}>
-                    {!identifiers || identifiersFetching || countIsFetching ? (
-                        <Skeleton variant='rounded' height={20} />
-                    ) : (
-                        <Box>
-                            <Typography component={'span'} variant='h7' sx={{ mt: 2, textAlign: 'left' }}>
-                                {`Total ${moduleConfig[activeModule].tag}: ${countData ? formatNumber(countData.length) : ''}.`}
-                            </Typography>
-                            <Typography component={'span'} variant='h7' sx={{ mt: 1, ml: 1, textAlign: 'left' }}>
-                                {`${
-                                    identifiers &&
-                                    identifiers?.run?.totalCount >= 0 &&
-                                    identifiers?.bioproject?.totalCount >= 0
-                                        ? `Matching BioProjects: ${identifiers?.bioproject ? formatNumber(identifiers.bioproject.totalCount) : ''}. Matching Sequences: ${identifiers?.run ? formatNumber(identifiers.run.totalCount) : ''}.`
-                                        : ''
-                                }`}
-                            </Typography>
+        <Modal
+            open={sidebarOpen}
+            sx={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}
+            onClose={() => dispatch(toggleSidebar())}
+            closeAfterTransition={false}
+        >
+            <Box>
+                <Slide direction='right' in={sidebarOpen} mountOnEnter unmountOnExit>
+                    <Box
+                        sx={{
+                            width: 700,
+                            height: '100%',
+                            position: 'absolute',
+                            top: 60,
+                            left: 240,
+                            backgroundColor: '#252427',
+                            pl: 4,
+                            pr: 4,
+                        }}
+                    >
+                        <Typography variant='h6' sx={{ textAlign: 'left', mt: 4, mb: 2 }}>
+                            {moduleConfig[activeModule].title}
+                        </Typography>
+                        <Box sx={{ mb: 2 }}>
+                            {!identifiersData || identifiersFetching || countIsFetching ? (
+                                <Skeleton variant='rounded' height={20} width={'80%'} />
+                            ) : (
+                                <Box>
+                                    <Typography component={'span'} variant='body2' sx={{ textAlign: 'left' }}>
+                                        {`Total ${countData ? formatNumber(countData.length) : ''}.`}
+                                    </Typography>
+                                    <Typography component={'span'} variant='body2' sx={{ mt: 1, textAlign: 'left' }}>
+                                        {`${
+                                            identifiersData &&
+                                            identifiersData?.run?.totalCount >= 0 &&
+                                            identifiersData?.bioproject?.totalCount >= 0
+                                                ? ` Matching BioProjects: ${identifiersData?.bioproject ? formatNumber(identifiersData.bioproject.totalCount) : ''}. Matching Sequences: ${identifiersData?.run ? formatNumber(identifiersData.run.totalCount) : ''}.`
+                                                : ''
+                                        }`}
+                                    </Typography>
+                                </Box>
+                            )}
                         </Box>
-                    )}
-                </Box>
+                        <Box>
+                            {countIsFetching || !countData ? (
+                                <Skeleton variant='rounded' height={'70vh'} />
+                            ) : (
+                                <VirtualizedTable
+                                    rows={getRows(countData, searchString, moduleFilters)}
+                                    onRowClick={onRowClick}
+                                    searchBar={<SearchBar query={searchString} setQuery={setSearchString} />}
+                                />
+                            )}
+                        </Box>
+                    </Box>
+                </Slide>
             </Box>
-        </Box>
+        </Modal>
     );
 };
 

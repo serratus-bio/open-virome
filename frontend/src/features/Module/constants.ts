@@ -1,26 +1,34 @@
 export const sectionConfig = {
     sra: {
         modules: ['host', 'seqType', 'bioproject'],
-        title: 'SRA Experiment',
+        title: 'Run Module',
     },
     palmdb: {
         modules: ['sotu', 'species', 'family'],
-        title: 'Palmdb Virome',
+        title: 'Virome Module',
     },
     context: {
         modules: ['geography', 'statHost', 'tissue'],
-        title: 'Context',
+        title: 'Metadata Module',
     },
 };
 
 export const moduleConfig = {
     host: {
-        title: 'Organism label',
-        tag: 'Organism',
+        title: 'Run label',
+        tag: 'Run label',
         groupByKey: 'host_label',
         resultsTable: 'srarun',
         resultsIdColumn: 'run',
-        defaultDisplay: 'filter',
+        defaultDisplay: 'figure',
+    },
+    seqType: {
+        title: 'Run Technology',
+        tag: 'Run Technology',
+        groupByKey: 'library_strategy',
+        resultsTable: 'srarun',
+        resultsIdColumn: 'run',
+        defaultDisplay: 'figure',
     },
     bioproject: {
         title: 'Bioproject',
@@ -28,15 +36,7 @@ export const moduleConfig = {
         groupByKey: 'bioproject',
         resultsTable: 'srarun',
         resultsIdColumn: 'run',
-        defaultDisplay: 'filter',
-    },
-    seqType: {
-        title: 'Dataset type',
-        tag: 'Dataset type',
-        groupByKey: 'library_strategy',
-        resultsTable: 'srarun',
-        resultsIdColumn: 'run',
-        defaultDisplay: 'filter',
+        defaultDisplay: 'figure',
     },
     sotu: {
         title: 'sOTU',
@@ -44,7 +44,7 @@ export const moduleConfig = {
         groupByKey: 'sotu',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
-        defaultDisplay: 'filter',
+        defaultDisplay: 'figure',
     },
     species: {
         title: 'Virus Species',
@@ -52,7 +52,7 @@ export const moduleConfig = {
         groupByKey: 'tax_species',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
-        defaultDisplay: 'filter',
+        defaultDisplay: 'figure',
     },
     family: {
         title: 'Virus Family',
@@ -60,7 +60,7 @@ export const moduleConfig = {
         groupByKey: 'tax_family',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
-        defaultDisplay: 'filter',
+        defaultDisplay: 'figure',
     },
     geography: {
         title: 'Geography',
@@ -68,7 +68,7 @@ export const moduleConfig = {
         groupByKey: 'geo',
         resultsIdColumn: 'biosample',
         resultsTable: 'biosample_geo_coordinates',
-        defaultDisplay: 'filter',
+        defaultDisplay: 'figure',
     },
     tissue: {
         title: 'Tissue',
@@ -79,8 +79,8 @@ export const moduleConfig = {
         defaultDisplay: 'table',
     },
     statHost: {
-        title: 'STAT Host',
-        tag: 'STAT',
+        title: 'Host (STAT)',
+        tag: 'Host (STAT)',
         groupByKey: 'stat_host_order',
         resultsTable: 'sra_stat',
         resultsIdColumn: 'run',

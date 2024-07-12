@@ -196,8 +196,10 @@ const NetworkPlot = ({ plotData = [] }) => {
                 cy={setCy}
                 stylesheet={stylesheet}
                 elements={getActiveComponent()}
-                style={{ width: '100%', height: '100%', minHeight: '70vh' }}
+                style={{ width: '60%', height: 600 }}
                 layout={layouts[1]}
+                minZoom={0.05}
+                maxZoom={1}
             />
         </Box>
     );

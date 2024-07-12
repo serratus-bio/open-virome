@@ -1,32 +1,39 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setActiveModule, selectActiveModule } from '../../app/slice.ts';
+import { setActiveQueryModule, toggleSidebar, selectSidebarOpen, selectActiveQueryModule } from '../../app/slice.ts';
 import { moduleConfig, sectionConfig } from '../Module/constants.ts';
 
-import Divider from '@mui/material/Divider';
 import MenuList from '@mui/material/MenuList';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemText from '@mui/material/ListItemText';
 import Drawer from '@mui/material/Drawer';
-import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
-import { Box } from '@mui/material';
+import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 
 const SidePanel = () => {
     const dispatch = useDispatch();
+    const sidebarOpen = useSelector(selectSidebarOpen);
+    const activeModule = useSelector(selectActiveQueryModule);
 
-    const activeModule = useSelector(selectActiveModule);
-
-    const onItemClick = (item: string) => {
-        dispatch(setActiveModule(item));
+    const onItemClick = (moduleKey: string) => {
+        dispatch(setActiveQueryModule(moduleKey));
     };
 
     const drawerWidth = 240;
+
+    const handleDrawerClose = () => {
+        dispatch(toggleSidebar());
+    };
+
     return (
         <Drawer
-            variant='permanent'
-            open={true}
+            open={sidebarOpen}
+            anchor={'left'}
+            variant='persistent'
             sx={{
+                'zIndex': sidebarOpen ? 1400 : -1,
                 'width': drawerWidth,
                 'flexShrink': 0,
                 '& .MuiDrawer-paper': {
@@ -36,21 +43,24 @@ const SidePanel = () => {
                 },
             }}
         >
-            <Toolbar />
-            <Divider />
-            {Object.keys(sectionConfig).map((item) => (
-                <Box key={item}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                <IconButton onClick={handleDrawerClose}>
+                    <ChevronLeftIcon fontSize='large' />
+                </IconButton>
+            </Box>
+            {Object.keys(sectionConfig).map((sectionKey) => (
+                <Box key={sectionKey}>
                     <Typography sx={{ mt: 2, ml: 2 }} variant='h6' component='div'>
-                        {sectionConfig[item].title}
+                        {sectionConfig[sectionKey].title}
                     </Typography>
                     <MenuList dense>
-                        {sectionConfig[item].modules.map((module) => (
+                        {sectionConfig[sectionKey].modules.map((moduleKey) => (
                             <MenuItem
-                                key={module}
-                                selected={activeModule === module}
-                                onClick={() => onItemClick(module)}
+                                key={moduleKey}
+                                onClick={() => onItemClick(moduleKey)}
+                                selected={moduleKey === activeModule}
                             >
-                                <ListItemText inset>{moduleConfig[module].title}</ListItemText>
+                                <ListItemText inset>{moduleConfig[moduleKey].title}</ListItemText>
                             </MenuItem>
                         ))}
                     </MenuList>
