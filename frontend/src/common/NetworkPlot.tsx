@@ -36,6 +36,13 @@ const NetworkPlot = ({ plotData = [] }) => {
         const componentLabels = getComponentOptions();
         if (componentLabels[0] === 'All' && activeSubgraph !== 'All') {
             setActiveSubgraph('All');
+            if (cy && headlessCy) {
+                cy.ready(() => {
+                    cy.layout({
+                        ...layouts[1],
+                    }).run();
+                });
+            }
         }
     }, [plotData]);
 
@@ -124,14 +131,14 @@ const NetworkPlot = ({ plotData = [] }) => {
             /* incremental layout options */
 
             // Node repulsion (non overlapping) multiplier
-            nodeRepulsion: (node) => 400000,
+            nodeRepulsion: (node) => 450000,
             // Ideal edge (non nested) length
             idealEdgeLength: (edge) => {
-                return Math.max(edge.data().weight * edge.data().numSOTUS * 0.8, 100);
+                return Math.min(edge.data().weight * edge.data().numSOTUS * 1.5, 100);
             },
             // Divisor to compute edge forces
             edgeElasticity: (edge) => {
-                return edge.data().weight * 0.45;
+                return edge.data().weight * 0.6;
             },
             // Nesting factor (multiplier) to compute ideal edge length for nested edges
             nestingFactor: 0.1,

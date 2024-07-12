@@ -87,11 +87,9 @@ const ResultsTable = ({ identifiers, moduleKey, shouldSkipFetching }) => {
         }
         if (resultData && resultData.length === 0 && !resultIsFetching) {
             return (
-                <Box sx={{ flex: 1, height: 100 }}>
-                    <Typography variant='h6' sx={{ ...sectionStyle }}>
-                        {`No data available`}
-                    </Typography>
-                </Box>
+                <Typography variant='h6' sx={{ ...sectionStyle, height: 100, minHeight: 100 }}>
+                    No data available
+                </Typography>
             );
         }
         return (

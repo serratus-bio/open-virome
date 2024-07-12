@@ -54,7 +54,15 @@ const ViromeLayout = ({ identifiers }) => {
             );
         }
         return (
-            <Box>
+            <Box
+                sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-start',
+                    alignItems: 'flex-start',
+                    height: 100,
+                    width: '100%',
+                }}
+            >
                 <Typography variant='h6'>No data available</Typography>
             </Box>
         );
