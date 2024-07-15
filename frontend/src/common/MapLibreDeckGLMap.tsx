@@ -255,8 +255,8 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                 center: [15.529, 43.8234],
                 container: mapDiv,
                 style:
-                    // OpenDataStandardDarkMap, OpenDataVisualizationLightMap, OpenDataVisualizationDarkMap
-                    'https://maps.geo.us-east-1.amazonaws.com/maps/v0/maps/OpenDataStandardDarkMap/style-descriptor?key=' +
+                    // OpenDataStandardDarkMap, OpenDataVisualizationLightMap, OpenDataVisualizationDarkMap, ESRIDarkGreyMap
+                    'https://maps.geo.us-east-1.amazonaws.com/maps/v0/maps/ESRIDarkGreyMap/style-descriptor?key=' +
                     AMAZON_LOCATION_API_KEY,
                 zoom: 0.8,
             });
@@ -287,7 +287,7 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                 mapDiv.remove();
             };
         }
-    }, []);
+    }, [identifiers]);
 
     useEffect(() => {
         if (bioprojectID) {

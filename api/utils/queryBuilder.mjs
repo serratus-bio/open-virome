@@ -76,7 +76,7 @@ export const getGroupedCountsByIdentifiers = ({ ids, idRanges, idColumn, groupBy
     let remappedGroupBy = handleIdKeyIrregularities(groupBy, table);
     clauses = `${clauses.length > 0 ? `WHERE ${clauses.join(' OR ')}` : ''}`;
     return `
-        SELECT ${remappedGroupBy} as name, COUNT(*) as count, (COUNT(*)/(SUM(COUNT(*))OVER())) * 100 as percent, SUM(spots)/POWER(10,9) as gbp
+        SELECT ${remappedGroupBy} as name, COUNT(*) as count, (COUNT(*) * 100.0 / SUM(COUNT(*)) OVER()) as percent, SUM(spots)/POWER(10,9) as gbp
         FROM ${table}
         ${clauses}
         GROUP BY ${remappedGroupBy}
