@@ -29,6 +29,7 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
                 return parseFloat(parseFloat(value).toFixed(1));
             case 'count':
             case 'percent':
+                return Math.round(parseFloat(value));
             default:
                 return parseInt(value);
         }
@@ -58,7 +59,7 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
 
     mergedRows.forEach((row) => {
         row.target = parseCount(row.target);
-        row.control = parseCount(Math.abs(row.control - row.target));
+        row.control = countKey == 'percent' ? parseCount(row.control) : parseCount(Math.abs(row.control - row.target));
     });
 
     mergedRows.sort((a, b) => a.target + a.control - (b.target + b.control));

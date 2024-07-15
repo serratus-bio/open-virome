@@ -30,7 +30,7 @@ const PolarBarPlot = ({ plotData = {}, styles = {} }) => {
             type: 'category',
         },
         polar: {
-            radius: [10, '80%'],
+            radius: ['15%', '80%'],
         },
         radiusAxis: {},
     };

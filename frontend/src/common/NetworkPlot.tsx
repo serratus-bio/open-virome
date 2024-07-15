@@ -10,7 +10,7 @@ cytoscape.use(fcose);
 
 const NetworkPlot = ({ plotData = [] }) => {
     const [cy, setCy] = useState(null);
-    const [activeSubgraph, setActiveSubgraph] = useState(1);
+    const [activeSubgraph, setActiveSubgraph] = useState('1');
     const [headlessCy, setHeadlessCy] = useState(
         cytoscape({
             headless: true,
@@ -19,32 +19,59 @@ const NetworkPlot = ({ plotData = [] }) => {
     );
 
     useEffect(() => {
-        if (cy && headlessCy) {
-            headlessCy.json({ elements: plotData });
-            headlessCy.ready(() => {
-                cy.json({ elements: getPlotData() });
-                cy.ready(() => {
-                    cy.layout({
-                        ...layouts[1],
-                    }).run();
-                });
-            });
-        }
-    }, [plotData, activeSubgraph]);
+        headlessCy.json({ elements: plotData });
+        headlessCy.ready(() => {
+            const componentLabels = getComponentOptions();
+            if (componentLabels[0] === 'All' && activeSubgraph !== 'All') {
+                setActiveSubgraph('All');
+            }
+            if (componentLabels[0] === '1' && activeSubgraph !== '1') {
+                setActiveSubgraph('1');
+            }
+        });
+    }, [plotData]);
 
     useEffect(() => {
-        const componentLabels = getComponentOptions();
-        if (componentLabels[0] === 'All' && activeSubgraph !== 'All') {
-            setActiveSubgraph('All');
-            if (cy && headlessCy) {
-                cy.ready(() => {
-                    cy.layout({
-                        ...layouts[1],
-                    }).run();
-                });
-            }
+        if (cy) {
+            cy.json({ elements: getPlotData() });
+            cy.ready(() => {
+                cy.layout({
+                    ...layouts[1],
+                }).run();
+            });
         }
-    }, [plotData]);
+    }, [activeSubgraph]);
+
+    const getPlotData = () => {
+        if (activeSubgraph === 'All') {
+            return plotData;
+        }
+
+        const components = headlessCy.elements().components();
+        components.sort((a, b) => b.length - a.length);
+        if (!components[parseInt(activeSubgraph) - 1]) {
+            return [];
+        }
+        return components[parseInt(activeSubgraph) - 1].jsons();
+    };
+
+    const getComponentOptions = () => {
+        const numComponents = headlessCy.elements().components().length;
+        let componentLabels;
+        if (headlessCy.elements().length < 500) {
+            componentLabels = Array.from({ length: numComponents }, (_, i) => {
+                if (i === 0) {
+                    return 'All';
+                }
+                return i.toString();
+            });
+        } else {
+            componentLabels = Array.from({ length: numComponents - 1 }, (_, i) => {
+                return (i + 1).toString();
+            });
+        }
+        return componentLabels;
+    };
 
     const stylesheet = [
         {
@@ -94,7 +121,7 @@ const NetworkPlot = ({ plotData = [] }) => {
             // - "draft" only applies spectral layout
             // - "default" improves the quality with incremental layout (fast cooling rate)
             // - "proof" improves the quality with incremental layout (slow cooling rate)
-            quality: 'default',
+            quality: 'proof',
             // Use random node positions at beginning of layout
             // if this is set to false, then quality option must be "proof"
             randomize: true,
@@ -143,7 +170,7 @@ const NetworkPlot = ({ plotData = [] }) => {
             // Nesting factor (multiplier) to compute ideal edge length for nested edges
             nestingFactor: 0.1,
             // Maximum number of iterations to perform - this is a suggested value and might be adjusted by the algorithm as required
-            numIter: 2500,
+            numIter: 6000,
             // For enabling tiling
             tile: true,
             // The comparison function to be used while sorting nodes during tiling operation.
@@ -181,38 +208,6 @@ const NetworkPlot = ({ plotData = [] }) => {
             relativePlacementConstraint: undefined,
         },
     ];
-
-    const getPlotData = () => {
-        if (activeSubgraph === 'All') {
-            return plotData;
-        }
-
-        const components = headlessCy.elements().components();
-        components.sort((a, b) => b.length - a.length);
-        if (!components[activeSubgraph - 1]) {
-            return [];
-        }
-
-        return components[activeSubgraph - 1].jsons();
-    };
-
-    const getComponentOptions = () => {
-        const numComponents = headlessCy.elements().components().length;
-        let componentLabels;
-        if (headlessCy.elements().length < 500) {
-            componentLabels = Array.from({ length: numComponents }, (_, i) => {
-                if (i === 0) {
-                    return 'All';
-                }
-                return i.toString();
-            });
-        } else {
-            componentLabels = Array.from({ length: numComponents - 1 }, (_, i) => {
-                return (i + 1).toString();
-            });
-        }
-        return componentLabels;
-    };
 
     return (
         <Box>
