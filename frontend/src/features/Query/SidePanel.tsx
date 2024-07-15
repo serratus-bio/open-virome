@@ -44,7 +44,7 @@ const SidePanel = () => {
                 },
             }}
         >
-            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mt: 0.5 }}>
                 <IconButton onClick={handleDrawerClose}>
                     <ChevronLeftIcon fontSize='large' />
                 </IconButton>

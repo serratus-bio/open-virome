@@ -1,15 +1,15 @@
 export const sectionConfig = {
     sra: {
         modules: ['host', 'seqType', 'bioproject'],
-        title: 'Run',
+        title: 'Run Module',
     },
     palmdb: {
         modules: ['species', 'family', 'sotu'],
-        title: 'Virome',
+        title: 'Virome Module',
     },
     context: {
         modules: ['geography', 'statHost', 'tissue'],
-        title: 'Metadata',
+        title: 'Metadata Module',
     },
 };
 
@@ -63,8 +63,8 @@ export const moduleConfig = {
         defaultDisplay: 'figure',
     },
     geography: {
-        title: 'Geography',
-        tag: 'Geography',
+        title: 'Ecology',
+        tag: 'Ecology',
         groupByKey: 'geo',
         resultsIdColumn: 'biosample',
         resultsTable: 'biosample_geo_coordinates',
