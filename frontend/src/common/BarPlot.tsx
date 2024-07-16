@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 
-const BarPlot = ({ plotData = {}, styles = {} }) => {
+const BarPlot = ({ plotData = {}, styles = {}, onEvents = {} }) => {
     const defaultConfig = {
         backgroundColor: 'transparent',
         textStyle: {
@@ -42,7 +42,7 @@ const BarPlot = ({ plotData = {}, styles = {} }) => {
         ...plotData,
     };
 
-    return <ReactEcharts option={options} style={styles} />;
+    return <ReactEcharts option={options} style={styles} onEvents={onEvents} />;
 };
 
 export default BarPlot;

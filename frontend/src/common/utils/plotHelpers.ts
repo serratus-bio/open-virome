@@ -475,11 +475,19 @@ export const getViromeGraphData = (rows = [], groupBy = 'sotu') => {
 
     const plotData = [];
     for (const run in runsToGroupedRowData) {
-        plotData.push({ data: { id: run, type: 'run', isNode: true } });
+        plotData.push({
+            group: 'nodes',
+            data: {
+                id: run,
+                type: 'run',
+                isNode: true,
+            },
+        });
         // runsToRowData[run].forEach((sOTU) => {
         Object.keys(runsToGroupedRowData[run]).forEach((groupByKey) => {
             const sOTU = runsToGroupedRowData[run][groupByKey][0];
             plotData.push({
+                group: 'nodes',
                 data: {
                     id: sOTU['sotu'],
                     type: 'sOTU',
@@ -490,7 +498,9 @@ export const getViromeGraphData = (rows = [], groupBy = 'sotu') => {
                 },
             });
             plotData.push({
+                group: 'edges',
                 data: {
+                    id: `${run}-${sOTU['sotu']}`,
                     source: run,
                     target: sOTU['sotu'],
                     isNode: false,
