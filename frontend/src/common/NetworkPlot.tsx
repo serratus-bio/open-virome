@@ -4,73 +4,11 @@ import fcose from 'cytoscape-fcose';
 
 import CytoscapeComponent from 'react-cytoscapejs';
 import Box from '@mui/material/Box';
-import DropDownSelect from './DropdownSelect.tsx';
 
 cytoscape.use(fcose);
 
 const NetworkPlot = ({ plotData = [] }) => {
     const [cy, setCy] = useState(null);
-    const [activeSubgraph, setActiveSubgraph] = useState('1');
-    const [headlessCy, setHeadlessCy] = useState(
-        cytoscape({
-            headless: true,
-            elements: plotData,
-        }),
-    );
-
-    const renderGraph = () => {
-        if (cy) {
-            cy.json({ elements: getPlotData() });
-            cy.ready(() => {
-                cy.layout({
-                    ...layouts[1],
-                }).run();
-            });
-        }
-    };
-
-    useEffect(() => {
-        if (headlessCy) {
-            headlessCy.json({ elements: plotData });
-            headlessCy.ready(() => {
-                const componentLabels = getComponentOptions();
-                if (activeSubgraph !== componentLabels[0]) {
-                    setActiveSubgraph(componentLabels[0]);
-                }
-                renderGraph();
-            });
-        }
-    }, [plotData]);
-
-    const getPlotData = () => {
-        if (activeSubgraph === 'All') {
-            return plotData;
-        }
-        const components = headlessCy.elements().components();
-        components.sort((a, b) => b.length - a.length);
-        if (!components[parseInt(activeSubgraph) - 1]) {
-            return [];
-        }
-        return components[parseInt(activeSubgraph) - 1].jsons();
-    };
-
-    const getComponentOptions = () => {
-        const numComponents = headlessCy.elements().components().length;
-        let componentLabels;
-        if (headlessCy.elements().length < 500) {
-            componentLabels = Array.from({ length: numComponents }, (_, i) => {
-                if (i === 0) {
-                    return 'All';
-                }
-                return i.toString();
-            });
-        } else {
-            componentLabels = Array.from({ length: numComponents - 1 }, (_, i) => {
-                return (i + 1).toString();
-            });
-        }
-        return componentLabels;
-    };
 
     const stylesheet = [
         {
@@ -108,12 +46,6 @@ const NetworkPlot = ({ plotData = [] }) => {
     ];
 
     const layouts = [
-        {
-            name: 'breadthfirst',
-            animate: true,
-            animationDuration: 500,
-            circle: true,
-        },
         {
             name: 'fcose',
             // 'draft', 'default' or 'proof'
@@ -210,23 +142,12 @@ const NetworkPlot = ({ plotData = [] }) => {
 
     return (
         <Box>
-            <Box sx={{ position: 'absolute', zIndex: 10 }}>
-                <DropDownSelect
-                    options={getComponentOptions()}
-                    activeOption={activeSubgraph}
-                    setActiveOption={(event) => {
-                        setActiveSubgraph(event.target.value);
-                    }}
-                    label='Component'
-                />
-            </Box>
-
             <CytoscapeComponent
                 cy={setCy}
                 stylesheet={stylesheet}
-                elements={getPlotData()}
-                style={{ width: '60%', height: 600 }}
-                layout={layouts[1]}
+                elements={plotData}
+                style={{ width: '100%', height: 400 }}
+                layout={layouts[0]}
                 minZoom={0.1}
                 maxZoom={1}
                 userZoomingEnabled={true}

@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 
-const PolarBarPlot = ({ plotData = {}, styles = {} }) => {
+const PolarBarPlot = ({ plotData = {}, styles = {}, onEvents = {} }) => {
     const defaultConfig = {
         backgroundColor: 'transparent',
         textStyle: {
@@ -60,7 +60,7 @@ const PolarBarPlot = ({ plotData = {}, styles = {} }) => {
         },
     };
 
-    return <ReactEcharts option={options} style={styles} />;
+    return <ReactEcharts option={options} style={styles} onEvents={onEvents} />;
 };
 
 export default PolarBarPlot;

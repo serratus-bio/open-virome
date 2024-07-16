@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactEcharts from 'echarts-for-react';
 
-const HistogramPlot = ({ plotData = {}, styles = {} }) => {
+const HistogramPlot = ({ plotData = {}, styles = {}, onEvents = {} }) => {
     const defaultConfig = {
         backgroundColor: 'transparent',
         textStyle: {
@@ -39,7 +39,7 @@ const HistogramPlot = ({ plotData = {}, styles = {} }) => {
         obj.barWidth = '101%';
     });
 
-    return <ReactEcharts option={options} style={styles} />;
+    return <ReactEcharts option={options} style={styles} onEvents={onEvents} />;
 };
 
 export default HistogramPlot;
