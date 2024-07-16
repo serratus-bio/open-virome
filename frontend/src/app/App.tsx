@@ -8,6 +8,7 @@ import { selectDarkMode } from './slice.ts';
 import SidePanel from '../features/Query/SidePanel.tsx';
 import AppToolbar from './Toolbar.tsx';
 import Box from '@mui/material/Box';
+import QuerySummaryText from '../features/Query/QuerySummaryText.tsx';
 import Module from '../features/Module/Module.tsx';
 import QueryView from '../features/Query/QueryView.tsx';
 import Toolbar from '@mui/material/Toolbar';
@@ -49,6 +50,7 @@ const App = () => {
                 <Box sx={getContainerStyles()}>
                     <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                         <Toolbar />
+                        <QuerySummaryText />
                         <Module sectionKey={'sra'} />
                         <Module sectionKey={'palmdb'} />
                         <Module sectionKey={'context'} />

@@ -77,8 +77,13 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
         mergedRows.splice(0, mergedRows.length - maxRows, others);
     }
 
-    const getZoomPercentage = (desiredRows, totalRows) =>
-        totalRows <= desiredRows ? 0 : Math.floor((1 - desiredRows / totalRows) * 100);
+    const getZoomPercentage = (desiredRows, totalRows) => {
+        if (totalRows <= desiredRows) {
+            return 0;
+        }
+        const percentage = (desiredRows / totalRows) * 100;
+        return Math.min(100, Math.max(0, 100 - percentage));
+    };
 
     const dataZoom = [
         {
@@ -416,7 +421,7 @@ export const getViromeGraphData = (rows = [], groupBy = 'sotu') => {
             gb_acc: row['gb_acc'],
             node_pid: row['node_pid'],
             gb_pid: row['gb_pid'],
-            label: groupBy === 'family' ? row['tax_family'] : groupBy === 'sotu' ? row['sotu'] : row['tax_species'],
+            label: groupBy === 'tax_family' ? row['tax_family'] : groupBy === 'sotu' ? row['sotu'] : row['tax_species'],
         };
 
         if (row['run'] in runsToRowData) {

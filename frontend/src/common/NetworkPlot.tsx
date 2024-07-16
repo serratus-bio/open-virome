@@ -18,20 +18,7 @@ const NetworkPlot = ({ plotData = [] }) => {
         }),
     );
 
-    useEffect(() => {
-        headlessCy.json({ elements: plotData });
-        headlessCy.ready(() => {
-            const componentLabels = getComponentOptions();
-            if (componentLabels[0] === 'All' && activeSubgraph !== 'All') {
-                setActiveSubgraph('All');
-            }
-            if (componentLabels[0] === '1' && activeSubgraph !== '1') {
-                setActiveSubgraph('1');
-            }
-        });
-    }, [plotData]);
-
-    useEffect(() => {
+    const renderGraph = () => {
         if (cy) {
             cy.json({ elements: getPlotData() });
             cy.ready(() => {
@@ -40,13 +27,25 @@ const NetworkPlot = ({ plotData = [] }) => {
                 }).run();
             });
         }
-    }, [activeSubgraph]);
+    };
+
+    useEffect(() => {
+        if (headlessCy) {
+            headlessCy.json({ elements: plotData });
+            headlessCy.ready(() => {
+                const componentLabels = getComponentOptions();
+                if (activeSubgraph !== componentLabels[0]) {
+                    setActiveSubgraph(componentLabels[0]);
+                }
+                renderGraph();
+            });
+        }
+    }, [plotData]);
 
     const getPlotData = () => {
         if (activeSubgraph === 'All') {
             return plotData;
         }
-
         const components = headlessCy.elements().components();
         components.sort((a, b) => b.length - a.length);
         if (!components[parseInt(activeSubgraph) - 1]) {
@@ -121,7 +120,7 @@ const NetworkPlot = ({ plotData = [] }) => {
             // - "draft" only applies spectral layout
             // - "default" improves the quality with incremental layout (fast cooling rate)
             // - "proof" improves the quality with incremental layout (slow cooling rate)
-            quality: 'proof',
+            quality: 'default',
             // Use random node positions at beginning of layout
             // if this is set to false, then quality option must be "proof"
             randomize: true,
@@ -189,7 +188,7 @@ const NetworkPlot = ({ plotData = [] }) => {
             // Gravity range (constant) for compounds
             gravityRangeCompound: 1.5,
             // Gravity force (constant) for compounds
-            gravityCompound: 1.0,
+            gravityCompound: 2.0,
             // Gravity range (constant)
             gravityRange: 3.8,
             // Initial cooling factor for incremental layout

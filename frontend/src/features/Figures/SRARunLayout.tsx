@@ -1,10 +1,8 @@
 import React from 'react';
-import { isSummaryView } from '../../common/utils/plotHelpers.ts';
 
 import Box from '@mui/material/Box';
 import TargetControlFigure from './TargetControlFigure.tsx';
 import BioprojectFigure from './BioprojectFigure.tsx';
-import Typography from '@mui/material/Typography';
 
 const SRARunLayout = ({ identifiers, activeModule }) => {
     const getFigure = () => {
@@ -19,18 +17,6 @@ const SRARunLayout = ({ identifiers, activeModule }) => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {isSummaryView(identifiers) ? (
-                <Typography
-                    variant='h6'
-                    sx={{
-                        mt: 2,
-                        mb: 2,
-                        alignSelf: 'flex-start',
-                    }}
-                >
-                    {'Dataset is too large, try adding filters in the query builder.'}
-                </Typography>
-            ) : null}
             <Box sx={{ flex: 1, width: '100%' }}>{getFigure()}</Box>
         </Box>
     );
