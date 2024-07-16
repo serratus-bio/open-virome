@@ -114,8 +114,8 @@ const ViromeLayout = ({ identifiers }) => {
                         width: '100%',
                     }}
                 >
-                    <Skeleton variant='rectangular' width={450} height={500} sx={{ mr: 4 }} />
-                    <Skeleton variant='rectangular' width={450} height={500} />
+                    <Skeleton variant='rectangular' width={450} height={400} sx={{ mr: 4 }} />
+                    <Skeleton variant='rectangular' width={450} height={400} />
                 </Box>
             );
         }
