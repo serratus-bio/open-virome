@@ -35,11 +35,13 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
         }
     };
 
+    const targetRowsSet = new Set(targetRows.map((row) => `${row.name}${row.count}`));
+
     const mergedRows = [...targetRows, ...controlRows].reduce((acc, row) => {
         const name = row.name || 'N/A';
         const count = parseCount(row[countKey]);
         const existingRow = acc.find((r) => r.name === name);
-        const isInTarget = targetRows.includes(row);
+        const isInTarget = targetRowsSet.has(`${row.name}${row.count}`);
         if (existingRow) {
             if (isInTarget) {
                 existingRow.target += count;
@@ -50,7 +52,7 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
             acc.push({
                 name,
                 target: isInTarget ? count : 0,
-                control: !isInTarget ? count : 0,
+                control: isInTarget ? 0 : count,
             });
         }
 
