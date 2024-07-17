@@ -94,7 +94,6 @@ const QuerySummaryText = () => {
     return (
         <Box
             sx={{
-                width: '100%',
                 mt: 1,
                 ml: '10%',
             }}

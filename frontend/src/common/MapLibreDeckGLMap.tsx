@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { MdCopyAll, MdOpenInNew } from 'react-icons/md';
+import MdCopyAll from '@mui/icons-material/CopyAll';
+import MdOpenInNew from '@mui/icons-material/OpenInNew';
 
 // SEND TO constants.ts
 const AMAZON_LOCATION_API_KEY =
@@ -229,7 +230,6 @@ const DeckGLRenderScatterplot: any = ({
     });
 };
 
-
 const MapLibreDeckGLMap = ({ style, identifiers }) => {
     style = {
         ...{ height: '100%', position: 'relative', width: '100%' },
@@ -334,15 +334,21 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                     <div style={{ flex: '2 0' }}>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>ATTRIBUTE VALUE</span>
-                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(attributeValue)} />
+                            <MapLibreDeckGLMapCopyButton
+                                onClick={() => navigator.clipboard.writeText(attributeValue)}
+                            />
                         </div>
-                        <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{trimTextEllipsis(attributeValue, 40)}</div>
+                        <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>
+                            {trimTextEllipsis(attributeValue, 40)}
+                        </div>
                     </div>
                     <div style={{ flex: '1 0' }}>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>LAT / LON</span>
                             <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(latLon)} />
-                            <MapLibreDeckGLMapURLButton href={'https://www.google.com/maps/search/?api=1&query=' + latLon} />
+                            <MapLibreDeckGLMapURLButton
+                                href={'https://www.google.com/maps/search/?api=1&query=' + latLon}
+                            />
                         </div>
                         <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{latLon}</div>
                     </div>
@@ -352,7 +358,9 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>BIOSAMPLE</span>
                             <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(biosampleID)} />
-                            <MapLibreDeckGLMapURLButton href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID} />
+                            <MapLibreDeckGLMapURLButton
+                                href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID}
+                            />
                         </div>
                         <div style={{ margin: '2px 0 0 0' }}>
                             {biosampleID ? (
@@ -369,7 +377,9 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>BIOPROJECT</span>
                             <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(bioprojectID)} />
-                            <MapLibreDeckGLMapURLButton href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + bioprojectID} />
+                            <MapLibreDeckGLMapURLButton
+                                href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + bioprojectID}
+                            />
                         </div>
                         <div style={{ margin: '2px 0 0 0' }}>
                             {bioprojectID ? (
@@ -388,10 +398,23 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
     );
 };
 
-
-const MapLibreDeckGLMapCopyButton = props => <MdCopyAll style={{ color: '#FFF', cursor: 'pointer', fontSize: '18px', margin: '4px 0 0 6px', userSelect: 'none', verticalAlign: 'bottom' }} {...props} />;
-const MapLibreDeckGLMapURLButton = props => <a style={{ color: '#FFF', margin: '4px 0 0 6px', userSelect: 'none' }} target="_blank" {...props}>
-    <MdOpenInNew style={{ fontSize: '18px', verticalAlign: 'bottom' }} />
-</a>;
+const MapLibreDeckGLMapCopyButton = (props) => (
+    <MdCopyAll
+        style={{
+            color: '#FFF',
+            cursor: 'pointer',
+            fontSize: '18px',
+            margin: '4px 0 0 6px',
+            userSelect: 'none',
+            verticalAlign: 'bottom',
+        }}
+        {...props}
+    />
+);
+const MapLibreDeckGLMapURLButton = (props) => (
+    <a style={{ color: '#FFF', margin: '4px 0 0 6px', userSelect: 'none' }} target='_blank' {...props}>
+        <MdOpenInNew style={{ fontSize: '18px', verticalAlign: 'bottom' }} />
+    </a>
+);
 
 export default MapLibreDeckGLMap;

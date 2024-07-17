@@ -70,7 +70,7 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
     const headCells = headers.map((header) => ({
         id: header,
-        numeric: true,
+        numeric: false,
         disablePadding: false,
         label: header,
     }));
@@ -104,11 +104,11 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     );
 }
 
-const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange }) => {
+const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange, pageRows = 10 }) => {
     const [order, setOrder] = React.useState<Order>('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [dense, setDense] = React.useState(true);
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [rowsPerPage, setRowsPerPage] = React.useState(pageRows);
 
     const onRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -121,14 +121,14 @@ const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange }) 
 
     const visibleRows = React.useMemo(
         () => stableSort(rows, getComparator(order, orderBy)),
-        [order, orderBy, page, rowsPerPage],
+        [order, orderBy, page, rowsPerPage, rows],
     );
 
     return (
         <Box sx={{ width: '100%', overflow: 'hidden' }}>
-            <Paper sx={{ width: '100%', mb: 2, overflow: 'hidden' }}>
+            <Paper sx={{ overflow: 'hidden' }}>
                 <TableContainer>
-                    <Table sx={{ minWidth: 750 }} aria-labelledby='tableTitle' size={dense ? 'small' : 'medium'}>
+                    <Table aria-labelledby='tableTitle' size={dense ? 'small' : 'medium'}>
                         <EnhancedTableHead
                             headers={headers}
                             order={order}
@@ -140,12 +140,17 @@ const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange }) 
                                 return (
                                     <TableRow hover tabIndex={-1} key={`${row.id}_${index}`}>
                                         {headers.map((header, index) => (
-                                            <TableCell key={index} align='right'>
-                                                {row[header] &&
-                                                (row[header].toString().length > 15 ||
-                                                    row[header].toString().split(' ').length > 1)
-                                                    ? row[header].toString().split(' ')[0].substring(0, 15) + '...'
-                                                    : row[header]}
+                                            <TableCell key={index} align='left'>
+                                                <div
+                                                    style={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        maxWidth: '200px',
+                                                        whiteSpace: 'nowrap',
+                                                    }}
+                                                >
+                                                    {row[header]}
+                                                </div>
                                             </TableCell>
                                         ))}
                                     </TableRow>

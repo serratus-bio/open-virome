@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { selectActiveModuleBySection } from '../../app/slice.ts';
 import { getViromeGraphData, isSummaryView } from '../../common/utils/plotHelpers.ts';
@@ -14,17 +14,21 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import DropDownSelect from '../../common/DropdownSelect.tsx';
 import ScatterPlot from '../../common/ScatterPlot.tsx';
+import ViromeSummaryTable from './ViromeSummaryTable.tsx';
 
 const ViromeLayout = ({ identifiers }) => {
     const activeModule = useSelector((state) => selectActiveModuleBySection(state, 'palmdb'));
     const [randomized, setRandomized] = useState(0);
     const [activeSubgraph, setActiveSubgraph] = useState('1');
+    const [isSummaryTableOpen, setIsSummaryTableOpen] = useState(false);
+    const [selectedNetworkItem, setSelectedNetworkItem] = useState(null);
     const [headlessCy, setHeadlessCy] = useState(
         cytoscape({
             headless: true,
             elements: [],
         }),
     );
+    const containerRef = React.useRef(null);
 
     const {
         data: resultData,
@@ -63,6 +67,10 @@ const ViromeLayout = ({ identifiers }) => {
             });
         }
     }, [resultData, activeModule]);
+
+    useEffect(() => {
+        setIsSummaryTableOpen(false);
+    }, [activeModule, identifiers]);
 
     const getNetworkPlotData = () => {
         if (activeSubgraph === 'All') {
@@ -149,8 +157,21 @@ const ViromeLayout = ({ identifiers }) => {
         );
     };
 
+    const onNetworkPlotClick = useCallback((data) => {
+        setIsSummaryTableOpen(true);
+        setSelectedNetworkItem(data);
+    }, []);
+
     const renderNetworkFigure = () => {
-        return <NetworkPlot plotData={getNetworkPlotData()} />;
+        return (
+            <Box ref={containerRef}>
+                <NetworkPlot
+                    plotData={getNetworkPlotData()}
+                    onNodeClick={onNetworkPlotClick}
+                    onEdgeClick={onNetworkPlotClick}
+                />
+            </Box>
+        );
     };
 
     const getScatterPlotData = () => {
@@ -173,32 +194,6 @@ const ViromeLayout = ({ identifiers }) => {
             return `${args.marker} Component: ${componentId} <br /> &ensp; &ensp; Nodes: ${nodes} <br />  &ensp; &ensp; Edges: ${edges}<br />`;
         };
 
-        const markLineOpt = {
-            animation: false,
-            lineStyle: {
-                type: 'solid',
-                color: 'white',
-                width: 1,
-            },
-            emphasis: {
-                disabled: true,
-            },
-            tooltip: {
-                show: false,
-            },
-            data: [
-                [
-                    {
-                        coord: ['0', '0'],
-                        symbol: 'none',
-                    },
-                    {
-                        type: 'max',
-                        symbol: 'none',
-                    },
-                ],
-            ],
-        };
         return {
             xAxis: {
                 type: 'value',
@@ -256,13 +251,12 @@ const ViromeLayout = ({ identifiers }) => {
                     emphasis: {
                         focus: 'series',
                     },
-                    // markLine: markLineOpt,
                 },
             ],
         };
     };
 
-    const onEvents = {
+    const onScatterPlotEvents = {
         click: (params) => {
             if (params.data && params.data[2] !== undefined) {
                 const subGraph = params.data[2] + 1;
@@ -273,7 +267,7 @@ const ViromeLayout = ({ identifiers }) => {
 
     const renderScatterPlot = () => {
         const plotData = getScatterPlotData();
-        return <ScatterPlot plotData={plotData} styles={{ minHeight: 500 }} onEvents={onEvents} />;
+        return <ScatterPlot plotData={plotData} styles={{ minHeight: 500 }} onEvents={onScatterPlotEvents} />;
     };
 
     const shouldRenderPlaceholder = (isError, isFetching, data) => {
@@ -312,8 +306,19 @@ const ViromeLayout = ({ identifiers }) => {
                         {renderDropdown()}
                         {renderNetworkFigure()}
                     </Box>
+
                     <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
-                        {renderScatterPlot()}
+                        {isSummaryTableOpen ? (
+                            <ViromeSummaryTable
+                                selectedItem={selectedNetworkItem}
+                                onClose={() => setIsSummaryTableOpen(false)}
+                                rows={resultData}
+                                activeModule={activeModule}
+                                maxWidth={containerRef.current?.clientWidth}
+                            />
+                        ) : (
+                            renderScatterPlot()
+                        )}
                     </Box>
                 </Box>
             )}

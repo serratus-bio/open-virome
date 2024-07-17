@@ -35,19 +35,15 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
         }
     };
 
-    const targetRowsSet = new Set(targetRows)
-
+    const targetRowsSet = new Set(targetRows);
     const mergedRows = [...targetRows, ...controlRows].reduce((acc, row) => {
         const name = row.name || 'N/A';
         const count = parseCount(row[countKey]);
         const existingRow = acc.find((r) => r.name === name);
         const isInTarget = targetRowsSet.has(row);
         if (existingRow) {
-            if (isInTarget) {
-                existingRow.target += count;
-            } else {
-                existingRow.control += count;
-            }
+            existingRow.target += isInTarget ? count : 0;
+            existingRow.control += isInTarget ? 0 : count;
         } else {
             acc.push({
                 name,
@@ -55,7 +51,6 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
                 control: isInTarget ? 0 : count,
             });
         }
-
         return acc;
     }, []);
 
@@ -406,7 +401,7 @@ const getRandomSubarray = (arr, size) => {
     return shuffled.slice(0, size);
 };
 
-export const getViromeGraphData = (rows = [], groupBy = 'sotu') => {
+export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
     let runsToRowData = {};
     let data;
     if (rows.length > 1000) {
@@ -423,7 +418,12 @@ export const getViromeGraphData = (rows = [], groupBy = 'sotu') => {
             gb_acc: row['gb_acc'],
             node_pid: row['node_pid'],
             gb_pid: row['gb_pid'],
-            label: groupBy === 'tax_family' ? row['tax_family'] : groupBy === 'sotu' ? row['sotu'] : row['tax_species'],
+            label:
+                groupByKey === 'tax_family'
+                    ? row['tax_family']
+                    : groupByKey === 'sotu'
+                      ? row['sotu']
+                      : row['tax_species'],
         };
 
         if (row['run'] in runsToRowData) {
@@ -433,14 +433,14 @@ export const getViromeGraphData = (rows = [], groupBy = 'sotu') => {
         }
     });
 
-    // reduce to groupBy level
+    // reduce to groupByKey level
     const runsToGroupedRowData = {};
     for (const run in runsToRowData) {
         const groupedRowData = runsToRowData[run].reduce((acc, row) => {
-            if (row[groupBy] in acc) {
-                acc[row[groupBy]].push(row);
+            if (row[groupByKey] in acc) {
+                acc[row[groupByKey]].push(row);
             } else {
-                acc[row[groupBy]] = [row];
+                acc[row[groupByKey]] = [row];
             }
             return acc;
         }, {});
@@ -485,30 +485,33 @@ export const getViromeGraphData = (rows = [], groupBy = 'sotu') => {
                 isNode: true,
             },
         });
-        // runsToRowData[run].forEach((sOTU) => {
-        Object.keys(runsToGroupedRowData[run]).forEach((groupByKey) => {
-            const sOTU = runsToGroupedRowData[run][groupByKey][0];
+        Object.keys(runsToGroupedRowData[run]).forEach((groupByValue) => {
+            const row = runsToGroupedRowData[run][groupByValue][0];
+            const rowValue = row[groupByKey];
+            if (!rowValue) {
+                return;
+            }
             plotData.push({
                 group: 'nodes',
                 data: {
-                    id: sOTU['sotu'],
-                    type: 'sOTU',
+                    id: rowValue,
+                    type: 'virus',
                     isNode: true,
-                    label: truncate(sOTU['label'], 40) ?? 'N/A',
-                    color: sOTUsToColor[sOTU['sotu']],
+                    label: truncate(row['label'], 40) ?? 'N/A',
+                    color: sOTUsToColor[row['sotu']],
                     numSOTUS: numSOTUS,
                 },
             });
             plotData.push({
                 group: 'edges',
                 data: {
-                    id: `${run}-${sOTU['sotu']}`,
+                    id: `${run}-${rowValue}`,
                     source: run,
-                    target: sOTU['sotu'],
+                    target: rowValue,
                     isNode: false,
-                    width: getEdgeWidth(sOTU),
-                    weight: getEdgeWeight(sOTU),
-                    color: sOTUsToColor[sOTU['sotu']],
+                    width: getEdgeWidth(row),
+                    weight: getEdgeWeight(row),
+                    color: sOTUsToColor[row['sotu']],
                     numSOTUS: numSOTUS,
                 },
             });
