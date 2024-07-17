@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { MdCopyAll, MdOpenInNew } from 'react-icons/md';
 
 // SEND TO constants.ts
 const AMAZON_LOCATION_API_KEY =
@@ -146,6 +147,8 @@ const DeckGLRenderScatterplot: any = ({
                 return clauses;
             };
 
+            console.log('identifiers', identifiers);
+
             const identifierClauses = getIdClauses(identifiers?.biosample?.single, identifiers?.biosample?.range);
 
             const SELECT = `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, FLOOR(RANDOM()*2) as class
@@ -226,6 +229,7 @@ const DeckGLRenderScatterplot: any = ({
     });
 };
 
+
 const MapLibreDeckGLMap = ({ style, identifiers }) => {
     style = {
         ...{ height: '100%', position: 'relative', width: '100%' },
@@ -256,7 +260,7 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                 container: mapDiv,
                 style:
                     // OpenDataStandardDarkMap, OpenDataVisualizationLightMap, OpenDataVisualizationDarkMap, ESRIDarkGreyMap
-                    'https://maps.geo.us-east-1.amazonaws.com/maps/v0/maps/ESRIDarkGreyMap/style-descriptor?key=' +
+                    'https://maps.geo.us-east-1.amazonaws.com/maps/v0/maps/OpenDataVisualizationLightMap/style-descriptor?key=' +
                     AMAZON_LOCATION_API_KEY,
                 zoom: 0.8,
             });
@@ -321,31 +325,39 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
             <div style={{ color: '#FFF', margin: '24px 0 0 0', padding: '0 8px 0 8px' }}>
                 <div style={{ display: 'flex' }}>
                     <div style={{ flex: '1 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>ATTRIBUTE NAME</div>
-                        <div style={{ fontSize: '18px' }}>{attributeName}</div>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                            <span>ATTRIBUTE NAME</span>
+                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(attributeName)} />
+                        </div>
+                        <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{attributeName}</div>
                     </div>
                     <div style={{ flex: '2 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>ATTRIBUTE VALUE</div>
-                        <div style={{ fontSize: '18px' }}>{trimTextEllipsis(attributeValue, 40)}</div>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                            <span>ATTRIBUTE VALUE</span>
+                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(attributeValue)} />
+                        </div>
+                        <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{trimTextEllipsis(attributeValue, 40)}</div>
                     </div>
                     <div style={{ flex: '1 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>LAT / LON</div>
-                        <div style={{ fontSize: '18px' }}>{latLon}</div>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                            <span>LAT / LON</span>
+                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(latLon)} />
+                            <MapLibreDeckGLMapURLButton href={'https://www.google.com/maps/search/?api=1&query=' + latLon} />
+                        </div>
+                        <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{latLon}</div>
                     </div>
                 </div>
                 <div style={{ display: 'flex', margin: '16px 0 0 0' }}>
                     <div style={{ flex: '1 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>BIOSAMPLE</div>
-                        <div>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                            <span>BIOSAMPLE</span>
+                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(biosampleID)} />
+                            <MapLibreDeckGLMapURLButton href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID} />
+                        </div>
+                        <div style={{ margin: '2px 0 0 0' }}>
                             {biosampleID ? (
                                 <>
-                                    <a
-                                        href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID}
-                                        style={{ color: 'inherit', fontSize: '18px', textDecoration: 'none' }}
-                                        target='_blank'
-                                    >
-                                        {biosampleID}
-                                    </a>
+                                    <div style={{ fontSize: '18px' }}>{biosampleID}</div>
                                     <div style={{ fontSize: '14px' }}>{biosampleTitle}</div>
                                 </>
                             ) : (
@@ -354,17 +366,15 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                         </div>
                     </div>
                     <div style={{ flex: '1 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>BIOPROJECT</div>
-                        <div>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                            <span>BIOPROJECT</span>
+                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(bioprojectID)} />
+                            <MapLibreDeckGLMapURLButton href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + bioprojectID} />
+                        </div>
+                        <div style={{ margin: '2px 0 0 0' }}>
                             {bioprojectID ? (
                                 <>
-                                    <a
-                                        href={'https://www.ncbi.nlm.nih.gov/bioproject/?term=' + bioprojectID}
-                                        style={{ color: 'inherit', fontSize: '18px', textDecoration: 'none' }}
-                                        target='_blank'
-                                    >
-                                        {bioprojectID}
-                                    </a>
+                                    <div style={{ fontSize: '18px' }}>{bioprojectID}</div>
                                     <div style={{ fontSize: '14px' }}>{bioprojectName}</div>
                                 </>
                             ) : (
@@ -377,5 +387,11 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
         </div>
     );
 };
+
+
+const MapLibreDeckGLMapCopyButton = props => <MdCopyAll style={{ color: '#FFF', cursor: 'pointer', fontSize: '18px', margin: '4px 0 0 6px', userSelect: 'none', verticalAlign: 'bottom' }} {...props} />;
+const MapLibreDeckGLMapURLButton = props => <a style={{ color: '#FFF', margin: '4px 0 0 6px', userSelect: 'none' }} target="_blank" {...props}>
+    <MdOpenInNew style={{ fontSize: '18px', verticalAlign: 'bottom' }} />
+</a>;
 
 export default MapLibreDeckGLMap;
