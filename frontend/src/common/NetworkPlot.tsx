@@ -7,12 +7,30 @@ import Box from '@mui/material/Box';
 
 cytoscape.use(fcose);
 
-const NetworkPlot = ({ plotData = [] }) => {
+const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
     const [cy, setCy] = useState(null);
+
+    useEffect(() => {
+        if (cy) {
+            if (onNodeClick) {
+                cy.on('tap', 'node', (event) => {
+                    const node = event.target;
+                    onNodeClick(node.data());
+                });
+            }
+
+            if (onEdgeClick) {
+                cy.on('tap', 'edge', (event) => {
+                    const edge = event.target;
+                    onEdgeClick(edge.data());
+                });
+            }
+        }
+    }, [cy]);
 
     const stylesheet = [
         {
-            selector: 'node[type="sOTU"]',
+            selector: 'node[type="virus"]',
             style: {
                 backgroundColor: 'data(color)',
                 label: 'data(label)',
@@ -157,4 +175,4 @@ const NetworkPlot = ({ plotData = [] }) => {
     );
 };
 
-export default NetworkPlot;
+export default React.memo(NetworkPlot);
