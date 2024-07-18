@@ -1,3 +1,6 @@
+const ENABLE_REDUCED_IDS = false;
+
+
 const getNumericSuffix = (str = '') => {
     const match = str.match(/\d+$/);
     return match ? parseInt(match[0]) : null;
@@ -21,7 +24,7 @@ const reduceConsecutiveToRange = (ids) => {
         return [[], []];
     }
 
-    if (ids.length < 5000) {
+    if (!ENABLE_REDUCED_IDS || ids.length < 5000) {
         return [[], ids];
     }
 
