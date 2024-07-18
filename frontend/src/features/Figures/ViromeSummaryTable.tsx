@@ -66,29 +66,11 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                     }}
                 >
                     <Box sx={{ mr: 10 }}>
-                        <Typography sx={{ flex: 1 }} variant='body'>{`Top palmId Hit:`}</Typography>
                         <Typography
                             sx={{ flex: 1 }}
-                            variant='body2'
-                        >{`${topPalmId['palm_id']} - ${topPalmId['nickname']}`}</Typography>
-                        <Link
-                            sx={{
-                                flex: 1,
-                                display: 'flex',
-                                alignItems: 'center',
-                                flexDirection: 'row',
-                                textDecoration: 'none',
-                            }}
-                            href={`https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&USER_FORMAT_DEFAULTS=on&SET_SAVED_SEARCH=true&PAGE=Proteins&PROGRAM=blastp&QUERY=${topPalmId?.node_seq}&JOB_TITLE=palmID_${topPalmId?.palm_id}&GAPCOSTS=11%201&DATABASE=nr&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=0.05&WORD_SIZE=6&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&PROG_DEFAULTS=on&SHOW_OVERVIEW=on&SHOW_LINKOUT=on&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML`}
-                            target='_blank'
-                        >
-                            <Typography variant='body2'>BLAST</Typography>
-                            <MdOpenInNew fontSize='small' sx={{ mb: 0.5, ml: 0.5 }} />
-                        </Link>
-                    </Box>
-                    <Box>
-                        <Typography sx={{ flex: 1 }} variant='body'>{`Top GenBank Hit:`}</Typography>
-                        <Typography sx={{ flex: 1 }} variant='body2'>
+                            variant='body'
+                        >{`Top GenBank Hit (${topGenBankId['gb_pid']}% aa id)`}</Typography>
+                        <Typography sx={{ flex: 1, mt: 1 }} variant='body2'>
                             <div
                                 style={{
                                     overflow: 'hidden',
@@ -97,7 +79,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                                     whiteSpace: 'nowrap',
                                 }}
                             >
-                                {`${topPalmId['tax_species']} ${topGenBankId['tax_family'] ? `(${topGenBankId['tax_family']}` : ''})`}
+                                {`${topPalmId['tax_species']} ${topGenBankId['tax_family'] ? `(${topGenBankId['tax_family']})` : ''}`}
                             </div>
                         </Typography>
                         <Link
@@ -112,6 +94,30 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                             target='_blank'
                         >
                             <Typography variant='body2'>{topGenBankId['gb_acc']}</Typography>
+                            <MdOpenInNew fontSize='small' sx={{ mb: 0.5, ml: 0.5 }} />
+                        </Link>
+                    </Box>
+                    <Box>
+                        <Typography
+                            sx={{ flex: 1 }}
+                            variant='body'
+                        >{`Top Palmprint Hit (${topPalmId['node_pid']}% aa id)`}</Typography>
+                        <Typography
+                            sx={{ flex: 1, mt: 1 }}
+                            variant='body2'
+                        >{`${topPalmId['palm_id']} - ${topPalmId['nickname']}`}</Typography>
+                        <Link
+                            sx={{
+                                flex: 1,
+                                display: 'flex',
+                                alignItems: 'center',
+                                flexDirection: 'row',
+                                textDecoration: 'none',
+                            }}
+                            href={`https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&USER_FORMAT_DEFAULTS=on&SET_SAVED_SEARCH=true&PAGE=Proteins&PROGRAM=blastp&QUERY=${topPalmId?.node_seq}&JOB_TITLE=palmID_${topPalmId?.palm_id}&GAPCOSTS=11%201&DATABASE=nr&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=0.05&WORD_SIZE=6&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&PROG_DEFAULTS=on&SHOW_OVERVIEW=on&SHOW_LINKOUT=on&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML`}
+                            target='_blank'
+                        >
+                            <Typography variant='body2'>BLAST</Typography>
                             <MdOpenInNew fontSize='small' sx={{ mb: 0.5, ml: 0.5 }} />
                         </Link>
                     </Box>
