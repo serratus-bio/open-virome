@@ -11,7 +11,6 @@ import NetworkPlot from '../../common/NetworkPlot.tsx';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
 import DropDownSelect from '../../common/DropdownSelect.tsx';
 import ScatterPlot from '../../common/ScatterPlot.tsx';
 import ViromeSummaryTable from './ViromeSummaryTable.tsx';
@@ -281,14 +280,6 @@ const ViromeLayout = ({ identifiers }) => {
                     sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', height: '100%', mb: 2 }}
                 >
                     <Typography variant='h6'>Dataset is too large. Displaying components of subsample. </Typography>
-                    <Button
-                        sx={{ ml: 2 }}
-                        onClick={() => {
-                            setRandomized(randomized + 1);
-                        }}
-                    >
-                        Shuffle
-                    </Button>
                 </Box>
             ) : null}
             {shouldRenderPlaceholder(resultError, resultIsFetching, resultData) ? (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { moduleConfig } from '../Module/constants.ts';
 
 import CrossIcon from '@mui/icons-material/Clear';
@@ -14,6 +14,10 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
     const isRun = selectedItem?.type === 'run';
     const isVirus = selectedItem?.type === 'virus';
     const isEdge = selectedItem?.isNode === false;
+
+    useEffect(() => {
+        setPage(0);
+    }, [rows, selectedItem]);
 
     let title = '';
     const renderTitle = () => {
@@ -58,33 +62,26 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                     sx={{
                         display: 'flex',
                         flexDirection: 'row',
-                        justifyContent: 'flex-start',
-                        alignItems: 'flex-start',
+                        justifyContent: 'space-between',
+                        alignItems: 'space-between',
                         width: '100%',
                         height: '100%',
                         mt: 1,
                     }}
                 >
-                    <Box sx={{ mr: 10 }}>
-                        <Typography
-                            sx={{ flex: 1 }}
-                            variant='body'
-                        >{`Top GenBank Hit (${topGenBankId['gb_pid']}% aa id)`}</Typography>
-                        <Typography sx={{ flex: 1, mt: 1 }} variant='body2'>
-                            <div
-                                style={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    maxWidth: '800px',
-                                    whiteSpace: 'nowrap',
-                                }}
-                            >
-                                {`${topPalmId['tax_species']} ${topGenBankId['tax_family'] ? `(${topGenBankId['tax_family']})` : ''}`}
-                            </div>
+                    <Box
+                        sx={{
+                            flex: 1,
+                            flexBasis: '50%',
+                            maxWidth: '45%',
+                        }}
+                    >
+                        <Typography variant='body'>{`Top GenBank Hit (${topGenBankId['gb_pid']}% aa id)`}</Typography>
+                        <Typography sx={{ mt: 1 }} variant='body2'>
+                            {`${topPalmId['tax_species']} ${topGenBankId['tax_family'] ? `(${topGenBankId['tax_family']})` : ''}`}
                         </Typography>
                         <Link
                             sx={{
-                                flex: 1,
                                 display: 'flex',
                                 alignItems: 'center',
                                 flexDirection: 'row',
@@ -97,18 +94,15 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                             <MdOpenInNew fontSize='small' sx={{ mb: 0.5, ml: 0.5 }} />
                         </Link>
                     </Box>
-                    <Box>
+
+                    <Box sx={{ flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
+                        <Typography variant='body'>{`Top Palmprint Hit (${topPalmId['node_pid']}% aa id)`}</Typography>
                         <Typography
-                            sx={{ flex: 1 }}
-                            variant='body'
-                        >{`Top Palmprint Hit (${topPalmId['node_pid']}% aa id)`}</Typography>
-                        <Typography
-                            sx={{ flex: 1, mt: 1 }}
+                            sx={{ mt: 1 }}
                             variant='body2'
                         >{`${topPalmId['palm_id']} - ${topPalmId['nickname']}`}</Typography>
                         <Link
                             sx={{
-                                flex: 1,
                                 display: 'flex',
                                 alignItems: 'center',
                                 flexDirection: 'row',
@@ -182,7 +176,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                     sx={{
                         'minWidth': 12,
                         'justifySelf': 'flex-end',
-                        'alignSelf': 'flex-end',
+                        'alignSelf': 'flex-start',
                         'backgroundColor': 'transparent',
                         '&:hover': {
                             backgroundColor: 'transparent',

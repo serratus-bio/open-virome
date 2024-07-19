@@ -10,6 +10,7 @@ export const handleIdKeyIrregularities = (key, table) => {
         },
         sra_stat: {
             run_id: 'run',
+            stat_host_order: 'name',
         },
         biosample_tissue: {
             biosample: 'biosample_id',
