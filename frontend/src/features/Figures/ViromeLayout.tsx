@@ -44,7 +44,7 @@ const ViromeLayout = ({ identifiers }) => {
                 : [],
             table: moduleConfig[activeModule].resultsTable,
             pageStart: 0,
-            pageEnd: isSummaryView(identifiers) ? 300 : undefined,
+            pageEnd: isSummaryView(identifiers) ? 100 : undefined,
             sortBy: isSummaryView(identifiers) ? 'gb_pid' : undefined,
         },
         {

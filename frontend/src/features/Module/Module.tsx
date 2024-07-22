@@ -20,6 +20,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
 import Tooltip from '@mui/material/Tooltip';
 import Skeleton from '@mui/material/Skeleton';
+import QuestionMarkIcon from '@mui/icons-material/HelpCenter';
 
 const Module = ({ sectionKey }) => {
     const dispatch = useDispatch();
@@ -83,6 +84,10 @@ const Module = ({ sectionKey }) => {
 
     const onModuleChange = (event) => {
         dispatch(setActiveModule({ sectionKey, moduleKey: event.target.value }));
+    };
+
+    const onHelpClick = () => {
+        window.open(sectionConfig[sectionKey]?.wikiUrl, '_blank');
     };
 
     return (
@@ -164,6 +169,11 @@ const Module = ({ sectionKey }) => {
                             onClick={() => onViewChange('table')}
                         >
                             <TableIcon fontSize='medium' />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title='Help' placement='top'>
+                        <IconButton sx={{ mt: -0.5, height: 30, width: 30 }} onClick={onHelpClick}>
+                            <QuestionMarkIcon fontSize='medium' />
                         </IconButton>
                     </Tooltip>
                 </Box>

@@ -12,7 +12,7 @@ const EnvironmentLayout = ({ identifiers }) => {
                 alignItems: 'center',
                 width: '100%',
                 height: '60vh',
-                mb: 40,
+                mb: 10,
             }}
         >
             <MapPlot identifiers={identifiers} style={{ width: '100%', height: '100%' }} />
