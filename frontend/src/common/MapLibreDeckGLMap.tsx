@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import MdCopyAll from '@mui/icons-material/CopyAll';
-import MdOpenInNew from '@mui/icons-material/OpenInNew';
+import { MdCopyAll, MdOpenInNew } from 'react-icons/md';
 
 // SEND TO constants.ts
 const AMAZON_LOCATION_API_KEY =
@@ -10,6 +9,7 @@ const LOGAN_RDS_PROXY_LAMBDA_ENDPOINT = 'https://dcoian99debdl.cloudfront.net';
 const MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE = false;
 
 // SEND TO UTIL FUNCTIONS
+const arrayMapColumns = (a, c) => a.map(v => Object.fromEntries(c.map((_v, _i) => [_v, v[_i]])));
 const bioprojectIDFromBiosample: any = async (biosample) => {
     if (!bioprojectIDFromBiosample._) bioprojectIDFromBiosample._ = {};
 
@@ -29,6 +29,26 @@ const bioprojectIDFromBiosample: any = async (biosample) => {
         })();
 
     return bioprojectIDFromBiosample._[biosample];
+};
+const selectBioproject: any = async (accession) => {
+    if (!selectBioproject._) selectBioproject._ = {};
+
+    if (!selectBioproject._[accession])
+        selectBioproject._[accession] = (async () => {
+            const response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
+                body: JSON.stringify({ SELECT: "name, title FROM bioproject WHERE accession = '" + accession + "' LIMIT 1;" }),
+                headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
+                method: 'POST',
+            });
+
+            if (response.status === 200) {
+                const json = await response.json();
+
+                if (json.length) return json[0];
+            }
+        })();
+
+    return selectBioproject._[accession];
 };
 const selectBiosample: any = async (accession) => {
     if (!selectBiosample._) selectBiosample._ = {};
@@ -148,28 +168,21 @@ const DeckGLRenderScatterplot: any = ({
                 return clauses;
             };
 
-            console.log('identifiers', identifiers);
-
             const identifierClauses = getIdClauses(identifiers?.biosample?.single, identifiers?.biosample?.range);
 
-            const SELECT = `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, FLOOR(RANDOM()*2) as class
+            const SELECT = { text:`accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, FLOOR(RANDOM()*2) as class
                 FROM biosample_geographical_location
-                WHERE
-                ${
-                    MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE
-                        ? 'ST_Intersects(lat_lon, ST_SetSRID(ST_GeomFromText(' + neswPolygon + '), 4326))'
-                        : 'TRUE'
-                }
-                ${identifierClauses.length > 0 ? `AND ${identifierClauses.join(' OR ')}` : ''}
-                LIMIT 32768;`;
+                WHERE palm_virome = TRUE
+                ${identifierClauses.length > 0 ? `AND (${identifierClauses.join(' OR ')})` : ''}
+                LIMIT 65536;` };
             const responseMs = Date.now();
 
             let response;
             try {
-                // console.debug('[DEBUG]', 'DeckGLRenderScatterplot.SELECT', SELECT);
+                console.debug('[DEBUG]', 'DeckGLRenderScatterplot.SELECT', SELECT);
 
                 response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
-                    body: JSON.stringify({ SELECT }),
+                    body: JSON.stringify({ SELECT:SELECT.text, array:true }),
                     headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
                     method: 'POST',
                 });
@@ -178,7 +191,7 @@ const DeckGLRenderScatterplot: any = ({
             }
 
             if (response && response.status === 200) {
-                const json = await response.json();
+                const json = arrayMapColumns(await response.json(), ['accession', 'attribute_name', 'attribute_value', 'lat', 'lon', 'class']);
                 const zoomDriftFactor = Math.pow(2, (16 - mlglMap.getZoom()) / 8) / 8000;
 
                 console.debug(
@@ -241,6 +254,7 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
     const [attributeValue, setAttributeValue] = useState('');
     const [bioprojectID, setBioprojectID] = useState('');
     const [bioprojectName, setBioprojectName] = useState('');
+    const [bioprojectTitle, setBioprojectTitle] = useState('');
     const [biosampleID, setBiosampleID] = useState('');
     const [biosampleTitle, setBiosampleTitle] = useState('');
     const [latLon, setLatLon] = useState('');
@@ -294,12 +308,16 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
     }, [identifiers]);
 
     useEffect(() => {
-        if (bioprojectID) {
-            // ...
-
-            setBioprojectName('<BIOPROJECT_NAME>');
-        } else {
+        if (bioprojectID)
+            selectBioproject(bioprojectID).then(data => {
+                if(data) {
+                    setBioprojectName(data.name||'');
+                    setBioprojectTitle(data.title||'');
+                }
+            });
+        else {
             setBioprojectName('');
+            setBioprojectTitle('');
         }
     }, [bioprojectID]);
 
@@ -307,7 +325,10 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
         if (biosampleID) {
             bioprojectIDFromBiosample(biosampleID).then(setBioprojectID);
 
-            selectBiosample(biosampleID).then((data) => setBiosampleTitle(data.title));
+            selectBiosample(biosampleID).then((data) => {
+                if(data)
+                    setBiosampleTitle(data.title||'');
+            });
         } else {
             setBioprojectID('');
             setBiosampleTitle('');
@@ -334,9 +355,7 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                     <div style={{ flex: '2 0' }}>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>ATTRIBUTE VALUE</span>
-                            <MapLibreDeckGLMapCopyButton
-                                onClick={() => navigator.clipboard.writeText(attributeValue)}
-                            />
+                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(attributeValue)} />
                         </div>
                         <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>
                             {trimTextEllipsis(attributeValue, 40)}
@@ -346,9 +365,7 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>LAT / LON</span>
                             <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(latLon)} />
-                            <MapLibreDeckGLMapURLButton
-                                href={'https://www.google.com/maps/search/?api=1&query=' + latLon}
-                            />
+                            <MapLibreDeckGLMapURLButton href={'https://www.google.com/maps/search/?api=1&query=' + latLon} />
                         </div>
                         <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{latLon}</div>
                     </div>
@@ -358,9 +375,7 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>BIOSAMPLE</span>
                             <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(biosampleID)} />
-                            <MapLibreDeckGLMapURLButton
-                                href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID}
-                            />
+                            <MapLibreDeckGLMapURLButton href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID} />
                         </div>
                         <div style={{ margin: '2px 0 0 0' }}>
                             {biosampleID ? (
@@ -377,15 +392,14 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>BIOPROJECT</span>
                             <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(bioprojectID)} />
-                            <MapLibreDeckGLMapURLButton
-                                href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + bioprojectID}
-                            />
+                            <MapLibreDeckGLMapURLButton href={'https://www.ncbi.nlm.nih.gov/bioproject/?term=' + bioprojectID} />
                         </div>
                         <div style={{ margin: '2px 0 0 0' }}>
                             {bioprojectID ? (
                                 <>
                                     <div style={{ fontSize: '18px' }}>{bioprojectID}</div>
                                     <div style={{ fontSize: '14px' }}>{bioprojectName}</div>
+                                    <div style={{ fontSize: '14px' }}>{bioprojectTitle}</div>
                                 </>
                             ) : (
                                 '\u200B'
@@ -398,23 +412,9 @@ const MapLibreDeckGLMap = ({ style, identifiers }) => {
     );
 };
 
-const MapLibreDeckGLMapCopyButton = (props) => (
-    <MdCopyAll
-        style={{
-            color: '#FFF',
-            cursor: 'pointer',
-            fontSize: '18px',
-            margin: '4px 0 0 6px',
-            userSelect: 'none',
-            verticalAlign: 'bottom',
-        }}
-        {...props}
-    />
-);
-const MapLibreDeckGLMapURLButton = (props) => (
-    <a style={{ color: '#FFF', margin: '4px 0 0 6px', userSelect: 'none' }} target='_blank' {...props}>
-        <MdOpenInNew style={{ fontSize: '18px', verticalAlign: 'bottom' }} />
-    </a>
-);
+const MapLibreDeckGLMapCopyButton = props => <MdCopyAll style={{ color: '#FFF', cursor: 'pointer', fontSize: '18px', margin: '4px 0 0 6px', userSelect: 'none', verticalAlign: 'bottom' }} {...props} />;
+const MapLibreDeckGLMapURLButton = props => <a style={{ color: '#FFF', margin: '4px 0 0 6px', userSelect: 'none' }} target="_blank" {...props}>
+    <MdOpenInNew style={{ fontSize: '18px', verticalAlign: 'bottom' }} />
+</a>;
 
 export default MapLibreDeckGLMap;
