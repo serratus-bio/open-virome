@@ -2,14 +2,17 @@ export const sectionConfig = {
     sra: {
         modules: ['host', 'seqType', 'bioproject'],
         title: 'Run Module',
+        wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Run-Module',
     },
     palmdb: {
         modules: ['species', 'family', 'sotu'],
         title: 'Virome Module',
+        wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Virome-Module',
     },
     context: {
         modules: ['geography', 'statHost', 'tissue'],
         title: 'Metadata Module',
+        wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Metadata-Module',
     },
 };
 
