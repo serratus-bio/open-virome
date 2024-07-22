@@ -4,11 +4,11 @@ import pg from 'pg';
 const { Pool } = pg;
 
 const pool = new Pool({
-    database: process.env.PG_DATABASE,
+    database: process.env.PG_DATABASE_LOGAN,
     host: process.env.PG_HOST,
-    password: process.env.PG_PASSWORD,
+    password: process.env.PG_PASSWORD_LOGAN,
     port: process.env.PG_PORT,
-    user: process.env.PG_USER,
+    user: process.env.PG_USER_LOGAN,
 });
 
 export const query = async (text, params) => {
