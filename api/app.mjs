@@ -9,7 +9,8 @@ import {
     getTotalCountsQuery,
     getGroupedCountsByIdentifiers,
     getGroupedCountsByFilters,
-    getCachedCountsResults,
+    hasNoGroupByFilters,
+    getCachedCountsQuery,
 } from './utils/queryBuilder.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware.js';
@@ -53,7 +54,7 @@ app.post('/counts', async (req, res) => {
     const groupBy = body?.groupBy || undefined;
     const sortByColumn = body?.sortByColumn || undefined;
     const sortByDirection = body?.sortByDirection || undefined;
-    const pageStart = body?.pageStart || undefined;
+    const pageStart = body?.pageStart || 0;
     const pageEnd = body?.pageEnd || undefined;
 
     if (idColumn && filters.length > 0) {
@@ -80,28 +81,15 @@ app.post('/counts', async (req, res) => {
             groupBy,
             table: table,
         });
+    } else if (hasNoGroupByFilters(filters, groupBy)) {
+        query = getCachedCountsQuery(groupBy);
     } else {
-        const cachedResults = getCachedCountsResults(filters, groupBy);
-        if (cachedResults) {
-            let result = cachedResults;
-            if (sortByColumn !== undefined) {
-                result.sort((a, b) => {
-                    if (sortByDirection === 'asc') {
-                        return a[sortByColumn] - b[sortByColumn];
-                    }
-                    return b[sortByColumn] - a[sortByColumn];
-                });
-            }
-            if (pageEnd !== undefined) {
-                result = result.slice(pageStart, pageEnd);
-            }
-            return res.json(result);
-        }
         query = getGroupedCountsByFilters({
             filters,
             groupBy,
         });
     }
+
     query = `
         ${query}
         ${sortByColumn !== undefined ? `ORDER BY ${sortByColumn} ${sortByDirection}` : ''}

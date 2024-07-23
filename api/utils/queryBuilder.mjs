@@ -1,5 +1,3 @@
-import { groupByToCounts } from '../cache/countsCache.mjs';
-
 export const handleIdKeyIrregularities = (key, table) => {
     const tableToRemappedKey = {
         sra: {
@@ -14,6 +12,7 @@ export const handleIdKeyIrregularities = (key, table) => {
         },
         biosample_geographical_location: {
             biosample: 'accession',
+            geo_attribute_value: 'attribute_value',
         },
         palm_virome: {
             run_id: 'run',
@@ -25,7 +24,7 @@ export const handleIdKeyIrregularities = (key, table) => {
     return key;
 };
 
-export const getFilterClauses = (filters, groupBy = undefined) => {
+export const getFilterClauses = (filters, table) => {
     let filterClauses = [];
     if (Object.keys(filters).length > 0) {
         let groupByKeys = filters.map((filter) => filter.groupByKey);
@@ -37,11 +36,11 @@ export const getFilterClauses = (filters, groupBy = undefined) => {
 
             filterClauses = [
                 ...filterClauses,
-                `${groupByKey} IN (${groupByValues.map((groupByValue) => `'${groupByValue}'`).join(', ')})`,
+                `${handleIdKeyIrregularities(groupByKey, table)} IN (${groupByValues.map((groupByValue) => `'${groupByValue}'`).join(', ')})`,
             ];
         });
     }
-    return `${filterClauses.join(' AND ')}${groupBy !== undefined ? ` AND ${groupBy} IS NOT NULL` : ''}`;
+    return `${filterClauses.join(' AND ')}`;
 };
 
 export const getIdClauses = (ids, idRanges, idColumn, table = 'sra') => {
@@ -81,14 +80,25 @@ export const getGroupedCountsByIdentifiers = ({ ids, idRanges, idColumn, groupBy
     `;
 };
 
-const hasNoGroupByFilters = (filters, groupBy) => {
+export const hasNoGroupByFilters = (filters, groupBy) => {
     return !filters.filter((filter) => filter.groupByKey !== groupBy).length > 0;
 };
 
-export const getCachedCountsResults = (filters, groupBy) => {
-    if (hasNoGroupByFilters(filters, groupBy)) {
-        return groupByToCounts[groupBy];
-    }
+export const getCachedCountsQuery = (groupBy) => {
+    const groupByToMaterializedView = {
+        organism: 'counts_sra_organism',
+        bioproject: 'counts_sra_bioproject',
+        assay_type: 'counts_sra_assay_type',
+        tax_species: 'counts_palm_virome_tax_species',
+        tax_family: 'counts_palm_virome_tax_family',
+        sotu: 'counts_palm_virome_sotu',
+        tissue: 'counts_biosample_tissue',
+        geo_attribute_value: 'counts_biosample_geographical_location',
+        stat_host_order: 'counts_sra_stat',
+    };
+    return `
+        SELECT * FROM ${groupByToMaterializedView[groupBy]}
+    `;
 };
 
 export const getGroupedCountsByFilters = ({ filters, groupBy }) => {
@@ -107,7 +117,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
         sra: "acc as run_id, to_char(releasedate, 'YYYY-MM') as releasedate, bioproject as bioproject, biosample as biosample, organism as organism, assay_type",
         sra_stat: 'run as run_id, name as stat_host_order, kmer_perc as percent_identity_stat',
         biosample_tissue: 'biosample_id as biosample, tissue, bto_id',
-        biosample_geographical_location: 'accession as biosample, attribute_value as attribute_value',
+        biosample_geographical_location: 'accession as biosample, attribute_value as geo_attribute_value',
         palm_virome: 'run as run_id, sotu, palm_id, tax_species, tax_family, gb_pid, node_pid',
     };
 
@@ -116,7 +126,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
         sra_stat: ['run_id', 'stat_host_order', 'percent_identity_stat'],
         palm_virome: ['run', 'sotu', 'palm_id', 'tax_species', 'tax_family', 'gb_pid', 'node_pid'],
         biosample_tissue: ['biosample_id', 'tissue', 'bto_id'],
-        biosample_geographical_location: ['accession', 'attribute_value'],
+        biosample_geographical_location: ['accession', 'geo_attribute_value'],
     };
 
     const tableToJoinKey = {
@@ -138,6 +148,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
         });
     }
     if (groupBy !== undefined) {
+        //TODO: improve table infered from groupBy, it's possible the mapping is not unique
         tables = [...tables, ...Object.keys(tableToColumn).filter((table) => tableToColumn[table].includes(groupBy))];
     }
 
@@ -159,7 +170,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
         });
         const selectStatement =
             i == 0 || columns.includes(groupBy) || tableFilters.length > 0 ? tableToInnerSelect[table] : tableJoinKey;
-        const whereStatement = tableFilters.length > 0 ? `WHERE ${getFilterClauses(tableFilters)}` : '';
+        const whereStatement = tableFilters.length > 0 ? `WHERE ${getFilterClauses(tableFilters, table)}` : '';
         if (i > 0) {
             joinStatements.push(`INNER JOIN (
                 SELECT ${selectStatement}
