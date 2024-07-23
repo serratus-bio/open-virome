@@ -171,7 +171,7 @@ const Module = ({ sectionKey }) => {
                             <TableIcon fontSize='medium' />
                         </IconButton>
                     </Tooltip>
-                    <Tooltip title='Help' placement='top'>
+                    <Tooltip title='Wiki' placement='top'>
                         <IconButton sx={{ mt: -0.5, height: 30, width: 30 }} onClick={onHelpClick}>
                             <QuestionMarkIcon fontSize='medium' />
                         </IconButton>

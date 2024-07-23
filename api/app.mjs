@@ -50,7 +50,7 @@ app.post('/counts', async (req, res) => {
     const idRanges = body?.idRanges || [];
 
     const filters = body?.filters || [];
-    const table = body?.table || 'srarun';
+    const table = body?.table || 'sra';
     const groupBy = body?.groupBy || undefined;
     const sortByColumn = body?.sortByColumn || undefined;
     const sortByDirection = body?.sortByDirection || undefined;
@@ -157,7 +157,7 @@ app.post('/results', async (req, res) => {
     const idColumn = body?.idColumn || 'run_id';
     const ids = body?.ids || [];
     const idRanges = body?.idRanges || [];
-    const table = body?.table || 'srarun';
+    const table = body?.table || 'sra';
     const columns = body?.columns || '*';
     const pageStart = body?.pageStart || 0;
     const pageEnd = body?.pageEnd || undefined;
