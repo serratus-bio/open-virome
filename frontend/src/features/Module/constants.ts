@@ -68,7 +68,7 @@ export const moduleConfig = {
     geography: {
         title: 'Ecology',
         tag: 'Ecology',
-        groupByKey: 'attribute_value',
+        groupByKey: 'geo_attribute_value',
         resultsIdColumn: 'biosample',
         resultsTable: 'biosample_geographical_location',
         defaultDisplay: 'figure',
