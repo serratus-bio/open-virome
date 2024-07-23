@@ -40,6 +40,8 @@ const QueryView = () => {
         groupBy: moduleConfig[activeModule].groupByKey,
         sortByColumn: 'count',
         sortByDirection: 'desc',
+        pageStart: 0,
+        pageEnd: 100000,
     });
 
     useEffect(() => {
