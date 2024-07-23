@@ -11,11 +11,10 @@ const EnvironmentLayout = ({ identifiers }) => {
                 flexDirection: 'column',
                 alignItems: 'center',
                 width: '100%',
-                height: '60vh',
-                mb: 10,
+                height: '100%',
             }}
         >
-            <MapPlot identifiers={identifiers} style={{ width: '100%', height: '100%' }} />
+            <MapPlot identifiers={identifiers} />
         </Box>
     );
 };
