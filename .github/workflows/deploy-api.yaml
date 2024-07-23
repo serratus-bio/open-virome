@@ -26,11 +26,11 @@ jobs:
         working-directory: ./api
         run: |
           touch .env
-          echo PG_DATABASE=${{ secrets.PG_DATABASE }} >> .env
+          echo PG_DATABASE_LOGAN=${{ secrets.PG_DATABASE_LOGAN }} >> .env
           echo PG_HOST=${{ secrets.PG_HOST }} >> .env
-          echo PG_PASSWORD=${{ secrets.PG_PASSWORD }} >> .env
+          echo PG_PASSWORD_LOGAN=${{ secrets.PG_PASSWORD_LOGAN }} >> .env
           echo PG_PORT=5432 >> .env
-          echo PG_USER=${{ secrets.PG_USER }} >> .env
+          echo PG_USER_LOGAN=${{ secrets.PG_USER_LOGAN }} >> .env
 
       - name: Build
         run: |

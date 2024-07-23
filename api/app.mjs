@@ -20,7 +20,6 @@ const port = 8000;
 app.use(express.json({ limit: '100mb' }));
 app.use(cors());
 app.use(awsServerlessExpressMiddleware.eventContext());
-
 app.use(bodyParser.json());
 app.use(
     bodyParser.urlencoded({
