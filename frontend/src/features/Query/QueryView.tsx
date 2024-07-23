@@ -18,6 +18,7 @@ import Slide from '@mui/material/Slide';
 const QueryView = () => {
     const dispatch = useDispatch();
     const [searchString, setSearchString] = useState('');
+    const [isTypingInterval, setIsTypingInterval] = useState(0);
     const activeModule = useSelector(selectActiveQueryModule);
     const filters = useSelector(selectAllFilters);
     const moduleFilters = useSelector((state) => selectFiltersByType(state, activeModule));
@@ -35,18 +36,36 @@ const QueryView = () => {
         data: countData,
         error: countError,
         isFetching: countIsFetching,
-    } = useGetCountsQuery({
-        filters: getFilterQuery({ filters, excludeType: activeModule }),
-        groupBy: moduleConfig[activeModule].groupByKey,
-        sortByColumn: 'count',
-        sortByDirection: 'desc',
-        pageStart: 0,
-        pageEnd: 100000,
-    });
+    } = useGetCountsQuery(
+        {
+            filters: getFilterQuery({ filters, excludeType: activeModule }),
+            groupBy: moduleConfig[activeModule].groupByKey,
+            sortByColumn: 'count',
+            sortByDirection: 'desc',
+            pageStart: 0,
+            pageEnd: 100000,
+            searchString: searchString,
+        },
+        {
+            skip: isTypingInterval > 0,
+        },
+    );
 
     useEffect(() => {
         setSearchString('');
     }, [activeModule]);
+
+    useEffect(() => {
+        const isTypingDelay = setTimeout(async () => {
+            setIsTypingInterval(0);
+        }, 500);
+        return () => clearTimeout(isTypingDelay);
+    }, [isTypingInterval]);
+
+    const handleSearchInput = (query) => {
+        setSearchString(query);
+        setIsTypingInterval(isTypingInterval + 1);
+    };
 
     const onRowClick = (row) => {
         if (row.selected) {
@@ -63,27 +82,6 @@ const QueryView = () => {
         }
     };
 
-    const stringSearch = (rows = []) => {
-        const searchStrings = searchString
-            .split(/[,\s]/)
-            .map((substring) => substring.trim())
-            .filter(Boolean);
-        return rows
-            .filter((row) => !!row.name)
-            .filter((row) =>
-                searchStrings.some((searchString) => row.name.toLowerCase().includes(searchString.toLowerCase())),
-            )
-            .sort((a, b) => {
-                const aMatches = searchStrings.filter((searchString) =>
-                    a.name.toLowerCase().includes(searchString.toLowerCase()),
-                ).length;
-                const bMatches = searchStrings.filter((searchString) =>
-                    b.name.toLowerCase().includes(searchString.toLowerCase()),
-                ).length;
-                return bMatches - aMatches;
-            });
-    };
-
     const getRows = (countData, searchString, moduleFilters) => {
         const addFilterState = (rows) => {
             return rows.map((row) => {
@@ -94,15 +92,11 @@ const QueryView = () => {
                 };
             });
         };
-
         if (!countData) {
             return [];
         }
         let rows = addFilterState(countData);
-        if (!searchString) {
-            return rows;
-        }
-        return stringSearch(rows);
+        return rows;
     };
 
     return (
@@ -139,7 +133,7 @@ const QueryView = () => {
                                         <SearchBar
                                             placeholder={`Search ${moduleConfig[activeModule].title.toLowerCase()}`}
                                             query={searchString}
-                                            setQuery={setSearchString}
+                                            setQuery={handleSearchInput}
                                         />
                                     }
                                 />
@@ -151,7 +145,7 @@ const QueryView = () => {
                             ) : (
                                 <Box>
                                     <Typography component={'span'} variant='body2' sx={{ textAlign: 'left' }}>
-                                        {`Total rows: ${countData ? formatNumber(countData.length) : ''}.`}
+                                        {`Total rows: ${countData && countData?.length > 100000 ? '≥' : ''}${countData ? formatNumber(countData.length) : ''}.`}
                                     </Typography>
                                     <Typography component={'span'} variant='body2' sx={{ mt: 1, textAlign: 'left' }}>
                                         {`${

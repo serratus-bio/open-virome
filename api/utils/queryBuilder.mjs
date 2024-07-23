@@ -101,6 +101,21 @@ export const getCachedCountsQuery = (groupBy) => {
     `;
 };
 
+export const getSearchStringClause = (searchString, filters, groupBy) => {
+    if (searchString === undefined) {
+        return '';
+    }
+    const searchStrings = searchString
+        .split(/[,\s]/)
+        .map((substring) => substring.trim())
+        .filter(Boolean);
+    const columnName = hasNoGroupByFilters(filters, groupBy) ? 'name' : groupBy;
+    const likeStatements = searchStrings.map((searchString) => {
+        return `LOWER(${columnName}) LIKE LOWER('%${searchString}%')`;
+    });
+    return `WHERE ${likeStatements.join(' OR ')}`;
+};
+
 export const getGroupedCountsByFilters = ({ filters, groupBy }) => {
     const tableJoin = getMinimalJoinSubQuery(filters, groupBy);
     return `

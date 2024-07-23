@@ -11,6 +11,7 @@ import {
     getGroupedCountsByFilters,
     hasNoGroupByFilters,
     getCachedCountsQuery,
+    getSearchStringClause,
 } from './utils/queryBuilder.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware.js';
@@ -56,6 +57,7 @@ app.post('/counts', async (req, res) => {
     const sortByDirection = body?.sortByDirection || undefined;
     const pageStart = body?.pageStart || 0;
     const pageEnd = body?.pageEnd || undefined;
+    const searchString = body?.searchString || undefined;
 
     if (idColumn && filters.length > 0) {
         return res.status(400).json({ error: 'Cannot have both idColumn and filters!' });
@@ -92,6 +94,7 @@ app.post('/counts', async (req, res) => {
 
     query = `
         ${query}
+        ${getSearchStringClause(searchString, filters, groupBy)}
         ${sortByColumn !== undefined ? `ORDER BY ${sortByColumn} ${sortByDirection}` : ''}
         ${pageEnd !== undefined ? `LIMIT ${pageEnd - pageStart} OFFSET ${pageStart}` : ''}
     `;
