@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectActiveModuleBySection } from '../../app/slice.ts';
 import { getViromeGraphData, isSummaryView } from '../../common/utils/plotHelpers.ts';
@@ -161,14 +161,12 @@ const ViromeLayout = ({ identifiers }) => {
         setSelectedNetworkItem(data);
     }, []);
 
+    const plotData = useMemo(() => getNetworkPlotData(), [activeSubgraph, randomized]);
+
     const renderNetworkFigure = () => {
         return (
             <Box ref={containerRef}>
-                <NetworkPlot
-                    plotData={getNetworkPlotData()}
-                    onNodeClick={onNetworkPlotClick}
-                    onEdgeClick={onNetworkPlotClick}
-                />
+                <NetworkPlot plotData={plotData} onNodeClick={onNetworkPlotClick} onEdgeClick={onNetworkPlotClick} />
             </Box>
         );
     };
