@@ -13,3 +13,10 @@ export const truncate = (s: string, n: number = 10) => {
     }
     return s.length > n ? s.substring(0, n - 1) + '...' : s;
 };
+
+export const abbreviateNumber = (value: number) => {
+    return Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        maximumFractionDigits: 1,
+    }).format(value);
+};
