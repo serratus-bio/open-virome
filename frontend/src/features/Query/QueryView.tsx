@@ -24,6 +24,11 @@ const QueryView = () => {
     const moduleFilters = useSelector((state) => selectFiltersByType(state, activeModule));
     const sidebarOpen = useSelector(selectSidebarOpen);
 
+    useEffect(() => {
+        setIsTypingInterval(0);
+        setSearchString('');
+    }, [activeModule]);
+
     const {
         data: identifiersData,
         error: identifiersError,
@@ -50,10 +55,6 @@ const QueryView = () => {
             skip: isTypingInterval > 0,
         },
     );
-
-    useEffect(() => {
-        setSearchString('');
-    }, [activeModule]);
 
     useEffect(() => {
         const isTypingDelay = setTimeout(async () => {
@@ -145,7 +146,7 @@ const QueryView = () => {
                             ) : (
                                 <Box>
                                     <Typography component={'span'} variant='body2' sx={{ textAlign: 'left' }}>
-                                        {`Total rows: ${countData && countData?.length > 100000 ? '≥' : ''}${countData ? formatNumber(countData.length) : ''}.`}
+                                        {`Total rows: ${countData && countData?.length >= 100000 ? '≥' : ''}${countData ? formatNumber(countData.length) : ''}.`}
                                     </Typography>
                                     <Typography component={'span'} variant='body2' sx={{ mt: 1, textAlign: 'left' }}>
                                         {`${

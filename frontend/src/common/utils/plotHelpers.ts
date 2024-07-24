@@ -1,4 +1,4 @@
-import { truncate } from './textFormatting.ts';
+import { truncate, abbreviateNumber } from './textFormatting.ts';
 import { histogram } from 'echarts-stat';
 import chroma from 'chroma-js';
 
@@ -101,6 +101,9 @@ export const getControlTargetPlotData = (targetRows = [], controlRows = [], coun
         xAxis: {
             type: 'value',
             max: maxCount,
+            axisLabel: {
+                formatter: abbreviateNumber,
+            },
         },
         yAxis: {
             type: 'category',
@@ -165,6 +168,9 @@ export const getBioprojectSizePlotData = (controlRows = []) => {
             boundaryGap: ['0%', '5%'],
             max: maxRuns,
             // type: maxRuns > 1000 ? 'log' : 'value',
+            axisLabel: {
+                formatter: abbreviateNumber,
+            },
         },
         yAxis: {
             name: 'Count',
@@ -243,6 +249,9 @@ export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRo
             nameGap: 25,
             boundaryGap: ['-10%', '0%'],
             max: 100,
+            axisLabel: {
+                formatter: abbreviateNumber,
+            },
         },
         yAxis: {
             name: 'Count',
@@ -326,6 +335,9 @@ export const getBioprojectSizeVsPercentagePlotData = (controlRows = [], targetRo
             nameGap: 25,
             boundaryGap: ['5%', '5%'],
             type: 'value',
+            axisLabel: {
+                formatter: abbreviateNumber,
+            },
         },
         yAxis: {
             type: 'value',
@@ -334,6 +346,9 @@ export const getBioprojectSizeVsPercentagePlotData = (controlRows = [], targetRo
             nameGap: 20,
             minInterval: 1,
             boundaryGap: ['5%', '5%'],
+            axisLabel: {
+                formatter: abbreviateNumber,
+            },
         },
         title: {
             text: 'Runs per BioProject vs. BioProject runs in Target set (%)',
