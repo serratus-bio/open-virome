@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import MdCopyAll from '@mui/icons-material/CopyAll';
 import MdOpenInNew from '@mui/icons-material/OpenInNew';
+import { isSummaryView } from '../common/utils/plotHelpers.ts';
 
 // SEND TO constants.ts
 const AMAZON_LOCATION_API_KEY =
@@ -178,7 +179,7 @@ const DeckGLRenderScatterplot: any = ({
                 FROM biosample_geographical_location
                 WHERE palm_virome = TRUE
                 ${identifierClauses.length > 0 ? `AND (${identifierClauses.join(' OR ')})` : ''}
-                LIMIT 65536;`,
+                LIMIT ${isSummaryView(identifiers) ? 3000 : 65536};`,
             };
             const responseMs = Date.now();
 
