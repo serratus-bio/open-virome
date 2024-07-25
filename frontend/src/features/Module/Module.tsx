@@ -151,16 +151,14 @@ const Module = ({ sectionKey }) => {
                                 : 'Figures'
                         }
                     >
-                        <span>
-                            <IconButton
-                                sx={{ mt: -0.5, height: 30, width: 30 }}
-                                color={isFigureView() ? 'primary' : 'default'}
-                                onClick={() => onViewChange('figure')}
-                                disabled={shouldDisableFigureView(identifiersData, sectionKey)}
-                            >
-                                <PlotIcon fontSize='medium' />
-                            </IconButton>
-                        </span>
+                        <IconButton
+                            sx={{ mt: -0.5, height: 30, width: 30 }}
+                            color={isFigureView() ? 'primary' : 'default'}
+                            onClick={() => onViewChange('figure')}
+                            disabled={shouldDisableFigureView(identifiersData, sectionKey)}
+                        >
+                            <PlotIcon fontSize='medium' />
+                        </IconButton>
                     </Tooltip>
                     <Tooltip title='Table' placement='top'>
                         <IconButton

@@ -129,18 +129,18 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
     const filterTypes = filters.map((filter) => filter.groupByKey);
 
     const tableToInnerSelect = {
-        sra: "acc as run_id, to_char(releasedate, 'YYYY-MM') as releasedate, bioproject as bioproject, biosample as biosample, organism as organism, assay_type",
-        sra_stat: 'run as run_id, name as stat_host_order, kmer_perc as percent_identity_stat',
-        biosample_tissue: 'biosample_id as biosample, tissue, bto_id',
+        sra: 'acc as run_id, bioproject as bioproject, biosample as biosample, organism as organism, assay_type',
+        sra_stat: 'run as run_id, name as stat_host_order',
+        biosample_tissue: 'biosample_id as biosample, tissue',
         biosample_geographical_location: 'accession as biosample, attribute_value as geo_attribute_value',
-        palm_virome: 'run as run_id, sotu, palm_id, tax_species, tax_family, gb_pid, node_pid',
+        palm_virome: 'run as run_id, sotu, tax_species, tax_family',
     };
 
     const tableToColumn = {
-        sra: ['acc', 'releasedate', 'bioproject', 'biosample', 'organism', 'host_label_tax_id', 'assay_type'],
-        sra_stat: ['run_id', 'stat_host_order', 'percent_identity_stat'],
-        palm_virome: ['run', 'sotu', 'palm_id', 'tax_species', 'tax_family', 'gb_pid', 'node_pid'],
-        biosample_tissue: ['biosample_id', 'tissue', 'bto_id'],
+        sra: ['acc', 'bioproject', 'biosample', 'organism', 'assay_type'],
+        sra_stat: ['run_id', 'stat_host_order'],
+        palm_virome: ['run', 'sotu', 'tax_species', 'tax_family'],
+        biosample_tissue: ['biosample_id', 'tissue'],
         biosample_geographical_location: ['accession', 'geo_attribute_value'],
     };
 

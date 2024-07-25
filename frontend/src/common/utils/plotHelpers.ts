@@ -10,7 +10,7 @@ export const shouldDisableFigureView = (identifiers, sectionKey = '') => {
     if (!identifiers) {
         return true;
     }
-    return identifiers?.run?.totalCount > 500000;
+    return identifiers?.run?.totalCount > 400000;
 };
 
 // https://github.com/ecomfe/echarts-stat?tab=readme-ov-file#return-value-only-for-standalone-usage

@@ -73,24 +73,29 @@ const QuerySummaryText = () => {
                 </>
             );
         }
-        if (
-            identifiersData &&
-            !identifiersFetching &&
-            !identifiersError &&
-            totalVirusCountData &&
-            !totalVirusCountIsFetching &&
-            !totalVirusCountError
-        ) {
+
+        if (!identifiersData || identifiersFetching) {
+            return <Skeleton variant='text' width={400} />;
+        }
+
+        if (identifiersError) {
             return (
                 <Typography paragraph variant='body1'>
-                    {`Current Query - Runs: ${formatNumber(identifiersData?.run?.totalCount)}, Bioprojects: ${formatNumber(identifiersData?.bioproject?.totalCount)}, Viruses: ${
-                        totalVirusCountData?.length ? formatNumber(totalVirusCountData[0]?.count) : 0
-                    }`}
+                    {`Error fetching identifiers`}
                 </Typography>
             );
         }
-        return <Skeleton variant='text' width={400} />;
+
+        return (
+            <Typography paragraph variant='body1'>
+                {`Current Query - Runs: ${formatNumber(identifiersData?.run?.totalCount)}, Bioprojects: ${formatNumber(identifiersData?.bioproject?.totalCount)}`}
+                {totalVirusCountData && !totalVirusCountIsFetching && !totalVirusCountError
+                    ? `, Viruses: ${totalVirusCountData?.length ? formatNumber(totalVirusCountData[0]?.count) : 0}`
+                    : ''}
+            </Typography>
+        );
     };
+
     return (
         <Box
             sx={{
