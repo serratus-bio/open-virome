@@ -44,6 +44,7 @@ const AppToolbar = () => {
     return (
         <AppBar position='fixed' sx={getAppBarStyles()}>
             <Toolbar sx={{ width: '100%' }}>
+                {/* Query Builder Icon */}
                 <IconButton
                     color='white'
                     aria-label='open drawer'
@@ -58,6 +59,7 @@ const AppToolbar = () => {
                 >
                 <TuneIcon fontSize='large' />
                 </IconButton>
+                {/* OV */}
                 <b> Open Virome </b>
                 <FilterTags />
             </Toolbar>

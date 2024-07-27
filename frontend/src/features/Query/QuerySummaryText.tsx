@@ -87,6 +87,7 @@ const QuerySummaryText = () => {
         }
 
         /* Current Query Selection Stats */
+        /* TODO: make returned counts monospace font */
         return (
             <Typography paragraph variant='body1'>
                 {`Query | Runs: ${formatNumber(identifiersData?.run?.totalCount)} |

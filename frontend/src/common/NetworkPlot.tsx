@@ -29,6 +29,7 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
     }, [cy]);
 
     const stylesheet = [
+    /* Cytoscape.js Controls */
         {
             selector: 'node[type="virus"]',
             style: {
@@ -36,8 +37,8 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
                 label: 'data(label)',
                 color: 'white',
                 shape: 'hexagon',
-                opacity: 0.8,
-                width: 30,
+                opacity: 1,
+                width: 35,
                 height: 30,
                 fontSize: 20,
             },
@@ -45,18 +46,18 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
         {
             selector: 'node[type="run"]',
             style: {
-                backgroundColor: 'grey',
+                backgroundColor: 'white',
                 color: 'white',
                 shape: 'ellipse',
                 opacity: 0.7,
-                width: 30,
-                height: 30,
+                width: 20,
+                height: 20,
             },
         },
         {
             selector: 'edge',
             style: {
-                width: 'data(width)',
+                width: 4,
                 lineColor: 'data(color)',
                 opacity: 0.5,
             },
@@ -164,10 +165,10 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
                 cy={setCy}
                 stylesheet={stylesheet}
                 elements={plotData}
-                style={{ width: '100%', height: 400 }}
+                style={{ width: '100%', height: 800, background: 'rgba(29, 30, 32, 0.6)' }}
                 layout={layouts[0]}
                 minZoom={0.1}
-                maxZoom={1}
+                maxZoom={2}
                 userZoomingEnabled={true}
                 // wheelSensitivity={0.3}
             />

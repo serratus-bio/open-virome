@@ -47,6 +47,7 @@ const App = () => {
 
     return (
         <ThemeProvider theme={theme}>
+        {/* Main Page Layout */}
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <AppToolbar />
