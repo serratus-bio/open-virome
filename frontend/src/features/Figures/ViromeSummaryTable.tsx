@@ -147,29 +147,34 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
     return !getResultTableRows()?.length > 0 ? (
         <Typography variant='h6'>No data available</Typography>
     ) : (
+        // Virome Summary Box Pop-up
         <Box
             sx={{
+                mt: 1,
+                marginLeft: '10px',
                 display: 'flex',
                 flexDirection: 'column',
-                width: '100%',
+                width: '95%',
                 height: '100%',
                 backgroundColor: 'rgba(86, 86, 86, 0.6)',
                 borderRadius: 2,
                 padding: 1.5,
             }}
         >
+            {/*Node Display Name*/}
             <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
+                    alignItems: 'left',
                     width: '100%',
                     mb: 1,
                 }}
             >
                 {renderTitle()}
-                <Button
+                {/*TODO: Add "Maximize" button to make Table Full-screen*/}
+                <Button close-window
                     onClick={onClose}
                     sx={{
                         'minWidth': 12,
@@ -177,7 +182,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                         'alignSelf': 'flex-start',
                         'backgroundColor': 'transparent',
                         '&:hover': {
-                            backgroundColor: 'transparent',
+                            backgroundColor: 'warning',
                         },
                     }}
                 >
