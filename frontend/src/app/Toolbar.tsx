@@ -14,7 +14,11 @@ const AppToolbar = () => {
     const dispatch = useDispatch();
     const open = useSelector(selectSidebarOpen);
 
-    const drawerWidth = 240;
+    /* Shift Toolbar by drawerWidth when query open
+     * 240 == Shift all
+     * 100 == Hide Text
+     */
+    const drawerWidth = 100;
     const theme = useTheme();
 
     const getAppBarStyles = () => ({
@@ -47,13 +51,14 @@ const AppToolbar = () => {
                     edge='start'
                     sx={{
                         backgroundColor: 'rgba(86, 86, 86, 0.7)',
-                        ml: '9%',
+                        ml: '0%',
                         mr: 2,
                         ...(open && { display: 'none' }),
                     }}
                 >
-                    <TuneIcon fontSize='large' />
+                <TuneIcon fontSize='large' />
                 </IconButton>
+                <b> Open Virome </b>
                 <FilterTags />
             </Toolbar>
         </AppBar>

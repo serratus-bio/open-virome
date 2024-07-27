@@ -33,15 +33,18 @@ const App = () => {
 
     const getContainerStyles = () => ({
         flexGrow: 1,
-        padding: theme.spacing(3),
+        /* padding below toolbar */
+        padding: theme.spacing(1),
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
-        marginLeft: `-240px`,
+        /* left Section Margin */
+        marginLeft: `-440px`,
         backgroundColor: 'rgba(29, 30, 32, 0.6)',
     });
 
+    /* padding below toolbar */
     return (
         <ThemeProvider theme={theme}>
             <Box sx={{ display: 'flex' }}>
