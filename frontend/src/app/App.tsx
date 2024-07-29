@@ -40,7 +40,8 @@ const App = () => {
             duration: theme.transitions.duration.leavingScreen,
         }),
         /* left Section Margin */
-        marginLeft: `-440px`,
+        /* set to -240 to offset Sidebar "drawerWidth" in SidePanel.tsx */
+        marginLeft: `-240px`,
         marginRight: `0px`,
         backgroundColor: 'rgba(29, 30, 32, 0.6)',
     });
@@ -53,7 +54,7 @@ const App = () => {
                 <AppToolbar />
                 <SidePanel />
                 <Box sx={getContainerStyles()}>
-                    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'left' }}>
                         <Toolbar />
                         <QuerySummaryText />
                         <Module sectionKey={'sra'} />

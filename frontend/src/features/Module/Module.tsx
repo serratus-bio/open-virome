@@ -94,7 +94,8 @@ const Module = ({ sectionKey }) => {
 
     return (
         /* Section Layout */
-        <Box sx={{ width: '80vw', maxWidth: '100%', ml: '10%', mt: 1, mb: 4, flexGrow: 1 }}>
+        /* Control Global Figure width on page here " */
+        <Box sx={{ width: '88%', maxWidth: '100%', ml: '2%', mt: 1, mb: 4, flexGrow: 1 }}>
             <Box
                 sx={{
                     display: 'flex',
@@ -115,7 +116,7 @@ const Module = ({ sectionKey }) => {
                     <Box sx={{ mb: 0 }}> {/* Pull-down Menu Module Select */}
                         <Select
                             sx={{
-                                'backgroundColor': '#28282887',
+                                'backgroundColor': '#28282800',
                                 'fontSize': 26,
                                 '.MuiOutlinedInput-notchedOutline': {
                                     borderColor: '#40a9ff',
