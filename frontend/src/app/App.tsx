@@ -33,23 +33,28 @@ const App = () => {
 
     const getContainerStyles = () => ({
         flexGrow: 1,
-        padding: theme.spacing(3),
+        /* padding below toolbar */
+        padding: theme.spacing(0),
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
+        /* left Section Margin */
+        /* set to -240 to offset Sidebar "drawerWidth" in SidePanel.tsx */
         marginLeft: `-240px`,
+        marginRight: `0px`,
         backgroundColor: 'rgba(29, 30, 32, 0.6)',
     });
 
     return (
         <ThemeProvider theme={theme}>
+        {/* Main Page Layout */}
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <AppToolbar />
                 <SidePanel />
                 <Box sx={getContainerStyles()}>
-                    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'left' }}>
                         <Toolbar />
                         <QuerySummaryText />
                         <Module sectionKey={'sra'} />

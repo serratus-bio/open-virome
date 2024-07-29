@@ -147,7 +147,7 @@ const ViromeLayout = ({ identifiers }) => {
                 <DropDownSelect
                     options={getComponentOptions()}
                     activeOption={activeSubgraph}
-                    label='Component'
+                    label='Virome Component'
                     setActiveOption={(event) => {
                         setActiveSubgraph(event.target.value);
                     }}
@@ -192,28 +192,30 @@ const ViromeLayout = ({ identifiers }) => {
         };
 
         return {
+            // Scatter Plot Settings - Virome Component
+            color: '#4CB9F1',
             xAxis: {
                 type: 'value',
-                name: 'Number of nodes',
+                name: 'Nodes # (Virus + Run)',
                 nameLocation: 'middle',
                 nameGap: 30,
             },
             yAxis: {
                 type: 'value',
-                name: 'Number of edges',
+                name: 'Edges # (contigs)',
                 nameLocation: 'middle',
                 nameGap: 35,
             },
             grid: {
                 left: '6%',
-                right: '4%',
-                bottom: '5%',
+                right: '6%',
+                bottom: '6%',
                 containLabel: true,
                 borderColor: 'white',
             },
             title: {
-                show: false,
-                text: 'Number of nodes vs. edges for each connected component',
+                show: true,
+                text: '   Virome Component Summary',
                 textStyle: {
                     color: 'white',
                     fontSize: 14,
@@ -264,7 +266,7 @@ const ViromeLayout = ({ identifiers }) => {
 
     const renderScatterPlot = () => {
         const plotData = getScatterPlotData();
-        return <ScatterPlot plotData={plotData} styles={{ minHeight: 500 }} onEvents={onScatterPlotEvents} />;
+        return <ScatterPlot plotData={plotData} styles={{ minHeight: 600 }} onEvents={onScatterPlotEvents} />;
     };
 
     const shouldRenderPlaceholder = (isError, isFetching, data) => {
@@ -292,11 +294,11 @@ const ViromeLayout = ({ identifiers }) => {
                     }}
                 >
                     <Box sx={{ flex: 1, width: '100%' }}>
-                        {renderDropdown()}
                         {renderNetworkFigure()}
                     </Box>
 
                     <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+                    {renderDropdown()}
                         {isSummaryTableOpen ? (
                             <ViromeSummaryTable
                                 selectedItem={selectedNetworkItem}

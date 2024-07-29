@@ -58,6 +58,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
         const topGenBankId = filteredRows.sort((a, b) => b['gb_pid'] - a['gb_pid'])[0];
         return (
             <>
+                {/*Summary Table Box*/}
                 <Box
                     sx={{
                         display: 'flex',
@@ -65,19 +66,14 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                         justifyContent: 'space-between',
                         alignItems: 'space-between',
                         width: '100%',
-                        height: '100%',
-                        mt: 1,
+                        mt: 0   ,
                     }}
                 >
-                    <Box
-                        sx={{
-                            flex: 1,
-                            flexBasis: '50%',
-                            maxWidth: '45%',
-                        }}
-                    >
+                    {/*GenBank Hit Stats*/}
+                    <Box sx={{ flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
+
                         <Typography variant='body'>{`Top GenBank Hit (${topGenBankId['gb_pid']}% aa id)`}</Typography>
-                        <Typography sx={{ mt: 1 }} variant='body2'>
+                        <Typography sx={{ mt: 0.5 }} variant='body2'>
                             {`${topPalmId['tax_species']} ${topGenBankId['tax_family'] ? `(${topGenBankId['tax_family']})` : ''}`}
                         </Typography>
                         <Link
@@ -95,10 +91,12 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                         </Link>
                     </Box>
 
+
+                    {/*palmDB Hit Stats*/}
                     <Box sx={{ flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
                         <Typography variant='body'>{`Top Palmprint Hit (${topPalmId['node_pid']}% aa id)`}</Typography>
                         <Typography
-                            sx={{ mt: 1 }}
+                            sx={{ mt: 0.5 }}
                             variant='body2'
                         >{`${topPalmId['palm_id']} - ${topPalmId['nickname']}`}</Typography>
                         <Link
@@ -125,22 +123,22 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
     };
 
     const getPagedRows = () => {
-        const startIndex = page * 5;
-        const endIndex = startIndex + 5;
+        const startIndex = page * 15;
+        const endIndex = startIndex + 15;
         return getResultTableRows().slice(startIndex, endIndex);
     };
 
     const renderTable = () => {
         const filteredRows = getResultTableRows();
         return (
-            <Box sx={{ mt: 4, maxWidth: maxWidth - 32 }}>
+            <Box sx={{ mt: 2, maxWidth: maxWidth - 26 }}>
                 <PagedTable
                     page={page}
                     onPageChange={onPageChange}
                     total={filteredRows.length}
                     rows={getPagedRows()}
                     headers={Object.keys(filteredRows[0])}
-                    pageRows={5}
+                    pageRows={15}
                 />
             </Box>
         );
@@ -149,29 +147,34 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
     return !getResultTableRows()?.length > 0 ? (
         <Typography variant='h6'>No data available</Typography>
     ) : (
+        // Virome Summary Box Pop-up
         <Box
             sx={{
+                mt: 1,
+                marginLeft: '10px',
                 display: 'flex',
                 flexDirection: 'column',
-                width: '100%',
+                width: '95%',
                 height: '100%',
-                backgroundColor: 'rgba(81, 81, 81, 1)',
+                backgroundColor: 'rgba(86, 86, 86, 0.6)',
                 borderRadius: 2,
-                padding: 2,
+                padding: 1.5,
             }}
         >
+            {/*Node Display Name*/}
             <Box
                 sx={{
                     display: 'flex',
                     flexDirection: 'row',
                     justifyContent: 'space-between',
-                    alignItems: 'center',
+                    alignItems: 'left',
                     width: '100%',
-                    mb: 2,
+                    mb: 1,
                 }}
             >
                 {renderTitle()}
-                <Button
+                {/*TODO: Add "Maximize" button to make Table Full-screen*/}
+                <Button close-window
                     onClick={onClose}
                     sx={{
                         'minWidth': 12,
@@ -179,7 +182,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                         'alignSelf': 'flex-start',
                         'backgroundColor': 'transparent',
                         '&:hover': {
-                            backgroundColor: 'transparent',
+                            backgroundColor: 'warning',
                         },
                     }}
                 >

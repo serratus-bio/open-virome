@@ -60,12 +60,14 @@ const Module = ({ sectionKey }) => {
     const getModuleFigureLayout = () => {
         if (!identifiersData || identifiersFetching) {
             return (
-                <Box sx={{ height: 400, width: '100%' }}>
+                <Box sx={{ height: 800, width: '100%' }}>
                     <Skeleton variant='rectangular' width={'100%'} height={'100%'} />
                 </Box>
             );
         }
-
+        /*
+        * X
+        */
         if (sectionKey === 'sra') {
             return <SRARunLayout identifiers={identifiersData} activeModule={activeModule} />;
         }
@@ -91,7 +93,9 @@ const Module = ({ sectionKey }) => {
     };
 
     return (
-        <Box sx={{ width: '80vw', maxWidth: 1500, ml: '10%', mt: 4, mb: 4, flexGrow: 1 }}>
+        /* Section Layout */
+        /* Control Global Figure width on page here " */
+        <Box sx={{ width: '88%', maxWidth: '100%', ml: '2%', mt: 1, mb: 4, flexGrow: 1 }}>
             <Box
                 sx={{
                     display: 'flex',
@@ -109,11 +113,11 @@ const Module = ({ sectionKey }) => {
                         alignItems: 'center',
                     }}
                 >
-                    <Box sx={{ mb: 0 }}>
+                    <Box sx={{ mb: 0 }}> {/* Pull-down Menu Module Select */}
                         <Select
                             sx={{
-                                'backgroundColor': '#28282887',
-                                'fontSize': 38,
+                                'backgroundColor': '#28282800',
+                                'fontSize': 26,
                                 '.MuiOutlinedInput-notchedOutline': {
                                     borderColor: '#40a9ff',
                                 },
@@ -134,7 +138,7 @@ const Module = ({ sectionKey }) => {
                             variant='standard'
                         >
                             {sectionConfig[sectionKey]?.modules.map((module) => (
-                                <MenuItem key={module} value={module} sx={{ pr: 2 }}>
+                                <MenuItem key={module} value={module} sx={{ pr: 10 }}>
                                     {moduleConfig[module]?.title}
                                 </MenuItem>
                             ))}
@@ -143,6 +147,7 @@ const Module = ({ sectionKey }) => {
                 </Box>
 
                 <Box>
+                    View:
                     <Tooltip
                         placement='top'
                         title={
@@ -151,8 +156,9 @@ const Module = ({ sectionKey }) => {
                                 : 'Figures'
                         }
                     >
+                        {/* Module View Icons */}
                         <IconButton
-                            sx={{ mt: -0.5, height: 30, width: 30 }}
+                            sx={{ mt: -0.5, height: 10, width: 30 }}
                             color={isFigureView() ? 'primary' : 'default'}
                             onClick={() => onViewChange('figure')}
                             disabled={shouldDisableFigureView(identifiersData, sectionKey)}
@@ -162,7 +168,7 @@ const Module = ({ sectionKey }) => {
                     </Tooltip>
                     <Tooltip title='Table' placement='top'>
                         <IconButton
-                            sx={{ mt: -0.5, height: 30, width: 30 }}
+                            sx={{ mt: -0.5, height: 10, width: 30 }}
                             color={isTableView() ? 'primary' : 'default'}
                             onClick={() => onViewChange('table')}
                         >
@@ -170,7 +176,7 @@ const Module = ({ sectionKey }) => {
                         </IconButton>
                     </Tooltip>
                     <Tooltip title='Wiki' placement='top'>
-                        <IconButton sx={{ mt: -0.5, height: 30, width: 30 }} onClick={onHelpClick}>
+                        <IconButton sx={{ mt: -0.5, height: 10, width: 30 }} onClick={onHelpClick}>
                             <QuestionMarkIcon fontSize='medium' />
                         </IconButton>
                     </Tooltip>
@@ -183,7 +189,7 @@ const Module = ({ sectionKey }) => {
                     justifyContent: 'flex-start',
                     alignItems: 'flex-start',
                     flexWrap: 'wrap',
-                    mt: 4,
+                    mt: 1,
                 }}
             >
                 {isTableView() ? (

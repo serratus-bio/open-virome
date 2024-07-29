@@ -162,7 +162,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
                     flexDirection: 'row',
                     justifyContent: 'space-between',
                     alignItems: 'center',
-                    mt: 4,
+                    mt: 0,
                 }}
             >
                 {shouldRenderPlaceholder(controlCountError, controlCountIsFetching, controlCountData) ? (

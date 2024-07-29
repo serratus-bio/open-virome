@@ -86,11 +86,16 @@ const QuerySummaryText = () => {
             );
         }
 
+        /* Current Query Selection Stats */
+        /* TODO: make returned counts monospace font */
         return (
             <Typography paragraph variant='body1'>
-                {`Current Query - Runs: ${formatNumber(identifiersData?.run?.totalCount)}, Bioprojects: ${formatNumber(identifiersData?.bioproject?.totalCount)}`}
-                {totalVirusCountData && !totalVirusCountIsFetching && !totalVirusCountError
-                    ? `, Viruses: ${totalVirusCountData?.length ? formatNumber(totalVirusCountData[0]?.count) : 0}`
+                {`Query | Runs: ${formatNumber(identifiersData?.run?.totalCount)} |
+                          bioProjects: ${formatNumber(identifiersData?.bioproject?.totalCount)}`} |
+                          {totalVirusCountData &&
+                          !totalVirusCountIsFetching &&
+                          !totalVirusCountError? `
+                          sOTU: ${totalVirusCountData?.length ? formatNumber(totalVirusCountData[0]?.count) : 0}`
                     : ''}
             </Typography>
         );
