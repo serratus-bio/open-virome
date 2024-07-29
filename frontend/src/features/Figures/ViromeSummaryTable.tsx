@@ -105,6 +105,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                     }}
                 >
                     {/*bioSample Stats*/}
+                    {/*TODO: retrieve bioSample title and display under link*/}
                     <Box sx={{ display: "flex", flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
                             <Typography variant='body'>{`bioSample: `}</Typography>
                             <Link
@@ -121,6 +122,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                         </Link>
                     </Box>
                     {/*bioProject Stats*/}
+                    {/*TODO: retrieve bioProject title and display under link*/}
                     <Box sx={{ display: "flex", flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
                             <Typography variant='body'>{`bioProject: `}</Typography>
                             <Link
