@@ -22,7 +22,10 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
     let title = '';
     const renderTitle = () => {
         if (isRun) {
-            title = `Run: ${selectedItem?.id}`;
+            // Add Link to SRA website for SRA / BioProject
+            // Retrieve BioProject for Run
+            // TODO: Display BioProject "Title" below in small text
+            title = `Run: ${selectedItem?.id} | ${getSciName()}` ;
         }
         if (isVirus) {
             title = `Virus: ${selectedItem?.id}`;
@@ -52,7 +55,93 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
         return [];
     };
 
-    const renderBlastLink = () => {
+    const getSciName = () => {
+        const filteredRows = getResultTableRows();
+        const runBioSample = filteredRows[0];
+        return (runBioSample['scientific_name']);
+    };
+
+    /*const getBiosample = () => {
+        const filteredRows = getResultTableRows();
+        const runBioSample = filteredRows[0];
+        return (runBioSample['bio_sample']);
+    };
+
+    const getBioproject = () => {
+        const filteredRows = getResultTableRows();
+        const runBioProject = filteredRows[0];
+        return (runBioProject['bio_project']);
+    };*/
+
+    const renderNodeSummary = () => {
+        if (isRun) {
+            return renderRunSummary()
+        }
+        if (isVirus) {
+            return renderVirusSummary()
+        }
+        if (isEdge) {
+            return "~"
+        }
+        return [];
+    }
+    //| bioSample: ${getBiosample()} | bioProject: ${getBioproject()}
+    const renderRunSummary = () => {
+        const filteredRows = getResultTableRows();
+        const firstRow = filteredRows[0]
+        const runBioSample = firstRow['bio_sample'];
+        const runBioProject = firstRow['bio_project'];
+        return (
+            <>
+                {/*Summary Table Box*/}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        alignItems: 'space-between',
+                        width: '100%',
+                        mt: 0   ,
+                    }}
+                >
+                    {/*bioSample Stats*/}
+                    <Box sx={{ display: "flex", flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
+                            <Typography variant='body'>{`bioSample: `}</Typography>
+                            <Link
+                                sx={{
+                                    alignItems: 'center',
+                                    flexDirection: 'column',
+                                    textDecoration: 'none',
+                                }}
+                                href={`https://www.ncbi.nlm.nih.gov/biosample/${runBioSample}`}
+                                target='_blank'
+                            >
+                            <Typography variant='body'> &nbsp; {runBioSample}</Typography>
+                            <MdOpenInNew fontSize='small' sx={{ mb: -0.5, ml: 0.5 }} />
+                        </Link>
+                    </Box>
+                    {/*bioProject Stats*/}
+                    <Box sx={{ display: "flex", flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
+                            <Typography variant='body'>{`bioProject: `}</Typography>
+                            <Link
+                                sx={{
+                                    alignItems: 'center',
+                                    flexDirection: 'column',
+                                    textDecoration: 'none',
+                                }}
+                                href={`https://www.ncbi.nlm.nih.gov/bioproject/?term=${runBioProject}`}
+                                target='_blank'
+                            >
+                            <Typography variant='body'> &nbsp; {runBioProject}</Typography>
+                            <MdOpenInNew fontSize='small' sx={{ mb: -0.5, ml: 0.5 }} />
+                        </Link>
+                    </Box>
+                </Box>
+            </>
+        );
+    };
+
+    const renderVirusSummary = () => {
         const filteredRows = getResultTableRows();
         const topPalmId = filteredRows.sort((a, b) => b['node_pid'] - a['node_pid'])[0];
         const topGenBankId = filteredRows.sort((a, b) => b['gb_pid'] - a['gb_pid'])[0];
@@ -90,8 +179,6 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                             <MdOpenInNew fontSize='small' sx={{ mb: 0.5, ml: 0.5 }} />
                         </Link>
                     </Box>
-
-
                     {/*palmDB Hit Stats*/}
                     <Box sx={{ flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
                         <Typography variant='body'>{`Top Palmprint Hit (${topPalmId['node_pid']}% aa id)`}</Typography>
@@ -191,7 +278,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
             </Box>
 
             <Box sx={{ width: '100%' }}>
-                {renderBlastLink()}
+                {renderNodeSummary()}
                 {renderTable()}
             </Box>
         </Box>
