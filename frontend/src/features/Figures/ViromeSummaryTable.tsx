@@ -81,7 +81,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
             return renderVirusSummary()
         }
         if (isEdge) {
-            return "~"
+            return renderContigSummary()
         }
         return [];
     }
@@ -196,6 +196,60 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                                 textDecoration: 'none',
                             }}
                             href={`https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&USER_FORMAT_DEFAULTS=on&SET_SAVED_SEARCH=true&PAGE=Proteins&PROGRAM=blastp&QUERY=${topPalmId?.node_seq}&JOB_TITLE=palmID_${topPalmId?.palm_id}&GAPCOSTS=11%201&DATABASE=nr&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=0.05&WORD_SIZE=6&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&PROG_DEFAULTS=on&SHOW_OVERVIEW=on&SHOW_LINKOUT=on&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML`}
+                            target='_blank'
+                        >
+                            <Typography variant='body2'>BLAST</Typography>
+                            <MdOpenInNew fontSize='small' sx={{ mb: 0.5, ml: 0.5 }} />
+                        </Link>
+                    </Box>
+                </Box>
+            </>
+        );
+    };
+
+    const renderContigSummary = () => {
+        const filteredRows = getResultTableRows();
+        const contigRow = filteredRows[0]
+        const contigRun = contigRow['run'];
+        const contigSotu = contigRow['sotu'];
+        const contigPalm = contigRow['palm_id'];
+        const contigCoverage = contigRow['node_coverage'];
+        var contigSeq = contigRow['node_seq'].replace(/(.{50})/g, `$1\n`);
+
+        return (
+            <>
+                {/*Summary Table Box*/}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        alignItems: 'space-between',
+                        width: '100%',
+                        mt: 0   ,
+                    }}
+                >
+                    {/*Fasta Display*/}
+                    <Box sx={{ flex: 1, flexBasis: '50%', maxWidth: '100%' }}>
+                        <Typography fontFamily='monospace' variant='body'>
+                            {`>${contigRun}_${contigSotu}_coverage_${contigCoverage}\n`}
+                        </Typography>
+                    </Box>
+                    <Box sx={{ flex: 1, flexBasis: '50%', maxWidth: '100%' }}>
+                        <Typography fontFamily='monospace' variant='body' whiteSpace="pre-wrap">
+                            {`${contigSeq}`}
+                        </Typography>
+                    </Box>
+                    {/*BLAST Sequence*/}
+                    <Box sx={{ flex: 1, mt: 2, flexBasis: '50%', maxWidth: '45%' }}>
+                        <Link
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                flexDirection: 'row',
+                                textDecoration: 'none',
+                            }}
+                            href={`https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&USER_FORMAT_DEFAULTS=on&SET_SAVED_SEARCH=true&PAGE=Proteins&PROGRAM=blastp&QUERY=${contigSeq}&JOB_TITLE=${contigRun}_${contigPalm}&GAPCOSTS=11%201&DATABASE=nr&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=0.05&WORD_SIZE=6&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&PROG_DEFAULTS=on&SHOW_OVERVIEW=on&SHOW_LINKOUT=on&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML`}
                             target='_blank'
                         >
                             <Typography variant='body2'>BLAST</Typography>
