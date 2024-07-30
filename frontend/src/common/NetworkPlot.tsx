@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import cytoscape from 'cytoscape';
 import fcose from 'cytoscape-fcose';
+import min from 'Math';
 
 import CytoscapeComponent from 'react-cytoscapejs';
 import Box from '@mui/material/Box';
@@ -36,7 +37,7 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
                 backgroundColor: 'data(color)',
                 label: 'data(label)',
                 color: 'white',
-                shape: 'hexagon',
+                shape: 'round-hexagon',
                 opacity: 1,
                 width: 35,
                 height: 30,
@@ -57,7 +58,8 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
         {
             selector: 'edge',
             style: {
-                width: 4,
+                label: 'data(node_coverage)',
+                width: 'data(weight)',
                 lineColor: 'data(color)',
                 opacity: 0.5,
             },

@@ -428,10 +428,12 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
     data.forEach((row) => {
         const rowData = {
             sotu: row['sotu'],
+            run:  row['run'],
             tax_species: row['tax_species'],
             tax_family: row['tax_family'],
             gb_acc: row['gb_acc'],
             node_pid: row['node_pid'],
+            node_coverage: row['node_coverage'],
             gb_pid: row['gb_pid'],
             label:
                 groupByKey === 'tax_family'
@@ -487,7 +489,22 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
         return (parseInt(sOTU['node_pid']) / 100) * 15;
     };
     const getEdgeWeight = (sOTU) => {
-        return parseInt(sOTU['node_pid']) / 100;
+        return (parseInt(sOTU['node_pid']) / 100);
+    };
+    const mapWeight = (value) => {
+        // rescale input value to the output value
+        const minScale = 0
+        const maxScale = 100
+        const minRescale = 3
+        const maxRescale = 20
+
+        if (value < minScale) {
+            value = minScale;
+        } else if (value > maxScale) {
+            value = maxScale;
+        }
+
+        return Math.round( ((value - minScale) / (maxScale - minScale)) * (maxRescale - minRescale) + minRescale );
     };
 
     const plotData = [];
@@ -524,8 +541,9 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
                     source: run,
                     target: rowValue,
                     isNode: false,
-                    width: getEdgeWidth(row),
-                    weight: getEdgeWeight(row),
+                    node_coverage: row['node_coverage'],
+                    width: getEdgeWidth(row['node_coverage']),
+                    weight: mapWeight(row['node_coverage']),
                     color: sOTUsToColor[row['sotu']],
                     numSOTUS: numSOTUS,
                 },

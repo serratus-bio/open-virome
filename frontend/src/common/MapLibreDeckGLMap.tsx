@@ -349,7 +349,8 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
 
     return (
         <div style={style}>
-            <div ref={mapRef} style={{ height: '500px', position: 'relative', width: '100%' }} />
+
+            <div ref={mapRef} style={{ height: '82%', position: 'relative', width: '100%' }} />
 
             {/* Tooltip */}
             <div style={{ color: '#FFF', margin: '24px 0 0 0', padding: '0 8px 0 0px', height: 200 }}>
