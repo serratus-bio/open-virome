@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import cytoscape from 'cytoscape';
 import fcose from 'cytoscape-fcose';
-import min from 'Math';
 
 import CytoscapeComponent from 'react-cytoscapejs';
 import Box from '@mui/material/Box';
@@ -30,7 +29,7 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
     }, [cy]);
 
     const stylesheet = [
-    /* Cytoscape.js Controls */
+        /* Cytoscape.js Controls */
         {
             selector: 'node[type="virus"]',
             style: {
@@ -167,7 +166,7 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
                 cy={setCy}
                 stylesheet={stylesheet}
                 elements={plotData}
-                style={{ width: '100%', height: 800, background: 'rgba(29, 30, 32, 0.6)' }}
+                style={{ width: '100%', height: '75vh', background: 'rgba(29, 30, 32, 0.6)' }}
                 layout={layouts[0]}
                 minZoom={0.1}
                 maxZoom={2}

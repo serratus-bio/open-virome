@@ -48,13 +48,15 @@ const App = () => {
 
     return (
         <ThemeProvider theme={theme}>
-        {/* Main Page Layout */}
+            {/* Main Page Layout */}
             <Box sx={{ display: 'flex' }}>
                 <CssBaseline />
                 <AppToolbar />
                 <SidePanel />
                 <Box sx={getContainerStyles()}>
-                    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'left' }}>
+                    <Box
+                        sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'left', ml: '3%' }}
+                    >
                         <Toolbar />
                         <QuerySummaryText />
                         <Module sectionKey={'sra'} />

@@ -428,7 +428,7 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
     data.forEach((row) => {
         const rowData = {
             sotu: row['sotu'],
-            run:  row['run'],
+            run: row['run'],
             tax_species: row['tax_species'],
             tax_family: row['tax_family'],
             gb_acc: row['gb_acc'],
@@ -489,14 +489,14 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
         return (parseInt(sOTU['node_pid']) / 100) * 15;
     };
     const getEdgeWeight = (sOTU) => {
-        return (parseInt(sOTU['node_pid']) / 100);
+        return parseInt(sOTU['node_pid']) / 100;
     };
     const mapWeight = (value) => {
         // rescale input value to the output value
-        const minScale = 0
-        const maxScale = 100
-        const minRescale = 3
-        const maxRescale = 20
+        const minScale = 0;
+        const maxScale = 100;
+        const minRescale = 3;
+        const maxRescale = 20;
 
         if (value < minScale) {
             value = minScale;
@@ -504,7 +504,7 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
             value = maxScale;
         }
 
-        return Math.round( ((value - minScale) / (maxScale - minScale)) * (maxRescale - minRescale) + minRescale );
+        return Math.round(((value - minScale) / (maxScale - minScale)) * (maxRescale - minRescale) + minRescale);
     };
 
     const plotData = [];

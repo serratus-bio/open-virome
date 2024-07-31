@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import MdCopyAll from '@mui/icons-material/CopyAll';
 import MdOpenInNew from '@mui/icons-material/OpenInNew';
 import { isSummaryView } from '../common/utils/plotHelpers.ts';
+import { truncate } from '../common/utils/textFormatting.ts';
 
 // SEND TO constants.ts
 const AMAZON_LOCATION_API_KEY =
@@ -74,7 +75,6 @@ const selectBiosample: any = async (accession) => {
 
     return selectBiosample._[accession];
 };
-const trimTextEllipsis = (s, n) => (s.length > n ? s.substring(0, n) + '...' : s);
 
 const cyrb128 = (str) => {
     let h1 = 1779033703;
@@ -349,9 +349,7 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
 
     return (
         <div style={style}>
-
-            <div ref={mapRef} style={{ height: '82%', position: 'relative', width: '100%' }} />
-
+            <div ref={mapRef} style={{ height: '70vh', position: 'relative', width: '100%' }} />
             {/* Tooltip */}
             <div style={{ color: '#FFF', margin: '24px 0 0 0', padding: '0 8px 0 0px', height: 200 }}>
                 <div style={{ display: 'flex' }}>
@@ -369,9 +367,7 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
                                 onClick={() => navigator.clipboard.writeText(attributeValue)}
                             />
                         </div>
-                        <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>
-                            {trimTextEllipsis(attributeValue, 40)}
-                        </div>
+                        <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{truncate(attributeValue, 40)}</div>
                     </div>
                     <div style={{ flex: '1 0' }}>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>

@@ -14,9 +14,9 @@ const Footer = () => {
             color='white'
             width={'100%'}
             pt={'5%'}
-            pl={'10%'}
             pr={'10%'}
             pb={'5%'}
+            pl={'3%'}
             flexDirection={'row'}
         >
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '100%' }}>

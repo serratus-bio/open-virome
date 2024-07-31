@@ -121,8 +121,8 @@ const ViromeLayout = ({ identifiers }) => {
                         width: '100%',
                     }}
                 >
-                    <Skeleton variant='rectangular' width={450} height={400} sx={{ mr: 4 }} />
-                    <Skeleton variant='rectangular' width={450} height={400} />
+                    <Skeleton variant='rectangular' width={'50%'} height={'70vh'} sx={{ mr: 4 }} />
+                    <Skeleton variant='rectangular' width={'50%'} height={'70vh'} />
                 </Box>
             );
         }
@@ -143,7 +143,7 @@ const ViromeLayout = ({ identifiers }) => {
 
     const renderDropdown = () => {
         return (
-            <Box sx={{}}>
+            <Box>
                 <DropDownSelect
                     options={getComponentOptions()}
                     activeOption={activeSubgraph}
@@ -151,6 +151,7 @@ const ViromeLayout = ({ identifiers }) => {
                     setActiveOption={(event) => {
                         setActiveSubgraph(event.target.value);
                     }}
+                    styles={{ width: 150 }}
                 />
             </Box>
         );
@@ -266,7 +267,7 @@ const ViromeLayout = ({ identifiers }) => {
 
     const renderScatterPlot = () => {
         const plotData = getScatterPlotData();
-        return <ScatterPlot plotData={plotData} styles={{ minHeight: 600 }} onEvents={onScatterPlotEvents} />;
+        return <ScatterPlot plotData={plotData} styles={{ height: '70vh' }} onEvents={onScatterPlotEvents} />;
     };
 
     const shouldRenderPlaceholder = (isError, isFetching, data) => {
@@ -293,19 +294,17 @@ const ViromeLayout = ({ identifiers }) => {
                         flexDirection: 'row',
                     }}
                 >
-                    <Box sx={{ flex: 1, width: '100%' }}>
-                        {renderNetworkFigure()}
-                    </Box>
+                    <Box sx={{ flex: 1, width: '100%' }}>{renderNetworkFigure()}</Box>
 
                     <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
-                    {renderDropdown()}
+                        {renderDropdown()}
                         {isSummaryTableOpen ? (
                             <ViromeSummaryTable
                                 selectedItem={selectedNetworkItem}
                                 onClose={() => setIsSummaryTableOpen(false)}
                                 rows={resultData}
                                 activeModule={activeModule}
-                                maxWidth={containerRef.current?.clientWidth}
+                                maxWidth={containerRef.current.clientWidth}
                             />
                         ) : (
                             renderScatterPlot()
