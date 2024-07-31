@@ -60,14 +60,14 @@ const Module = ({ sectionKey }) => {
     const getModuleFigureLayout = () => {
         if (!identifiersData || identifiersFetching) {
             return (
-                <Box sx={{ height: 800, width: '100%' }}>
+                <Box sx={{ height: '70vh', width: '100%' }}>
                     <Skeleton variant='rectangular' width={'100%'} height={'100%'} />
                 </Box>
             );
         }
         /*
-        * X
-        */
+         * X
+         */
         if (sectionKey === 'sra') {
             return <SRARunLayout identifiers={identifiersData} activeModule={activeModule} />;
         }
@@ -95,7 +95,7 @@ const Module = ({ sectionKey }) => {
     return (
         /* Section Layout */
         /* Control Global Figure width on page here " */
-        <Box sx={{ width: '88%', maxWidth: '100%', ml: '2%', mt: 1, mb: 4, flexGrow: 1 }}>
+        <Box sx={{ width: '88vw', maxWidth: '100%', mt: 1, mb: 4, flexGrow: 1 }}>
             <Box
                 sx={{
                     display: 'flex',
@@ -113,7 +113,9 @@ const Module = ({ sectionKey }) => {
                         alignItems: 'center',
                     }}
                 >
-                    <Box sx={{ mb: 0 }}> {/* Pull-down Menu Module Select */}
+                    <Box sx={{ mb: 0 }}>
+                        {' '}
+                        {/* Pull-down Menu Module Select */}
                         <Select
                             sx={{
                                 'backgroundColor': '#28282800',

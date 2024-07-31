@@ -4,7 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 
-const DropDownSelect = ({ options = [], activeOption = '', setActiveOption = () => {}, label = '' }) => {
+const DropDownSelect = ({ styles = {}, options = [], activeOption = '', setActiveOption = () => {}, label = '' }) => {
     const menuStyles = {
         PaperProps: {
             style: {
@@ -24,6 +24,7 @@ const DropDownSelect = ({ options = [], activeOption = '', setActiveOption = () 
                 label={label}
                 onChange={setActiveOption}
                 MenuProps={menuStyles}
+                sx={styles}
             >
                 {options.map((option, index) => {
                     return (

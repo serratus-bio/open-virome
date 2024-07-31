@@ -22,10 +22,11 @@ const AppToolbar = () => {
     const theme = useTheme();
 
     const getAppBarStyles = () => ({
-        transition: theme.transitions.create(['margin', 'width'], {
+        'transition': theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
+        '& .MuiToolbar-root': { padding: 0 },
         ...(open && {
             width: `calc(100% - ${drawerWidth}px)`,
             marginLeft: `${drawerWidth}px`,
@@ -43,7 +44,7 @@ const AppToolbar = () => {
 
     return (
         <AppBar position='fixed' sx={getAppBarStyles()}>
-            <Toolbar sx={{ width: '100%' }}>
+            <Toolbar sx={{ width: '100%', pl: 0 }}>
                 {/* Query Builder Icon */}
                 <IconButton
                     color='white'
@@ -52,12 +53,12 @@ const AppToolbar = () => {
                     edge='start'
                     sx={{
                         backgroundColor: 'rgba(86, 86, 86, 0.7)',
-                        ml: '0%',
                         mr: 2,
+                        ml: '3%',
                         ...(open && { display: 'none' }),
                     }}
                 >
-                <TuneIcon fontSize='large' />
+                    <TuneIcon fontSize='large' />
                 </IconButton>
                 {/* OV */}
                 <b> Open Virome </b>

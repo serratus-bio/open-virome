@@ -91,26 +91,16 @@ const QuerySummaryText = () => {
         return (
             <Typography paragraph variant='body1'>
                 {`Query | Runs: ${formatNumber(identifiersData?.run?.totalCount)} |
-                          bioProjects: ${formatNumber(identifiersData?.bioproject?.totalCount)}`} |
-                          {totalVirusCountData &&
-                          !totalVirusCountIsFetching &&
-                          !totalVirusCountError? `
-                          sOTU: ${totalVirusCountData?.length ? formatNumber(totalVirusCountData[0]?.count) : 0}`
+                          bioProjects: ${formatNumber(identifiersData?.bioproject?.totalCount)}`}
+                {totalVirusCountData && !totalVirusCountIsFetching && !totalVirusCountError
+                    ? `
+                          | sOTU: ${totalVirusCountData?.length ? formatNumber(totalVirusCountData[0]?.count) : 0}`
                     : ''}
             </Typography>
         );
     };
 
-    return (
-        <Box
-            sx={{
-                mt: 1,
-                ml: '10%',
-            }}
-        >
-            {getQuerySummaryText()}
-        </Box>
-    );
+    return <Box sx={{ mt: 4, mb: 2 }}>{getQuerySummaryText()}</Box>;
 };
 
 export default QuerySummaryText;

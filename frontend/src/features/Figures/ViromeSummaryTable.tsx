@@ -25,7 +25,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
             // Add Link to SRA website for SRA / BioProject
             // Retrieve BioProject for Run
             // TODO: Display BioProject "Title" below in small text
-            title = `Run: ${selectedItem?.id} | ${getSciName()}` ;
+            title = `Run: ${selectedItem?.id} | ${getSciName()}`;
         }
         if (isVirus) {
             title = `Virus: ${selectedItem?.id}`;
@@ -58,7 +58,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
     const getSciName = () => {
         const filteredRows = getResultTableRows();
         const runBioSample = filteredRows[0];
-        return (runBioSample['scientific_name']);
+        return runBioSample['scientific_name'];
     };
 
     /*const getBiosample = () => {
@@ -75,20 +75,20 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
 
     const renderNodeSummary = () => {
         if (isRun) {
-            return renderRunSummary()
+            return renderRunSummary();
         }
         if (isVirus) {
-            return renderVirusSummary()
+            return renderVirusSummary();
         }
         if (isEdge) {
-            return renderContigSummary()
+            return renderContigSummary();
         }
         return [];
-    }
+    };
     //| bioSample: ${getBiosample()} | bioProject: ${getBioproject()}
     const renderRunSummary = () => {
         const filteredRows = getResultTableRows();
-        const firstRow = filteredRows[0]
+        const firstRow = filteredRows[0];
         const runBioSample = firstRow['bio_sample'];
         const runBioProject = firstRow['bio_project'];
         return (
@@ -101,39 +101,39 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                         justifyContent: 'space-between',
                         alignItems: 'space-between',
                         width: '100%',
-                        mt: 0   ,
+                        mt: 0,
                     }}
                 >
                     {/*bioSample Stats*/}
                     {/*TODO: retrieve bioSample title and display under link*/}
-                    <Box sx={{ display: "flex", flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
-                            <Typography variant='body'>{`bioSample: `}</Typography>
-                            <Link
-                                sx={{
-                                    alignItems: 'center',
-                                    flexDirection: 'column',
-                                    textDecoration: 'none',
-                                }}
-                                href={`https://www.ncbi.nlm.nih.gov/biosample/${runBioSample}`}
-                                target='_blank'
-                            >
+                    <Box sx={{ display: 'flex', flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
+                        <Typography variant='body'>{`bioSample: `}</Typography>
+                        <Link
+                            sx={{
+                                alignItems: 'center',
+                                flexDirection: 'column',
+                                textDecoration: 'none',
+                            }}
+                            href={`https://www.ncbi.nlm.nih.gov/biosample/${runBioSample}`}
+                            target='_blank'
+                        >
                             <Typography variant='body'> &nbsp; {runBioSample}</Typography>
                             <MdOpenInNew fontSize='small' sx={{ mb: -0.5, ml: 0.5 }} />
                         </Link>
                     </Box>
                     {/*bioProject Stats*/}
                     {/*TODO: retrieve bioProject title and display under link*/}
-                    <Box sx={{ display: "flex", flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
-                            <Typography variant='body'>{`bioProject: `}</Typography>
-                            <Link
-                                sx={{
-                                    alignItems: 'center',
-                                    flexDirection: 'column',
-                                    textDecoration: 'none',
-                                }}
-                                href={`https://www.ncbi.nlm.nih.gov/bioproject/?term=${runBioProject}`}
-                                target='_blank'
-                            >
+                    <Box sx={{ display: 'flex', flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
+                        <Typography variant='body'>{`bioProject: `}</Typography>
+                        <Link
+                            sx={{
+                                alignItems: 'center',
+                                flexDirection: 'column',
+                                textDecoration: 'none',
+                            }}
+                            href={`https://www.ncbi.nlm.nih.gov/bioproject/?term=${runBioProject}`}
+                            target='_blank'
+                        >
                             <Typography variant='body'> &nbsp; {runBioProject}</Typography>
                             <MdOpenInNew fontSize='small' sx={{ mb: -0.5, ml: 0.5 }} />
                         </Link>
@@ -157,12 +157,11 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                         justifyContent: 'space-between',
                         alignItems: 'space-between',
                         width: '100%',
-                        mt: 0   ,
+                        mt: 0,
                     }}
                 >
                     {/*GenBank Hit Stats*/}
                     <Box sx={{ flex: 1, flexBasis: '50%', maxWidth: '45%' }}>
-
                         <Typography variant='body'>{`Top GenBank Hit (${topGenBankId['gb_pid']}% aa id)`}</Typography>
                         <Typography sx={{ mt: 0.5 }} variant='body2'>
                             {`${topPalmId['tax_species']} ${topGenBankId['tax_family'] ? `(${topGenBankId['tax_family']})` : ''}`}
@@ -209,7 +208,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
 
     const renderContigSummary = () => {
         const filteredRows = getResultTableRows();
-        const contigRow = filteredRows[0]
+        const contigRow = filteredRows[0];
         const contigRun = contigRow['run'];
         const contigSotu = contigRow['sotu'];
         const contigPalm = contigRow['palm_id'];
@@ -226,7 +225,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                         justifyContent: 'space-between',
                         alignItems: 'space-between',
                         width: '100%',
-                        mt: 0   ,
+                        mt: 0,
                     }}
                 >
                     {/*Fasta Display*/}
@@ -236,7 +235,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                         </Typography>
                     </Box>
                     <Box sx={{ flex: 1, flexBasis: '50%', maxWidth: '100%' }}>
-                        <Typography fontFamily='monospace' variant='body' whiteSpace="pre-wrap">
+                        <Typography fontFamily='monospace' variant='body' whiteSpace='pre-wrap'>
                             {`${contigSeq}`}
                         </Typography>
                     </Box>
@@ -266,8 +265,8 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
     };
 
     const getPagedRows = () => {
-        const startIndex = page * 15;
-        const endIndex = startIndex + 15;
+        const startIndex = page * 10;
+        const endIndex = startIndex + 10;
         return getResultTableRows().slice(startIndex, endIndex);
     };
 
@@ -281,7 +280,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                     total={filteredRows.length}
                     rows={getPagedRows()}
                     headers={Object.keys(filteredRows[0])}
-                    pageRows={15}
+                    pageRows={10}
                 />
             </Box>
         );
@@ -317,7 +316,8 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
             >
                 {renderTitle()}
                 {/*TODO: Add "Maximize" button to make Table Full-screen*/}
-                <Button close-window
+                <Button
+                    close-window
                     onClick={onClose}
                     sx={{
                         'minWidth': 12,

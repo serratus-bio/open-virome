@@ -1,6 +1,6 @@
 /**
-* Section Organization and Labels
-*/
+ * Section Organization and Labels
+ */
 export const sectionConfig = {
     sra: {
         modules: ['host', 'seqType', 'bioproject'],
@@ -20,8 +20,8 @@ export const sectionConfig = {
 };
 
 /**
-* Module Labels and defaults
-*/
+ * Module Labels and defaults
+ */
 export const moduleConfig = {
     host: {
         title: 'Run Label',
