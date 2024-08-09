@@ -176,11 +176,10 @@ const DeckGLRenderScatterplot: any = ({
 
             const identifierClauses = getIdClauses(identifiers?.biosample?.single, identifiers?.biosample?.range);
 
-            const SELECT:any = {
+            const SELECT: any = {
                 text: `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, FLOOR(RANDOM()*2) as class
-                FROM biosample_geographical_location
-                WHERE palm_virome = TRUE
-                ${identifierClauses.length > 0 ? `AND (${identifierClauses.join(' OR ')})` : ''}
+                FROM biosample_geo_virome
+                ${identifierClauses.length > 0 ? `WHERE (${identifierClauses.join(' OR ')})` : ''}
                 LIMIT ${isSummaryView(identifiers) ? 2048 : 65536};`,
             };
             SELECT.deflate = btoa(String.fromCharCode.apply(null, deflate(SELECT.text)));

@@ -10,7 +10,7 @@ export const handleIdKeyIrregularities = (key, table) => {
         biosample_tissue: {
             biosample: 'biosample_id',
         },
-        biosample_geographical_location: {
+        biosample_geo_virome: {
             biosample: 'accession',
             geo_attribute_value: 'attribute_value',
         },
@@ -132,7 +132,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
         sra: 'acc as run_id, bioproject as bioproject, biosample as biosample, organism as organism, assay_type',
         sra_stat: 'run as run_id, name as stat_host_order',
         biosample_tissue: 'biosample_id as biosample, tissue',
-        biosample_geographical_location: 'accession as biosample, attribute_value as geo_attribute_value',
+        biosample_geo_virome: 'accession as biosample, attribute_value as geo_attribute_value',
         palm_virome: 'run as run_id, sotu, tax_species, tax_family',
     };
 
@@ -141,7 +141,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
         sra_stat: ['run_id', 'stat_host_order'],
         palm_virome: ['run', 'sotu', 'tax_species', 'tax_family'],
         biosample_tissue: ['biosample_id', 'tissue'],
-        biosample_geographical_location: ['accession', 'geo_attribute_value'],
+        biosample_geo_virome: ['accession', 'geo_attribute_value'],
     };
 
     const tableToJoinKey = {
@@ -149,7 +149,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
         sra_stat: 'run_id',
         palm_virome: 'run_id',
         biosample_tissue: 'biosample',
-        biosample_geographical_location: 'biosample',
+        biosample_geo_virome: 'biosample',
     };
 
     let tables = [];
