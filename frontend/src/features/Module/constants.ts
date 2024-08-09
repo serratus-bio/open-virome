@@ -76,7 +76,7 @@ export const moduleConfig = {
         tag: 'Ecology',
         groupByKey: 'geo_attribute_value',
         resultsIdColumn: 'biosample',
-        resultsTable: 'biosample_geographical_location',
+        resultsTable: 'biosample_geo_virome',
         defaultDisplay: 'figure',
     },
     tissue: {
