@@ -1,6 +1,9 @@
 # Open Virome
 
-## Getting started
+- [Open Virome Online](https://www.openvirome.com)
+- [OpenViromeR](https://github.com/ababaian/open.viromeR): `R` language interface package for Open Virome data
+
+## Starting an Open Virome instance locally
 
 To start the app using local frontend with API calls to the remote server
 
