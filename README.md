@@ -1,6 +1,6 @@
 # Open Virome
 
-- [Open Virome Online](https://www.openvirome.com)
+- [Open Virome Online](https://openvirome.com)
 - [OpenViromeR](https://github.com/ababaian/open.viromeR): `R` language interface package for Open Virome data
 
 ## Starting an Open Virome instance locally
