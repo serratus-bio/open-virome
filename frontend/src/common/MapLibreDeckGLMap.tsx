@@ -10,7 +10,6 @@ import { truncate } from '../common/utils/textFormatting.ts';
 const AMAZON_LOCATION_API_KEY =
     'v1.public.eyJqdGkiOiJmZmZkN2UwNC0wNmRmLTQ4OTctOWEzOC00NTA5N2NiODY5MGIifSUgWkDQ2dkshoBIAo_0q3syXuabEaV9KFm9vj6iO5WvXML2A0HDkRXoETBgOzQjQiygufvZfAzJWw4d0FX9rOzRLpTcqr3CoNuolH7JBn3y4SKcRwk4pf-g-LD6tUtYpYgv5UPSx2SjVzTJIgC7hVte0qV7AY6_bptW_8pkfVnbKo_S5LBVxWB2dPDKc_6tiqYllOjOtmugN23b1Qdkhj5Pm5xgBWMQvHhjhNodXIkrYy5RvCE0vvzqd4uD_4bmj45OjXVAu_SO7xyPmV-77gtWSgj5it44McnP40jhBc-GNtMYrGZlyItIrKpbUUslAPCsgVzXVpAN8uF89rec9ko.ZWU0ZWIzMTktMWRhNi00Mzg0LTllMzYtNzlmMDU3MjRmYTkx';
 const LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER = 'Bearer 20240516';
-// const LOGAN_RDS_PROXY_LAMBDA_ENDPOINT = 'https://dcoian99debdl.cloudfront.net';
 const LOGAN_RDS_PROXY_LAMBDA_ENDPOINT = 'https://omdmrhz5lb2nrbmodjtm5fxhqq0uevzh.lambda-url.us-east-1.on.aws/';
 const MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE = false;
 
@@ -180,7 +179,7 @@ const DeckGLRenderScatterplot: any = ({
             const SELECT: any = {
                 text: `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, id
                 FROM bgl_gp4326_wwf_tew_pv
-                ${identifierClauses.length > 0 ? ` AND (${identifierClauses.join(' OR ')})` : ''}
+                ${identifierClauses.length > 0 ? `WHERE (${identifierClauses.join(' OR ')})` : ''}
                 LIMIT 65536;`,
             };
             console.log('SELECT.text', SELECT.text);
