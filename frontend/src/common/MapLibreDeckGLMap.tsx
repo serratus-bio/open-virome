@@ -125,6 +125,34 @@ const splitmix32 = (a) => () => {
     return ((t = t ^ (t >>> 15)) >>> 0) / 4294967296;
 };
 
+const WWF_TEW = Object.fromEntries(Object.entries({
+    WWF_TEW_BIOME_01:{ color:'#008346' },
+    WWF_TEW_BIOME_02:{ color:'#9DCC00' },
+    WWF_TEW_BIOME_03:{ color:'#C4B72E' },
+    WWF_TEW_BIOME_04:{ color:'#015C31' },
+    WWF_TEW_BIOME_05:{ color:'#006E84' },
+    WWF_TEW_BIOME_06:{ color:'#FFA8BB' },
+    WWF_TEW_BIOME_07:{ color:'#FAD505' },
+    WWF_TEW_BIOME_08:{ color:'#8F7C00' },
+    WWF_TEW_BIOME_09:{ color:'#67C7BF' },
+    WWF_TEW_BIOME_10:{ color:'#993E01' },
+    WWF_TEW_BIOME_11:{ color:'#C20088' },
+    WWF_TEW_BIOME_12:{ color:'#0275DC' },
+    WWF_TEW_BIOME_13:{ color:'#FFA405' },
+    WWF_TEW_BIOME_14:{ color:'#FFCC99' },
+    WWF_TEW_BIOME_98:{ color:'#000000' },
+    WWF_TEW_BIOME_99:{ color:'#000000' }
+})
+    .map(([k, v]) => {
+        v.color = v.color
+            .substring(1)
+            .match(/(.{1,2})/g)
+            .map(_v => parseInt(_v, 16));
+
+        return [k, v];
+    })
+);
+
 const DeckGLRenderScatterplot: any = ({
     mbOverlay,
     mlglMap,
@@ -224,7 +252,12 @@ const DeckGLRenderScatterplot: any = ({
                     layers: [
                         new (globalThis as any).deck.ScatterplotLayer({
                             data: json,
-                            getFillColor: (d) => (d.class === 1 ? [0, 128, 255] : [255, 0, 128]),
+                            getFillColor:d => {
+                                if(!d.id)
+                                    d.id = 'WWF_TEW_BIOME_99';
+
+                                return WWF_TEW[d.id].color;
+                            },
                             getPosition: (d) => {
                                 const prng = splitmix32(cyrb128(d.accession)[0]);
 
