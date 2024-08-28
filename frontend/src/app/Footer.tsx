@@ -44,7 +44,7 @@ const Footer = () => {
                     </Link>
                 </Typography>
                 <Typography variant='body2'>
-                    <Link href='https://github.com/serratus-bio/open-virome/issues/new' color='inherit' target='_blank'>
+                    <Link href='https://github.com/serratus-bio/open-virome/issues/new/choose' color='inherit' target='_blank'>
                         Report an Issue
                     </Link>
                 </Typography>
