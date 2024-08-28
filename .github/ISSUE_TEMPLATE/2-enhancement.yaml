@@ -1,6 +1,6 @@
 name: Feature request
 description: Submit a proposal/request for a new Open Virome feature
-label: enhancement
+labels: enhancement
 body:
   - type: textarea
     id: feature
@@ -13,8 +13,10 @@ body:
 
   - type: textarea
     id: rationale
-    attributes: >
-      label: Why is this needed? Please outline the motivation for the proposal. Is your feature request related to a specific problem? e.g., *"I'm working on X and would like Y to be possible"*.
+    attributes:
+      label: Why is this needed?
+      description: >
+        Please outline the motivation for the proposal. Is your feature request related to a specific problem? e.g., *"I'm working on X and would like Y to be possible"*.
     validations:
       required: true
 
