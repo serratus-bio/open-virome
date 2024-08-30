@@ -29,7 +29,7 @@ const bioprojectIDFromBiosample: any = async (biosample) => {
             if (response.status === 200) {
                 const json = await response.json();
 
-                if (json.length) return json[0].bioproject;
+                if (json.result?.length) return json.result[0].bioproject;
             }
         })();
 
@@ -51,7 +51,7 @@ const selectBioproject: any = async (accession) => {
             if (response.status === 200) {
                 const json = await response.json();
 
-                if (json.length) return json[0];
+                if (json.result?.length) return json.result[0];
             }
         })();
 
@@ -71,7 +71,7 @@ const selectBiosample: any = async (accession) => {
             if (response.status === 200) {
                 const json = await response.json();
 
-                if (json.length) return json[0];
+                if (json.result?.length) return json.result[0];
             }
         })();
 
