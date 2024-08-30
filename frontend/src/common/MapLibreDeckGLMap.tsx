@@ -268,7 +268,7 @@ const DeckGLRenderScatterplot: any = ({
                                 ];
                             },
                             id: 'scatterplotLayer',
-                            onHover: (info, event) => {
+                            onClick: (info, event) => {
                                 if (info.object) {
                                     setAttributeName(info.object.attribute_name);
                                     setAttributeValue(info.object.attribute_value);
@@ -281,7 +281,7 @@ const DeckGLRenderScatterplot: any = ({
                             opacity: 0.8,
                             pickable: true,
                             radiusMaxPixels: 16,
-                            radiusMinPixels: 4,
+                            radiusMinPixels: 6,
                         }),
                     ],
                 });
@@ -387,26 +387,23 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
 
     return (
         <div style={style}>
-            <div ref={mapRef} style={{ height: '70vh', position: 'relative', width: '100%' }} />
-            {/* Tooltip */}
-            <div style={{ color: '#FFF', margin: '24px 0 0 0', padding: '0 8px 0 0px', height: 200 }}>
-                <div style={{ display: 'flex' }}>
-                    <div style={{ flex: '1 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                            <span>ATTRIBUTE NAME</span>
-                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(attributeName)} />
-                        </div>
-                        <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{attributeName}</div>
+            <div ref={mapRef} style={{ height: '70vh', position: 'relative', width: '100%' }}>
+                {/* Tooltip */}
+                <div style={{ backgroundColor: 'rgba(18, 18, 18, 0.8)', borderRadius: '6px', color: '#FFF', maxHeight: '512px', overflowY: 'scroll', padding: '12px 16px 16px 16px', position: 'absolute', right: '8px', top: '8px', width: '384px', zIndex: 1 }}>
+                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                        <span>ATTRIBUTE NAME</span>
+                        <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(attributeName)} />
                     </div>
-                    <div style={{ flex: '1 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                            <span>ATTRIBUTE VALUE</span>
-                            <MapLibreDeckGLMapCopyButton
-                                onClick={() => navigator.clipboard.writeText(attributeValue)}
-                            />
-                        </div>
-                        <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{truncate(attributeValue, 40)}</div>
+                    <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{attributeName}</div>
+                    <div style={{ height: '8px' }}></div>
+                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                        <span>ATTRIBUTE VALUE</span>
+                        <MapLibreDeckGLMapCopyButton
+                            onClick={() => navigator.clipboard.writeText(attributeValue)}
+                        />
                     </div>
+                    <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{truncate(attributeValue, 40)}</div>
+                    <div style={{ height: '8px' }}></div>
                     <div style={{ flex: '1 0' }}>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>LAT / LON</span>
@@ -417,46 +414,44 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
                         </div>
                         <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{latLon}</div>
                     </div>
-                </div>
-                <div style={{ display: 'flex', margin: '16px 0 0 0' }}>
-                    <div style={{ flex: '1 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                            <span>BIOSAMPLE</span>
+                    <div style={{ height: '8px' }}></div>
+                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                        <span>BIOSAMPLE</span>
+                        <div style={{ color: '#FFF', display: 'inline', fontSize: '18px', fontWeight: 400, margin: '0 0 0 8px' }}>{biosampleID}</div>
+                        <div style={{ display: 'inline', margin: '0 0 0 4px', verticalAlign: 'top' }}>
                             <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(biosampleID)} />
                             <MapLibreDeckGLMapURLButton
                                 href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID}
                             />
                         </div>
-                        <div style={{ margin: '2px 0 0 0' }}>
-                            {biosampleID ? (
-                                <>
-                                    <div style={{ fontSize: '18px' }}>{biosampleID}</div>
-                                    <div style={{ fontSize: '14px' }}>{biosampleTitle}</div>
-                                </>
-                            ) : (
-                                '\u200B'
-                            )}
-                        </div>
                     </div>
-                    <div style={{ flex: '2 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                            <span>BIOPROJECT</span>
+                    <div style={{ margin: '2px 0 0 0' }}>
+                        {biosampleID ? (
+                            <div style={{ fontSize: '14px' }}>{biosampleTitle}</div>
+                        ) : (
+                            '\u200B'
+                        )}
+                    </div>
+                    <div style={{ height: '8px' }}></div>
+                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                        <span>BIOPROJECT</span>
+                        <div style={{ color: '#FFF', display: 'inline', fontSize: '18px', fontWeight: 400, margin: '0 0 0 8px' }}>{bioprojectID}</div>
+                        <div style={{ display: 'inline', margin: '0 0 0 4px', verticalAlign: 'top' }}>
                             <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(bioprojectID)} />
                             <MapLibreDeckGLMapURLButton
                                 href={'https://www.ncbi.nlm.nih.gov/bioproject/?term=' + bioprojectID}
                             />
                         </div>
-                        <div style={{ margin: '2px 0 0 0' }}>
-                            {bioprojectID ? (
-                                <>
-                                    <div style={{ fontSize: '18px' }}>{bioprojectID}</div>
-                                    <div style={{ fontSize: '14px' }}>{bioprojectName}</div>
-                                    <div style={{ fontSize: '14px' }}>{bioprojectTitle}</div>
-                                </>
-                            ) : (
-                                '\u200B'
-                            )}
-                        </div>
+                    </div>
+                    <div style={{ margin: '2px 0 0 0' }}>
+                        {bioprojectID ? (
+                            <>
+                                <div style={{ fontSize: '14px' }}>{bioprojectName}</div>
+                                <div style={{ fontSize: '14px' }}>{bioprojectTitle}</div>
+                            </>
+                        ) : (
+                            '\u200B'
+                        )}
                     </div>
                 </div>
             </div>
