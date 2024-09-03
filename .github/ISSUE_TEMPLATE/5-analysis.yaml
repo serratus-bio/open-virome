@@ -1,0 +1,52 @@
+name: Analysis
+description: Test an hypothesis using Open Virome
+labels: analysis
+body:
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: Hypothesis
+      description: |
+        TBD *can one do* _markdown_ **in here** __test__ /test/
+  
+  - type: textarea
+    id: background
+    attributes:
+      label: Background
+      description: |
+        TBD
+  
+  - type: textarea
+    id: experiment
+    attributes:
+      label: Experiment
+      description: |
+        TBD
+  
+  - type: textarea
+    id: controls
+    attributes:
+      label: Controls
+      description: |
+        TBD
+  
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Expected Outcome
+      description: |
+        TBD
+
+  - type: textarea
+      id: questions
+      attributes:
+        label: Open Questions
+        description: |
+          TBD
+  
+  - type: textarea
+      id: references
+      attributes:
+        label: References
+        description: |
+          TBD
