@@ -38,15 +38,15 @@ body:
         TBD
 
   - type: textarea
-      id: open
-      attributes:
-        label: Open Questions
-        description: |
-          TBD
+    id: questions
+    attributes:
+      label: Open Questions
+      description: |
+        TBD
   
   - type: textarea
-      id: references
-      attributes:
-        label: References
-        description: |
-          TBD
+    id: references
+    attributes:
+      label: References
+      description: |
+        TBD
