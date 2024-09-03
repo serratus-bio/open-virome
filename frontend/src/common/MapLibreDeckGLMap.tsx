@@ -126,22 +126,22 @@ const splitmix32 = (a) => () => {
 };
 
 const WWF_TEW = Object.fromEntries(Object.entries({
-    WWF_TEW_BIOME_01:{ color:'#008346' },
-    WWF_TEW_BIOME_02:{ color:'#9DCC00' },
-    WWF_TEW_BIOME_03:{ color:'#C4B72E' },
-    WWF_TEW_BIOME_04:{ color:'#015C31' },
-    WWF_TEW_BIOME_05:{ color:'#006E84' },
-    WWF_TEW_BIOME_06:{ color:'#FFA8BB' },
-    WWF_TEW_BIOME_07:{ color:'#FAD505' },
-    WWF_TEW_BIOME_08:{ color:'#8F7C00' },
-    WWF_TEW_BIOME_09:{ color:'#67C7BF' },
-    WWF_TEW_BIOME_10:{ color:'#993E01' },
-    WWF_TEW_BIOME_11:{ color:'#C20088' },
-    WWF_TEW_BIOME_12:{ color:'#0275DC' },
-    WWF_TEW_BIOME_13:{ color:'#FFA405' },
-    WWF_TEW_BIOME_14:{ color:'#FFCC99' },
-    WWF_TEW_BIOME_98:{ color:'#000000' },
-    WWF_TEW_BIOME_99:{ color:'#000000' }
+    WWF_TEW_BIOME_01:{ color:'#008346', name:'Tropical & Subtropical Moist Broadleaf Forests' },
+    WWF_TEW_BIOME_02:{ color:'#9DCC00', name:'Tropical & Subtropical Dry Broadleaf Forests' },
+    WWF_TEW_BIOME_03:{ color:'#C4B72E', name:'Tropical & Subtropical Coniferous Forests' },
+    WWF_TEW_BIOME_04:{ color:'#015C31', name:'Temperate Broadleaf & Mixed Forests' },
+    WWF_TEW_BIOME_05:{ color:'#006E84', name:'Temperate Conifer Forests' },
+    WWF_TEW_BIOME_06:{ color:'#FFA8BB', name:'Boreal Forests/Taiga' },
+    WWF_TEW_BIOME_07:{ color:'#FAD505', name:'Tropical & Subtropical Grasslands, Savannas & Shrublands' },
+    WWF_TEW_BIOME_08:{ color:'#8F7C00', name:'Temperate Grasslands, Savannas & Shrublands' },
+    WWF_TEW_BIOME_09:{ color:'#67C7BF', name:'Flooded Grasslands & Savannas' },
+    WWF_TEW_BIOME_10:{ color:'#993E01', name:'Montane Grasslands & Shrublands' },
+    WWF_TEW_BIOME_11:{ color:'#C20088', name:'Tundra' },
+    WWF_TEW_BIOME_12:{ color:'#0275DC', name:'Mediterranean Forests, Woodlands & Scrub' },
+    WWF_TEW_BIOME_13:{ color:'#FFA405', name:'Deserts & Xeric Shrublands' },
+    WWF_TEW_BIOME_14:{ color:'#FFCC99', name:'Mangroves' },
+    WWF_TEW_BIOME_98:{ color:'#000000', name:'Ocean' },
+    WWF_TEW_BIOME_99:{ color:'#000000', name:'Ocean' }
 })
     .map(([k, v]) => {
         v.color = v.color
@@ -158,6 +158,7 @@ const DeckGLRenderScatterplot: any = ({
     mlglMap,
     setAttributeName,
     setAttributeValue,
+    setBiomeID,
     setBiosampleID,
     setLatLon,
     identifiers,
@@ -273,6 +274,7 @@ const DeckGLRenderScatterplot: any = ({
                                     setAttributeName(info.object.attribute_name);
                                     setAttributeValue(info.object.attribute_value);
 
+                                    setBiomeID(info.object.id);
                                     setBiosampleID(info.object.accession);
 
                                     setLatLon([info.object.lat, info.object.lon].join(','));
@@ -303,6 +305,7 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
     const mapRef = useRef(null);
     const [attributeName, setAttributeName] = useState('');
     const [attributeValue, setAttributeValue] = useState('');
+    const [biomeID, setBiomeID] = useState('');
     const [bioprojectID, setBioprojectID] = useState('');
     const [bioprojectName, setBioprojectName] = useState('');
     const [bioprojectTitle, setBioprojectTitle] = useState('');
@@ -341,6 +344,7 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
                     mlglMap,
                     setAttributeName,
                     setAttributeValue,
+                    setBiomeID,
                     setBioprojectID,
                     setBiosampleID,
                     setLatLon,
@@ -452,6 +456,14 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
                         ) : (
                             '\u200B'
                         )}
+                    </div>
+                    <div style={{ height: '8px' }}></div>
+                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                        <span style={{ verticalAlign:'middle' }}>BIOME</span>
+                        <span style={{ backgroundColor:biomeID && WWF_TEW[biomeID].color, display:'inline-block', height:'14px', fontSize: '14px', margin:'0 0 0 8px', verticalAlign:'middle', width:'36px' }} />
+                    </div>
+                    <div style={{ margin: '2px 0 0 0' }}>
+                        <span style={{ fontSize: '14px', verticalAlign:'middle' }}>{biomeID && WWF_TEW[biomeID].name}</span>
                     </div>
                 </div>
             </div>
