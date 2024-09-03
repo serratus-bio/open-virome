@@ -126,25 +126,25 @@ const splitmix32 = (a) => () => {
 };
 
 const WWF_TEW = Object.fromEntries(Object.entries({
-    WWF_TEW_BIOME_01:{ color:'#008346', name:'Tropical & Subtropical Moist Broadleaf Forests' },
-    WWF_TEW_BIOME_02:{ color:'#9DCC00', name:'Tropical & Subtropical Dry Broadleaf Forests' },
-    WWF_TEW_BIOME_03:{ color:'#C4B72E', name:'Tropical & Subtropical Coniferous Forests' },
-    WWF_TEW_BIOME_04:{ color:'#015C31', name:'Temperate Broadleaf & Mixed Forests' },
-    WWF_TEW_BIOME_05:{ color:'#006E84', name:'Temperate Conifer Forests' },
-    WWF_TEW_BIOME_06:{ color:'#FFA8BB', name:'Boreal Forests/Taiga' },
-    WWF_TEW_BIOME_07:{ color:'#FAD505', name:'Tropical & Subtropical Grasslands, Savannas & Shrublands' },
-    WWF_TEW_BIOME_08:{ color:'#8F7C00', name:'Temperate Grasslands, Savannas & Shrublands' },
-    WWF_TEW_BIOME_09:{ color:'#67C7BF', name:'Flooded Grasslands & Savannas' },
-    WWF_TEW_BIOME_10:{ color:'#993E01', name:'Montane Grasslands & Shrublands' },
-    WWF_TEW_BIOME_11:{ color:'#C20088', name:'Tundra' },
-    WWF_TEW_BIOME_12:{ color:'#0275DC', name:'Mediterranean Forests, Woodlands & Scrub' },
-    WWF_TEW_BIOME_13:{ color:'#FFA405', name:'Deserts & Xeric Shrublands' },
-    WWF_TEW_BIOME_14:{ color:'#FFCC99', name:'Mangroves' },
-    WWF_TEW_BIOME_98:{ color:'#000000', name:'Ocean' },
-    WWF_TEW_BIOME_99:{ color:'#000000', name:'Ocean' }
+    WWF_TEW_BIOME_01:{ hex:'#008346', name:'Tropical & Subtropical Moist Broadleaf Forests' },
+    WWF_TEW_BIOME_02:{ hex:'#9DCC00', name:'Tropical & Subtropical Dry Broadleaf Forests' },
+    WWF_TEW_BIOME_03:{ hex:'#C4B72E', name:'Tropical & Subtropical Coniferous Forests' },
+    WWF_TEW_BIOME_04:{ hex:'#015C31', name:'Temperate Broadleaf & Mixed Forests' },
+    WWF_TEW_BIOME_05:{ hex:'#006E84', name:'Temperate Conifer Forests' },
+    WWF_TEW_BIOME_06:{ hex:'#FFA8BB', name:'Boreal Forests/Taiga' },
+    WWF_TEW_BIOME_07:{ hex:'#FAD505', name:'Tropical & Subtropical Grasslands, Savannas & Shrublands' },
+    WWF_TEW_BIOME_08:{ hex:'#8F7C00', name:'Temperate Grasslands, Savannas & Shrublands' },
+    WWF_TEW_BIOME_09:{ hex:'#67C7BF', name:'Flooded Grasslands & Savannas' },
+    WWF_TEW_BIOME_10:{ hex:'#993E01', name:'Montane Grasslands & Shrublands' },
+    WWF_TEW_BIOME_11:{ hex:'#C20088', name:'Tundra' },
+    WWF_TEW_BIOME_12:{ hex:'#0275DC', name:'Mediterranean Forests, Woodlands & Scrub' },
+    WWF_TEW_BIOME_13:{ hex:'#FFA405', name:'Deserts & Xeric Shrublands' },
+    WWF_TEW_BIOME_14:{ hex:'#FFCC99', name:'Mangroves' },
+    WWF_TEW_BIOME_98:{ hex:'#000000', name:'Ocean' },
+    WWF_TEW_BIOME_99:{ hex:'#000000', name:'Ocean' }
 })
     .map(([k, v]) => {
-        v.color = v.color
+        v.rgb = v.hex
             .substring(1)
             .match(/(.{1,2})/g)
             .map(_v => parseInt(_v, 16));
@@ -257,7 +257,7 @@ const DeckGLRenderScatterplot: any = ({
                                 if(!d.id)
                                     d.id = 'WWF_TEW_BIOME_99';
 
-                                return WWF_TEW[d.id].color;
+                                return WWF_TEW[d.id].rgb;
                             },
                             getPosition: (d) => {
                                 const prng = splitmix32(cyrb128(d.accession)[0]);
@@ -460,7 +460,7 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
                     <div style={{ height: '8px' }}></div>
                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                         <span style={{ verticalAlign:'middle' }}>BIOME</span>
-                        <span style={{ backgroundColor:biomeID && WWF_TEW[biomeID].color, display:'inline-block', height:'14px', fontSize: '14px', margin:'0 0 0 8px', verticalAlign:'middle', width:'36px' }} />
+                        <span style={{ backgroundColor:biomeID ? WWF_TEW[biomeID].hex : 'transparent', display:'inline-block', height:'14px', fontSize: '14px', margin:'0 0 0 8px', verticalAlign:'middle', width:'36px' }} />
                     </div>
                     <div style={{ margin: '2px 0 0 0' }}>
                         <span style={{ fontSize: '14px', verticalAlign:'middle' }}>{biomeID && WWF_TEW[biomeID].name}</span>
