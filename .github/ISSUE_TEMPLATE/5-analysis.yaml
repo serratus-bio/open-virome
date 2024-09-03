@@ -38,7 +38,7 @@ body:
         TBD
 
   - type: textarea
-      id: questions
+      id: open
       attributes:
         label: Open Questions
         description: |
