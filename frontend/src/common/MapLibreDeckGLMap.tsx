@@ -1,6 +1,7 @@
 import MdCopyAll from '@mui/icons-material/CopyAll';
 import MdOpenInNew from '@mui/icons-material/OpenInNew';
 import React, { useEffect, useRef, useState } from 'react';
+import Flag from 'react-world-flags';
 import { deflate } from 'pako';
 
 import { isSummaryView } from '../common/utils/plotHelpers.ts';
@@ -115,6 +116,16 @@ const gaussianRandom = (prng) => {
     return z * STDEV + MEAN;
 };
 
+const regionCountries = {
+    'Africa':['AGO', 'BDI', 'BEN', 'BFA', 'BWA', 'CAF', 'CIV', 'CMR', 'COD', 'COG', 'COM', 'CPV', 'DJI', 'DZA', 'EGY', 'ERI', 'ESH', 'ETH', 'GAB', 'GHA', 'GIN', 'GMB', 'GNB', 'GNQ', 'KEN', 'LBR', 'LBY', 'LSO', 'MAR', 'MDG', 'MLI', 'MOZ', 'MRT', 'MUS', 'MWI', 'MYT', 'NAM', 'NER', 'NGA', 'REU', 'RWA', 'SDN', 'SEN', 'SLE', 'SOM', 'SSD', 'STP', 'SWZ', 'SYC', 'TCD', 'TGO', 'TUN', 'TZA', 'UGA', 'ZAF', 'ZMB', 'ZWE'],
+    'Antarctica':['ATF', 'BVT', 'HMD'],
+    'Asia':['AFG', 'ARE', 'ARM', 'AZE', 'BGD', 'BHR', 'BRN', 'BTN', 'CHN', 'CYP', 'GEO', 'HKG', 'IDN', 'IND', 'IOT', 'IRN', 'IRQ', 'ISR', 'JOR', 'JPN', 'KAZ', 'KGZ', 'KHM', 'KOR', 'KWT', 'LAO', 'LBN', 'LKA', 'MAC', 'MMR', 'MNG', 'MYS', 'NPL', 'OMN', 'PAK', 'PHL', 'PRK', 'PSE', 'QAT', 'RUS', 'SAU', 'SGP', 'SYR', 'THA', 'TJK', 'TKM', 'TLS', 'TUR', 'TWN', 'UZB', 'VNM', 'YEM'],
+    'Europe':['ALB', 'AND', 'AUT', 'BEL', 'BGR', 'BIH', 'BLR', 'CHE', 'CZE', 'DEU', 'DNK', 'ESP', 'EST', 'FIN', 'FRA', 'FRO', 'GBR', 'GIB', 'GRC', 'HRV', 'HUN', 'IRL', 'ISL', 'ITA', 'LIE', 'LTU', 'LUX', 'LVA', 'MCO', 'MDA', 'MKD', 'MLT', 'MNE', 'NLD', 'NOR', 'POL', 'PRT', 'ROU', 'SJM', 'SMR', 'SRB', 'SVK', 'SVN', 'SWE', 'UKR', 'VAT'],
+    'North America':['ANT', 'ABW', 'AIA', 'ATG', 'BHS', 'BLZ', 'BMU', 'BRB', 'CAN', 'CRI', 'CUB', 'CYM', 'DMA', 'DOM', 'GLP', 'GRD', 'GRL', 'GTM', 'HND', 'HTI', 'JAM', 'KNA', 'LCA', 'MEX', 'MSR', 'MTQ', 'NIC', 'PAN', 'PRI', 'SLV', 'TCA', 'TTO', 'USA', 'VCT', 'VGB', 'VIR'],
+    'Oceania':['ASM', 'AUS', 'CCK', 'COK', 'CXR', 'FJI', 'FLK', 'FSM', 'GUM', 'KIR', 'MNP', 'NCL', 'NFK', 'NIU', 'NRU', 'NZL', 'PCN', 'PLW', 'PNG', 'PYF', 'SLB', 'TON', 'VUT', 'WSM'],
+    'South America':['ARG', 'BOL', 'BRA', 'CHL', 'COL', 'ECU', 'GUF', 'GUY', 'PER', 'PRY', 'SUR', 'URY', 'VEN'],
+};
+
 const splitmix32 = (a) => () => {
     a = (a | 0) + (0x9e3779b9 | 0);
 
@@ -160,6 +171,7 @@ const DeckGLRenderScatterplot: any = ({
     setAttributeValue,
     setBiomeID,
     setBiosampleID,
+    setCountryID,
     setLatLon,
     identifiers,
 }) => {
@@ -206,9 +218,10 @@ const DeckGLRenderScatterplot: any = ({
             const identifierClauses = getIdClauses(identifiers?.biosample?.single, identifiers?.biosample?.range);
 
             const SELECT: any = {
-                text: `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, id
-                FROM bgl_gp4326_wwf_tew_pv
-                ${identifierClauses.length > 0 ? `WHERE (${identifierClauses.join(' OR ')})` : ''}
+                text: `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, gm4326_id, gp4326_wwf_tew_id
+                FROM bgl_gm4326_gp4326
+                WHERE palm_virome = TRUE
+                ${identifierClauses.length > 0 ? ` AND (${identifierClauses.join(' OR ')})` : ''}
                 LIMIT 65536;`,
             };
             console.log('SELECT.text', SELECT.text);
@@ -237,7 +250,8 @@ const DeckGLRenderScatterplot: any = ({
                     'attribute_value',
                     'lat',
                     'lon',
-                    'id'
+                    'gm4326_id',
+                    'gp4326_wwf_tew_id'
                 ]);
                 const zoomDriftFactor = Math.pow(2, (16 - mlglMap.getZoom()) / 8) / 8000;
 
@@ -254,10 +268,10 @@ const DeckGLRenderScatterplot: any = ({
                         new (globalThis as any).deck.ScatterplotLayer({
                             data: json,
                             getFillColor:d => {
-                                if(!d.id)
-                                    d.id = 'WWF_TEW_BIOME_99';
+                                if(!d.gp4326_wwf_tew_id)
+                                    d.gp4326_wwf_tew_id = 'WWF_TEW_BIOME_99';
 
-                                return WWF_TEW[d.id].rgb;
+                                return WWF_TEW[d.gp4326_wwf_tew_id].rgb;
                             },
                             getPosition: (d) => {
                                 const prng = splitmix32(cyrb128(d.accession)[0]);
@@ -274,8 +288,10 @@ const DeckGLRenderScatterplot: any = ({
                                     setAttributeName(info.object.attribute_name);
                                     setAttributeValue(info.object.attribute_value);
 
-                                    setBiomeID(info.object.id);
+                                    setBiomeID(info.object.gp4326_wwf_tew_id);
                                     setBiosampleID(info.object.accession);
+
+                                    setCountryID(info.object.gm4326_id);
 
                                     setLatLon([info.object.lat, info.object.lon].join(','));
                                 }
@@ -311,6 +327,8 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
     const [bioprojectTitle, setBioprojectTitle] = useState('');
     const [biosampleID, setBiosampleID] = useState('');
     const [biosampleTitle, setBiosampleTitle] = useState('');
+    const [countryID, setCountryID] = useState('');
+    const [countryRegionID, setCountryRegionID] = useState('');
     const [latLon, setLatLon] = useState('');
 
     useEffect(() => {
@@ -347,6 +365,7 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
                     setBiomeID,
                     setBioprojectID,
                     setBiosampleID,
+                    setCountryID,
                     setLatLon,
                     identifiers,
                 });
@@ -388,6 +407,18 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
             setBiosampleTitle('');
         }
     }, [biosampleID]);
+
+    useEffect(() => {
+        if(countryID)
+            setCountryRegionID(Object.keys(regionCountries).filter(k => regionCountries[k].includes(countryID))[0]);
+        else if(
+               biomeID === 'WWF_TEW_BIOME_98'
+            || biomeID === 'WWF_TEW_BIOME_99'
+        )
+            setCountryRegionID('Ocean');
+        else
+            setCountryRegionID('');
+    }, [biomeID, countryID]);
 
     return (
         <div style={style}>
@@ -464,6 +495,21 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
                     </div>
                     <div style={{ margin: '2px 0 0 0' }}>
                         <span style={{ fontSize: '14px', verticalAlign:'middle' }}>{biomeID && WWF_TEW[biomeID].name}</span>
+                    </div>
+                    <div style={{ height: '8px' }}></div>
+                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                        <span>COUNTRY</span>
+                    </div>
+                    <div style={{ margin: '2px 0 0 0' }}>
+                        <Flag code={countryID} height="16" style={{ verticalAlign:'middle' }} />
+                        <span style={{ fontSize: '14px', margin:'0 0 0 8px', verticalAlign:'middle' }}>{countryID}</span>
+                    </div>
+                    <div style={{ height: '8px' }}></div>
+                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                        <span>REGION</span>
+                    </div>
+                    <div style={{ margin: '2px 0 0 0' }}>
+                        <span style={{ fontSize: '14px' }}>{countryRegionID}</span>
                     </div>
                 </div>
             </div>
