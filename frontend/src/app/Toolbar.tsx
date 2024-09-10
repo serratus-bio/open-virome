@@ -7,7 +7,6 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import FilterTags from '../features/Query/FilterTags.tsx';
 import IconButton from '@mui/material/IconButton';
-import PageviewIcon from '@mui/icons-material/Pageview';
 import TuneIcon from '@mui/icons-material/Tune';
 
 const AppToolbar = () => {
@@ -28,13 +27,14 @@ const AppToolbar = () => {
         }),
         '& .MuiToolbar-root': { padding: 0 },
         ...(open && {
-            width: `calc(100% - ${drawerWidth}px)`,
-            marginLeft: `${drawerWidth}px`,
-            transition: theme.transitions.create(['margin', 'width'], {
+            'width': `calc(100% - ${drawerWidth}px)`,
+            'marginLeft': `${drawerWidth}px`,
+            'transition': theme.transitions.create(['margin', 'width'], {
                 easing: theme.transitions.easing.easeOut,
                 duration: theme.transitions.duration.enteringScreen,
             }),
-            zIndex: 1400,
+            'zIndex': 1400,
+            '& .MuiToolbar-root': { paddingLeft: 4 },
         }),
     });
 
