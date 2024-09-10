@@ -152,63 +152,76 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
         biosample_geo_virome: 'biosample',
     };
 
-    let tables = [];
 
-    if (filters.length > 0) {
-        filterTypes.forEach((filterType) => {
-            tables = [
-                ...tables,
-                ...Object.keys(tableToColumn).filter((table) => tableToColumn[table].includes(filterType)),
-            ];
-        });
-    }
+    // Helper function to get tables based on filters or groupBy
+    const getRelevantTables = (keys) => {
+        return [...new Set(keys.flatMap(key =>
+            Object.keys(tableToColumn).filter(table => tableToColumn[table].includes(key))
+        ))];
+    };
+
+    // Determine relevant tables from filters and groupBy
+    let tables = filters.length ? getRelevantTables(filterTypes) : [];
     if (groupBy !== undefined) {
-        //TODO: improve table infered from groupBy, it's possible the mapping is not unique
-        tables = [...tables, ...Object.keys(tableToColumn).filter((table) => tableToColumn[table].includes(groupBy))];
+        tables = [...tables, ...getRelevantTables([groupBy])];
     }
 
+    // Default join order has sra table first, remove duplicate tables
+    tables = ['sra', ...tables.filter((table) => table !== 'sra')];
     tables = [...new Set(tables)];
-    tables = tables.filter((table) => table !== 'sra');
-    tables = ['sra', ...tables];
 
-    let joinStatements = [];
-    for (let i = 0; i < tables.length; i++) {
-        const table = tables[i];
-        const columns = tableToColumn[table];
-        const tableJoinKey = tableToJoinKey[table];
-        let tableFilters = filters.filter((filter) => columns.includes(filter.groupByKey));
-        tableFilters = tableFilters.map((filter) => {
-            return {
-                ...filter,
-                filterKey: handleIdKeyIrregularities(filter.filterKey, table),
-            };
-        });
-        const selectStatement =
-            i == 0 || columns.includes(groupBy) || tableFilters.length > 0 ? tableToInnerSelect[table] : tableJoinKey;
-        const whereStatement = tableFilters.length > 0 ? `WHERE ${getFilterClauses(tableFilters, table)}` : '';
-        if (i > 0) {
-            joinStatements.push(`INNER JOIN (
+
+    // Helper to build join statements
+    const buildJoinStatement = (table, index, selectStatement, whereStatement, tableJoinKey) => {
+        if (index === 0) {
+            return `(
+                SELECT ${selectStatement} FROM ${table}
+                ${whereStatement}
+            ) as ${table}`;
+        } else {
+            return `INNER JOIN (
                 SELECT ${selectStatement}
                 FROM ${table}
                 ${whereStatement}
-            ) as ${table} ON sra.${tableJoinKey} = ${table}.${tableJoinKey}`);
-        } else {
-            joinStatements.push(`(
-                SELECT ${selectStatement} FROM ${table}
-                ${whereStatement}
-            ) as ${table}`);
+            ) as ${table} ON sra.${tableJoinKey} = ${table}.${tableJoinKey}`;
         }
-    }
+    };
 
-    let selectStatements = ['sra.run_id as run_id, sra.biosample as biosample, sra.bioproject as bioproject'];
+    // Build join statements
+    const joinStatements = tables.map((table, i) => {
+        const columns = tableToColumn[table];
+        const tableJoinKey = tableToJoinKey[table];
+        let tableFilters = filters.filter((filter) => columns.includes(filter.groupByKey));
+
+        // Adjust filter keys to account for irregularities
+        tableFilters = tableFilters.map((filter) => ({
+            ...filter,
+            filterKey: handleIdKeyIrregularities(filter.filterKey, table),
+        }));
+
+        const isSingleOrFistTable = i === 0 || columns.includes(groupBy) || tableFilters.length > 0
+
+        const selectStatement = isSingleOrFistTable
+            ? tableToInnerSelect[table]
+            : tableJoinKey;
+
+        const whereStatement = tableFilters.length > 0
+            ? `WHERE ${getFilterClauses(tableFilters, table)}`
+            : '';
+
+        return buildJoinStatement(table, i, selectStatement, whereStatement, tableJoinKey);
+    });
+
+    // Construct select statements
+    const selectStatements = ['sra.run_id as run_id, sra.biosample as biosample, sra.bioproject as bioproject'];
     if (groupBy !== undefined && !selectStatements[0].includes(groupBy)) {
         const groupByTable = tables.find((table) => tableToColumn[table].includes(groupBy));
         selectStatements.push(`${groupByTable}.${groupBy} as ${groupBy}`);
     }
 
-    const query = `
+    // Final query construction
+    return `
         SELECT ${selectStatements.join(', ')}
         FROM ${joinStatements.join('\n')}
     `;
-    return query;
 };

@@ -7,7 +7,6 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import FilterTags from '../features/Query/FilterTags.tsx';
 import IconButton from '@mui/material/IconButton';
-import PageviewIcon from '@mui/icons-material/Pageview';
 import TuneIcon from '@mui/icons-material/Tune';
 
 const AppToolbar = () => {
@@ -35,6 +34,7 @@ const AppToolbar = () => {
                 duration: theme.transitions.duration.enteringScreen,
             }),
             zIndex: 1400,
+            '& .MuiToolbar-root': { paddingLeft: 4 },
         }),
     });
 
