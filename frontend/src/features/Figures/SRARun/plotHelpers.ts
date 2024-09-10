@@ -10,23 +10,33 @@ export function histogramBins(values) {
     return bins;
 }
 
-export const getTargetControlPlotData = (targetRows = [], controlRows = [], countKey = 'count', maxRows) => {
+export const getTargetControlPlotData = (targetRows = [], controlRows = [], countKey = 'count', maxRows = 9) => {
+    let colKey = countKey;
+    if (countKey === 'percent') {
+        colKey = 'count';
+    }
+
     const parseCount = (value) => {
-        switch (countKey) {
+        let val;
+        switch (colKey) {
             case 'gbp':
-                return parseFloat(parseFloat(value).toFixed(1));
+                val = parseFloat(parseFloat(value).toFixed(1));
             case 'count':
             case 'percent':
-                return Math.round(parseFloat(value));
+                val = Math.round(parseFloat(value));
             default:
-                return parseInt(value);
+                val = parseInt(value);
         }
+        if (isNaN(val)) {
+            return 0;
+        }
+        return val;
     };
 
     const targetRowsSet = new Set(targetRows);
     const mergedRows = [...targetRows, ...controlRows].reduce((acc, row) => {
         const name = row.name || 'N/A';
-        const count = parseCount(row[countKey]);
+        const count = parseCount(row[colKey]);
         const existingRow = acc.find((r) => r.name === name);
         const isInTarget = targetRowsSet.has(row);
         if (existingRow) {
@@ -42,10 +52,21 @@ export const getTargetControlPlotData = (targetRows = [], controlRows = [], coun
         return acc;
     }, []);
 
+    // Subtract target from control count
     mergedRows.forEach((row) => {
         row.target = parseCount(row.target);
-        row.control = countKey == 'percent' ? parseCount(row.control) : parseCount(Math.abs(row.control - row.target));
+        row.control = parseCount(Math.max(row.control - row.target, 0));
     });
+
+    // Calculate percentage of set
+    if (countKey === 'percent') {
+        const totalTarget = mergedRows.reduce((acc, row) => acc + row.target, 0);
+        const totalControl = mergedRows.reduce((acc, row) => acc + row.control, 0);
+        mergedRows.forEach((row) => {
+            row.target = Math.round((row.target / totalTarget) * 100);
+            row.control = Math.round((row.control / totalControl) * 100);
+        });
+    }
 
     mergedRows.sort((a, b) => a.target + a.control - (b.target + b.control));
 
@@ -62,6 +83,8 @@ export const getTargetControlPlotData = (targetRows = [], controlRows = [], coun
         mergedRows.splice(0, mergedRows.length - maxRows, others);
     }
 
+    const maxCount = Math.max(...mergedRows.flatMap((row) => [row.target, row.control]));
+
     const getZoomPercentage = (desiredRows, totalRows) => {
         if (totalRows <= desiredRows) {
             return 0;
@@ -69,7 +92,6 @@ export const getTargetControlPlotData = (targetRows = [], controlRows = [], coun
         const percentage = (desiredRows / totalRows) * 100;
         return Math.min(100, Math.max(0, 100 - percentage));
     };
-
     const dataZoom = [
         {
             type: 'inside',
@@ -82,8 +104,6 @@ export const getTargetControlPlotData = (targetRows = [], controlRows = [], coun
             moveOnMouseWheel: true,
         },
     ];
-
-    const maxCount = Math.max(...mergedRows.flatMap((row) => [row.target, row.control]));
 
     return {
         xAxis: {
@@ -138,9 +158,7 @@ export const getTargetControlPlotData = (targetRows = [], controlRows = [], coun
 export const getBioprojectSizePlotData = (controlRows = []) => {
     const values = controlRows.map((row) => parseInt(row['count']));
     const bins = histogramBins(values);
-
     const maxRuns = Math.max(...bins.data.map((bin) => bin[3]));
-    const maxCount = Math.max(...bins.data.map((bin) => bin[1]));
 
     const tooltipFormatter = (args) => {
         const count = args[0].value[1];
@@ -221,7 +239,6 @@ export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRo
     });
 
     const bins = histogramBins(percentageToNumRuns);
-    const maxCount = Math.max(...bins.data.map((bin) => bin[1]));
 
     const tooltipFormatter = (args) => {
         const count = args[0].value[1];
@@ -314,7 +331,6 @@ export const getBioprojectSizeVsPercentagePlotData = (controlRows = [], targetRo
         const runs = rows[args.dataIndex][0];
         return `${args.marker} Bioproject: ${bioprojectId} <br /> &ensp; &ensp; ${percentage}% Target  <br />  &ensp; &ensp; ${runs} Runs <br />`;
     };
-    const maxRuns = Math.max(...rows.map((row) => row[0]));
 
     return {
         xAxis: {
