@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
-import { moduleConfig } from '../Module/constants.ts';
-import { shouldDisableFigureView, isSummaryView, getControlTargetPlotData } from '../../common/utils/plotHelpers.ts';
-import { useGetCountsQuery } from '../../api/client.ts';
-import { formatNumber } from '../../common/utils/textFormatting.ts';
+import { moduleConfig } from '../../Module/constants.ts';
+import { shouldDisableFigureView, isSummaryView } from '../../../common/utils/plotHelpers.ts';
+import { getTargetControlPlotData } from './plotHelpers.ts';
+import { useGetCountsQuery } from '../../../api/client.ts';
+import { formatNumber } from '../../../common/utils/textFormatting.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
-import BarPlot from '../../common/BarPlot.tsx';
-import PolarBarPlot from '../../common/PolarBarPlot.tsx';
-import RadioButtonsGroup from '../../common/RadioButtonsGroup.tsx';
+import BarPlot from '../../../common/BarPlot.tsx';
+import PolarBarPlot from '../../../common/PolarBarPlot.tsx';
+import RadioButtonsGroup from '../../../common/RadioButtonsGroup.tsx';
 
 const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
     const [activeCountKey, setActiveCountKey] = useState('count');
@@ -73,7 +74,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
     };
 
     const renderFigure = (seriesName) => {
-        const plotData = getControlTargetPlotData(targetCountData, controlCountData, activeCountKey);
+        const plotData = getTargetControlPlotData(targetCountData, controlCountData, activeCountKey);
         let totalRuns = getTotalRuns(seriesName);
         const filteredPlotData = {
             ...plotData,

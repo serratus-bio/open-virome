@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { moduleConfig } from '../Module/constants.ts';
+import { moduleConfig } from '../../Module/constants.ts';
 
 import CrossIcon from '@mui/icons-material/Clear';
-import PagedTable from '../../common/PagedTable.tsx';
+import PagedTable from '../../../common/PagedTable.tsx';
 import Link from '@mui/material/Link';
 import MdOpenInNew from '@mui/icons-material/OpenInNew';
 import Typography from '@mui/material/Typography';
