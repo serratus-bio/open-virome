@@ -72,8 +72,8 @@ export const moduleConfig = {
         defaultDisplay: 'figure',
     },
     geography: {
-        title: 'Ecology',
-        tag: 'Ecology',
+        title: 'Ecology (Simple)',
+        tag: 'Ecology (Simple)',
         groupByKey: 'geo_attribute_value',
         resultsIdColumn: 'biosample',
         resultsTable: 'biosample_geo_virome',

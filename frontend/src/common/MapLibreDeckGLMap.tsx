@@ -173,6 +173,7 @@ const DeckGLRenderScatterplot: any = ({
     setBiosampleID,
     setCountryID,
     setLatLon,
+    setResultCount,
     identifiers,
 }) => {
     if (!DeckGLRenderScatterplot.n) DeckGLRenderScatterplot.n = 0;
@@ -243,6 +244,7 @@ const DeckGLRenderScatterplot: any = ({
 
             if (response && response.status === 200) {
                 let json = await response.json();
+                const zoomDriftFactor = Math.pow(2, (16 - mlglMap.getZoom()) / 8) / 8000;
 
                 json = arrayMapColumns(json.result, [
                     'accession',
@@ -253,7 +255,8 @@ const DeckGLRenderScatterplot: any = ({
                     'gm4326_id',
                     'gp4326_wwf_tew_id'
                 ]);
-                const zoomDriftFactor = Math.pow(2, (16 - mlglMap.getZoom()) / 8) / 8000;
+
+                setResultCount(json.length);
 
                 console.debug(
                     '[DEBUG]',
@@ -330,6 +333,7 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
     const [countryID, setCountryID] = useState('');
     const [countryRegionID, setCountryRegionID] = useState('');
     const [latLon, setLatLon] = useState('');
+    const [resultCount, setResultCount] = useState(0);
 
     useEffect(() => {
         if (mapRef.current && globalThis.maplibregl && globalThis.deck) {
@@ -367,6 +371,7 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
                     setBiosampleID,
                     setCountryID,
                     setLatLon,
+                    setResultCount,
                     identifiers,
                 });
 
@@ -425,20 +430,7 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
             <div ref={mapRef} style={{ height: '70vh', position: 'relative', width: '100%' }}>
                 {/* Tooltip */}
                 <div style={{ backgroundColor: 'rgba(18, 18, 18, 0.8)', borderRadius: '6px', color: '#FFF', maxHeight: '512px', overflowY: 'scroll', padding: '12px 16px 16px 16px', position: 'absolute', right: '8px', top: '8px', width: '384px', zIndex: 1 }}>
-                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                        <span>ATTRIBUTE NAME</span>
-                        <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(attributeName)} />
-                    </div>
-                    <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{attributeName}</div>
-                    <div style={{ height: '8px' }}></div>
-                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                        <span>ATTRIBUTE VALUE</span>
-                        <MapLibreDeckGLMapCopyButton
-                            onClick={() => navigator.clipboard.writeText(attributeValue)}
-                        />
-                    </div>
-                    <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{truncate(attributeValue, 40)}</div>
-                    <div style={{ height: '8px' }}></div>
+                    {/* <div style={{ height: '8px' }}></div>
                     <div style={{ flex: '1 0' }}>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>LAT / LON</span>
@@ -448,8 +440,7 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
                             />
                         </div>
                         <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{latLon}</div>
-                    </div>
-                    <div style={{ height: '8px' }}></div>
+                    </div> */}
                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                         <span>BIOSAMPLE</span>
                         <div style={{ color: '#FFF', display: 'inline', fontSize: '18px', fontWeight: 400, margin: '0 0 0 8px' }}>{biosampleID}</div>
@@ -467,6 +458,12 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
                             '\u200B'
                         )}
                     </div>
+                    <div style={{ height: '8px' }}></div>
+                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                        <span>{attributeName.toUpperCase()}</span>
+                        <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(attributeName)} />
+                    </div>
+                    <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{truncate(attributeValue, 40)}</div>
                     <div style={{ height: '8px' }}></div>
                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                         <span>BIOPROJECT</span>
@@ -488,30 +485,36 @@ const MapLibreDeckGLMap = ({ identifiers, style = {} }) => {
                             '\u200B'
                         )}
                     </div>
-                    <div style={{ height: '8px' }}></div>
+                    {/* <div style={{ height: '8px' }}></div>
                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                         <span style={{ verticalAlign:'middle' }}>BIOME</span>
                         <span style={{ backgroundColor:biomeID ? WWF_TEW[biomeID].hex : 'transparent', display:'inline-block', height:'14px', fontSize: '14px', margin:'0 0 0 8px', verticalAlign:'middle', width:'36px' }} />
                     </div>
                     <div style={{ margin: '2px 0 0 0' }}>
                         <span style={{ fontSize: '14px', verticalAlign:'middle' }}>{biomeID && WWF_TEW[biomeID].name}</span>
-                    </div>
-                    <div style={{ height: '8px' }}></div>
+                    </div> */}
+                    {/* <div style={{ height: '8px' }}></div>
                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                         <span>COUNTRY</span>
                     </div>
                     <div style={{ margin: '2px 0 0 0' }}>
                         <Flag code={countryID} height="16" style={{ verticalAlign:'middle' }} />
                         <span style={{ fontSize: '14px', margin:'0 0 0 8px', verticalAlign:'middle' }}>{countryID}</span>
-                    </div>
-                    <div style={{ height: '8px' }}></div>
+                    </div> */}
+                    {/* <div style={{ height: '8px' }}></div>
                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                         <span>REGION</span>
                     </div>
                     <div style={{ margin: '2px 0 0 0' }}>
                         <span style={{ fontSize: '14px' }}>{countryRegionID}</span>
-                    </div>
+                    </div> */}
                 </div>
+                {resultCount >= 1024*64 && <div style={{ backgroundColor: 'rgba(18, 18, 18, 0.8)', borderRadius: '6px', color: '#FFF', maxHeight: '512px', overflowY: 'scroll', padding: '12px 16px 12px 16px', position: 'absolute', right: '400px', top: '8px', zIndex: 1 }}>
+                    <div style={{ color: '#E90', fontSize: '12px', fontWeight: 700 }}>
+                        <div>More than 65,536 points match your currenty query.</div>
+                        <div>To see them all download the full dataset. {resultCount}</div>
+                    </div>
+                </div>}
             </div>
         </div>
     );
