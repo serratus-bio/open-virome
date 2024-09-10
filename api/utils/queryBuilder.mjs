@@ -152,12 +152,13 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
         biosample_geo_virome: 'biosample',
     };
 
-
     // Helper function to get tables based on filters or groupBy
     const getRelevantTables = (keys) => {
-        return [...new Set(keys.flatMap(key =>
-            Object.keys(tableToColumn).filter(table => tableToColumn[table].includes(key))
-        ))];
+        return [
+            ...new Set(
+                keys.flatMap((key) => Object.keys(tableToColumn).filter((table) => tableToColumn[table].includes(key))),
+            ),
+        ];
     };
 
     // Determine relevant tables from filters and groupBy
@@ -169,7 +170,6 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
     // Default join order has sra table first, remove duplicate tables
     tables = ['sra', ...tables.filter((table) => table !== 'sra')];
     tables = [...new Set(tables)];
-
 
     // Helper to build join statements
     const buildJoinStatement = (table, index, selectStatement, whereStatement, tableJoinKey) => {
@@ -199,15 +199,11 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
             filterKey: handleIdKeyIrregularities(filter.filterKey, table),
         }));
 
-        const isSingleOrFistTable = i === 0 || columns.includes(groupBy) || tableFilters.length > 0
+        const isSingleOrFirstTable = i === 0 || columns.includes(groupBy) || tableFilters.length > 0;
 
-        const selectStatement = isSingleOrFistTable
-            ? tableToInnerSelect[table]
-            : tableJoinKey;
+        const selectStatement = isSingleOrFirstTable ? tableToInnerSelect[table] : tableJoinKey;
 
-        const whereStatement = tableFilters.length > 0
-            ? `WHERE ${getFilterClauses(tableFilters, table)}`
-            : '';
+        const whereStatement = tableFilters.length > 0 ? `WHERE ${getFilterClauses(tableFilters, table)}` : '';
 
         return buildJoinStatement(table, i, selectStatement, whereStatement, tableJoinKey);
     });

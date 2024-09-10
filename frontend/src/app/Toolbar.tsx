@@ -27,13 +27,13 @@ const AppToolbar = () => {
         }),
         '& .MuiToolbar-root': { padding: 0 },
         ...(open && {
-            width: `calc(100% - ${drawerWidth}px)`,
-            marginLeft: `${drawerWidth}px`,
-            transition: theme.transitions.create(['margin', 'width'], {
+            'width': `calc(100% - ${drawerWidth}px)`,
+            'marginLeft': `${drawerWidth}px`,
+            'transition': theme.transitions.create(['margin', 'width'], {
                 easing: theme.transitions.easing.easeOut,
                 duration: theme.transitions.duration.enteringScreen,
             }),
-            zIndex: 1400,
+            'zIndex': 1400,
             '& .MuiToolbar-root': { paddingLeft: 4 },
         }),
     });
