@@ -1,16 +1,15 @@
 import React from 'react';
+import { shouldDisableFigureView, isSummaryView } from '../../../common/utils/plotHelpers.ts';
 import {
-    shouldDisableFigureView,
-    isSummaryView,
     getBioprojectSizePlotData,
     getBioprojectTargetPercentagePlotData,
     getBioprojectSizeVsPercentagePlotData,
-} from '../../common/utils/plotHelpers.ts';
-import { useGetCountsQuery } from '../../api/client.ts';
-import { moduleConfig } from '../Module/constants.ts';
+} from './plotHelpers.ts';
+import { useGetCountsQuery } from '../../../api/client.ts';
+import { moduleConfig } from '../../Module/constants.ts';
 
-import HistogramPlot from '../../common/HistogramPlot.tsx';
-import ScatterPlot from '../../common/ScatterPlot.tsx';
+import HistogramPlot from '../../../common/HistogramPlot.tsx';
+import ScatterPlot from '../../../common/ScatterPlot.tsx';
 import Skeleton from '@mui/material/Skeleton';
 import Box from '@mui/material/Box';
 

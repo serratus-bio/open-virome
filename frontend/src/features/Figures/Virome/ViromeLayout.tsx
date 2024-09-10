@@ -1,18 +1,19 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { selectActiveModuleBySection } from '../../app/slice.ts';
-import { getViromeGraphData, isSummaryView } from '../../common/utils/plotHelpers.ts';
-import { useGetResultQuery } from '../../api/client.ts';
-import { moduleConfig } from '../Module/constants.ts';
-import { handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
+import { selectActiveModuleBySection } from '../../../app/slice.ts';
+import { isSummaryView } from '../../../common/utils/plotHelpers.ts';
+import { getViromeGraphData } from './plotHelpers.ts';
+import { useGetResultQuery } from '../../../api/client.ts';
+import { moduleConfig } from '../../Module/constants.ts';
+import { handleIdKeyIrregularities } from '../../../common/utils/queryHelpers.ts';
 import cytoscape from 'cytoscape';
 
-import NetworkPlot from '../../common/NetworkPlot.tsx';
+import NetworkPlot from '../../../common/NetworkPlot.tsx';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
-import DropDownSelect from '../../common/DropdownSelect.tsx';
-import ScatterPlot from '../../common/ScatterPlot.tsx';
+import DropDownSelect from '../../../common/DropdownSelect.tsx';
+import ScatterPlot from '../../../common/ScatterPlot.tsx';
 import ViromeSummaryTable from './ViromeSummaryTable.tsx';
 
 const ViromeLayout = ({ identifiers }) => {

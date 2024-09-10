@@ -9,9 +9,9 @@ import { useGetIdentifiersQuery } from '../../api/client.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import SRARunLayout from '../Figures/SRARunLayout.tsx';
+import SRARunLayout from '../Figures/SRARun/SRARunLayout.tsx';
 import EnvironmentLayout from '../Figures/EnvironmentLayout.tsx';
-import ViromeLayout from '../Figures/ViromeLayout.tsx';
+import ViromeLayout from '../Figures/Virome/ViromeLayout.tsx';
 import IconButton from '@mui/material/IconButton';
 import TableIcon from '@mui/icons-material/TableRows';
 import PlotIcon from '@mui/icons-material/InsertChart';
