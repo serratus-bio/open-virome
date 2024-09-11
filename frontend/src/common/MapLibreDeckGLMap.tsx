@@ -429,7 +429,62 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
         <div style={style}>
             <div ref={mapRef} style={{ height: '70vh', position: 'relative', width: '100%' }}>
                 {/* Tooltip */}
-                {biosampleID && <div style={{ backgroundColor: 'rgba(18, 18, 18, 0.8)', borderRadius: '6px', color: '#FFF', maxHeight: '512px', overflowY: 'scroll', padding: '12px 16px 16px 16px', position: 'absolute', right: '8px', top: '8px', width: '384px', zIndex: 1 }}>
+                <div style={{ display:'flex', flexDirection:'column', gap:'8px', position: 'absolute', right: '8px', top: '8px', width: '384px', zIndex: 1 }}>
+                    {resultCount >= 1024*64 && <MapLibreDeckGLMapTooltipSection>
+                        <div style={{ color: '#E90', fontSize: '12px', fontWeight: 700 }}>
+                            <div>More than 65,536 points match your currenty query.</div>
+                            <div>To see them all download the full dataset.</div>
+                        </div>
+                    </MapLibreDeckGLMapTooltipSection>}
+                    <MapLibreDeckGLMapTooltipSection>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                            <span>BIOSAMPLE</span>
+                            <div style={{ color: '#FFF', display: 'inline', fontSize: '18px', fontWeight: 400, margin: '0 0 0 8px' }}>{biosampleID}</div>
+                            <div style={{ display: 'inline', margin: '0 0 0 4px', verticalAlign: 'top' }}>
+                                <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(biosampleID)} />
+                                <MapLibreDeckGLMapURLButton
+                                    href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID}
+                                />
+                            </div>
+                        </div>
+                        <div style={{ margin: '2px 0 0 0' }}>
+                            {biosampleID ? (
+                                <div style={{ fontSize: '14px' }}>{biosampleTitle}</div>
+                            ) : (
+                                '\u200B'
+                            )}
+                        </div>
+                        <div style={{ height: '8px' }}></div>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                            <span>BIOPROJECT</span>
+                            <div style={{ color: '#FFF', display: 'inline', fontSize: '18px', fontWeight: 400, margin: '0 0 0 8px' }}>{bioprojectID}</div>
+                            <div style={{ display: 'inline', margin: '0 0 0 4px', verticalAlign: 'top' }}>
+                                <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(bioprojectID)} />
+                                <MapLibreDeckGLMapURLButton
+                                    href={'https://www.ncbi.nlm.nih.gov/bioproject/?term=' + bioprojectID}
+                                />
+                            </div>
+                        </div>
+                        <div style={{ margin: '2px 0 0 0' }}>
+                            {bioprojectID ? (
+                                <>
+                                    <div style={{ fontSize: '14px' }}>{bioprojectName}</div>
+                                    <div style={{ fontSize: '14px' }}>{bioprojectTitle}</div>
+                                </>
+                            ) : (
+                                '\u200B'
+                            )}
+                        </div>
+                        <div style={{ height: '8px' }}></div>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                            <span>{attributeName.toUpperCase()}</span>
+                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(attributeValue)} />
+                        </div>
+                        <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{truncate(attributeValue, 40)}</div>
+                    </MapLibreDeckGLMapTooltipSection>
+                </div>
+
+                {false && <div style={{ backgroundColor: 'rgba(18, 18, 18, 0.8)', borderRadius: '6px', color: '#FFF', padding: '12px 16px 16px 16px', position: 'absolute', right: '8px', top: '8px', width: '384px', zIndex: 1 }}>
                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                         <span>{layout.toUpperCase()}</span>
                     </div>
@@ -444,50 +499,6 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                         </div>
                         <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{latLon}</div>
                     </div> */}
-                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                        <span>BIOSAMPLE</span>
-                        <div style={{ color: '#FFF', display: 'inline', fontSize: '18px', fontWeight: 400, margin: '0 0 0 8px' }}>{biosampleID}</div>
-                        <div style={{ display: 'inline', margin: '0 0 0 4px', verticalAlign: 'top' }}>
-                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(biosampleID)} />
-                            <MapLibreDeckGLMapURLButton
-                                href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID}
-                            />
-                        </div>
-                    </div>
-                    <div style={{ margin: '2px 0 0 0' }}>
-                        {biosampleID ? (
-                            <div style={{ fontSize: '14px' }}>{biosampleTitle}</div>
-                        ) : (
-                            '\u200B'
-                        )}
-                    </div>
-                    <div style={{ height: '8px' }}></div>
-                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                        <span>{attributeName.toUpperCase()}</span>
-                        <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(attributeName)} />
-                    </div>
-                    <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{truncate(attributeValue, 40)}</div>
-                    <div style={{ height: '8px' }}></div>
-                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                        <span>BIOPROJECT</span>
-                        <div style={{ color: '#FFF', display: 'inline', fontSize: '18px', fontWeight: 400, margin: '0 0 0 8px' }}>{bioprojectID}</div>
-                        <div style={{ display: 'inline', margin: '0 0 0 4px', verticalAlign: 'top' }}>
-                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(bioprojectID)} />
-                            <MapLibreDeckGLMapURLButton
-                                href={'https://www.ncbi.nlm.nih.gov/bioproject/?term=' + bioprojectID}
-                            />
-                        </div>
-                    </div>
-                    <div style={{ margin: '2px 0 0 0' }}>
-                        {bioprojectID ? (
-                            <>
-                                <div style={{ fontSize: '14px' }}>{bioprojectName}</div>
-                                <div style={{ fontSize: '14px' }}>{bioprojectTitle}</div>
-                            </>
-                        ) : (
-                            '\u200B'
-                        )}
-                    </div>
                     {/* <div style={{ height: '8px' }}></div>
                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                         <span style={{ verticalAlign:'middle' }}>BIOME</span>
@@ -512,18 +523,12 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                         <span style={{ fontSize: '14px' }}>{countryRegionID}</span>
                     </div> */}
                 </div>}
-                {resultCount >= 1024*64+1 && <div style={{ backgroundColor: 'rgba(18, 18, 18, 0.8)', borderRadius: '6px', color: '#FFF', maxHeight: '512px', overflowY: 'scroll', padding: '12px 16px 12px 16px', position: 'absolute', right: '400px', top: '8px', zIndex: 1 }}>
-                    <div style={{ color: '#E90', fontSize: '12px', fontWeight: 700 }}>
-                        <div>More than 65,536 points match your currenty query.</div>
-                        <div>To see them all download the full dataset. {resultCount}</div>
-                    </div>
-                </div>}
             </div>
         </div>
     );
 };
 
-const MapLibreDeckGLMapCopyButton = (props) => (
+const MapLibreDeckGLMapCopyButton = ({ ...props }) => (
     <MdCopyAll
         style={{
             color: '#FFF',
@@ -536,10 +541,14 @@ const MapLibreDeckGLMapCopyButton = (props) => (
         {...props}
     />
 );
-const MapLibreDeckGLMapURLButton = (props) => (
+const MapLibreDeckGLMapURLButton = ({ ...props }) => (
     <a style={{ color: '#FFF', margin: '4px 0 0 6px', userSelect: 'none' }} target='_blank' {...props}>
         <MdOpenInNew style={{ fontSize: '18px', verticalAlign: 'bottom' }} />
     </a>
 );
+
+const MapLibreDeckGLMapTooltipSection = ({ children, ...props }) => {
+    return <div style={{ backgroundColor: 'rgba(18, 18, 18, 0.8)', borderRadius: '6px', color: '#FFF', padding: '12px 16px 12px 16px' }} {...props}>{children}</div>;
+};
 
 export default MapLibreDeckGLMap;
