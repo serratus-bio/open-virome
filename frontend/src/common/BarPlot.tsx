@@ -42,6 +42,12 @@ const BarPlot = ({ plotData = {}, styles = {}, onEvents = {} }) => {
         ...plotData,
     };
 
+    options.series.forEach((obj) => {
+        if (obj.label != null) {
+            obj.label.position = ['50%', '5%']
+        }
+    });
+
     return <ReactEcharts option={options} style={styles} onEvents={onEvents} />;
 };
 
