@@ -61,7 +61,6 @@ const ViromeLayout = ({ identifiers }) => {
         if (allFilters.length === 0 || !resultData) {
             return resultData;
         }
-
         const familyFilters = allFilters.filter((filter) => filter.filterType === 'family');
         const speciesFilters = allFilters.filter((filter) => filter.filterType === 'species');
         const sotuFilters = allFilters.filter((filter) => filter.filterType === 'sotu');
