@@ -432,7 +432,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                 <div style={{ display:'flex', flexDirection:'column', gap:'8px', position: 'absolute', right: '8px', top: '8px', width: '384px', zIndex: 1 }}>
                     {resultCount >= 1024*64 && <MapLibreDeckGLMapTooltipSection>
                         <div style={{ color: '#E90', fontSize: '12px', fontWeight: 700 }}>
-                            <div>More than 65,536 points match your currenty query.</div>
+                            <div>More than 65,536 points match your current query.</div>
                             <div>To see them all download the full dataset.</div>
                         </div>
                     </MapLibreDeckGLMapTooltipSection>}
