@@ -13,7 +13,7 @@ export const sectionConfig = {
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Virome-Module',
     },
     context: {
-        modules: ['geography', 'statHost', 'tissue'],
+        modules: ['geography_simple', 'geography_advanced', 'statHost', 'tissue'],
         title: 'Metadata Module',
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Metadata-Module',
     },
@@ -71,9 +71,17 @@ export const moduleConfig = {
         resultsIdColumn: 'run',
         defaultDisplay: 'figure',
     },
-    geography: {
+    geography_simple: {
         title: 'Ecology (Simple)',
         tag: 'Ecology (Simple)',
+        groupByKey: 'geo_attribute_value',
+        resultsIdColumn: 'biosample',
+        resultsTable: 'biosample_geo_virome',
+        defaultDisplay: 'figure',
+    },
+    geography_advanced: {
+        title: 'Ecology (Advanced)',
+        tag: 'Ecology (Advanced)',
         groupByKey: 'geo_attribute_value',
         resultsIdColumn: 'biosample',
         resultsTable: 'biosample_geo_virome',

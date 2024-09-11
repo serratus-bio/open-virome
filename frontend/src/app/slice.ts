@@ -22,7 +22,7 @@ const appSlice = createSlice({
         activeModules: {
             sra: 'host',
             palmdb: 'species',
-            context: 'geography',
+            context: 'geography_simple',
         },
         darkMode: true,
     },

@@ -2,7 +2,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import MapPlot from '../../common/MapLibreDeckGLMap.tsx';
 
-const EnvironmentLayout = ({ identifiers }) => {
+const EnvironmentLayout = ({ identifiers, layout }) => {
     return (
         <Box
             sx={{
@@ -13,7 +13,7 @@ const EnvironmentLayout = ({ identifiers }) => {
                 height: '100%',
             }}
         >
-            <MapPlot identifiers={identifiers} />
+            <MapPlot identifiers={identifiers} layout={layout} />
         </Box>
     );
 };
