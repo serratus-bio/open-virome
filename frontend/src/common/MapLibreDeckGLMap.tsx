@@ -117,13 +117,233 @@ const gaussianRandom = (prng) => {
 };
 
 const regionCountries = {
-    'Africa':['AGO', 'BDI', 'BEN', 'BFA', 'BWA', 'CAF', 'CIV', 'CMR', 'COD', 'COG', 'COM', 'CPV', 'DJI', 'DZA', 'EGY', 'ERI', 'ESH', 'ETH', 'GAB', 'GHA', 'GIN', 'GMB', 'GNB', 'GNQ', 'KEN', 'LBR', 'LBY', 'LSO', 'MAR', 'MDG', 'MLI', 'MOZ', 'MRT', 'MUS', 'MWI', 'MYT', 'NAM', 'NER', 'NGA', 'REU', 'RWA', 'SDN', 'SEN', 'SLE', 'SOM', 'SSD', 'STP', 'SWZ', 'SYC', 'TCD', 'TGO', 'TUN', 'TZA', 'UGA', 'ZAF', 'ZMB', 'ZWE'],
-    'Antarctica':['ATF', 'BVT', 'HMD'],
-    'Asia':['AFG', 'ARE', 'ARM', 'AZE', 'BGD', 'BHR', 'BRN', 'BTN', 'CHN', 'CYP', 'GEO', 'HKG', 'IDN', 'IND', 'IOT', 'IRN', 'IRQ', 'ISR', 'JOR', 'JPN', 'KAZ', 'KGZ', 'KHM', 'KOR', 'KWT', 'LAO', 'LBN', 'LKA', 'MAC', 'MMR', 'MNG', 'MYS', 'NPL', 'OMN', 'PAK', 'PHL', 'PRK', 'PSE', 'QAT', 'RUS', 'SAU', 'SGP', 'SYR', 'THA', 'TJK', 'TKM', 'TLS', 'TUR', 'TWN', 'UZB', 'VNM', 'YEM'],
-    'Europe':['ALB', 'AND', 'AUT', 'BEL', 'BGR', 'BIH', 'BLR', 'CHE', 'CZE', 'DEU', 'DNK', 'ESP', 'EST', 'FIN', 'FRA', 'FRO', 'GBR', 'GIB', 'GRC', 'HRV', 'HUN', 'IRL', 'ISL', 'ITA', 'LIE', 'LTU', 'LUX', 'LVA', 'MCO', 'MDA', 'MKD', 'MLT', 'MNE', 'NLD', 'NOR', 'POL', 'PRT', 'ROU', 'SJM', 'SMR', 'SRB', 'SVK', 'SVN', 'SWE', 'UKR', 'VAT'],
-    'North America':['ANT', 'ABW', 'AIA', 'ATG', 'BHS', 'BLZ', 'BMU', 'BRB', 'CAN', 'CRI', 'CUB', 'CYM', 'DMA', 'DOM', 'GLP', 'GRD', 'GRL', 'GTM', 'HND', 'HTI', 'JAM', 'KNA', 'LCA', 'MEX', 'MSR', 'MTQ', 'NIC', 'PAN', 'PRI', 'SLV', 'TCA', 'TTO', 'USA', 'VCT', 'VGB', 'VIR'],
-    'Oceania':['ASM', 'AUS', 'CCK', 'COK', 'CXR', 'FJI', 'FLK', 'FSM', 'GUM', 'KIR', 'MNP', 'NCL', 'NFK', 'NIU', 'NRU', 'NZL', 'PCN', 'PLW', 'PNG', 'PYF', 'SLB', 'TON', 'VUT', 'WSM'],
-    'South America':['ARG', 'BOL', 'BRA', 'CHL', 'COL', 'ECU', 'GUF', 'GUY', 'PER', 'PRY', 'SUR', 'URY', 'VEN'],
+    'Africa': [
+        'AGO',
+        'BDI',
+        'BEN',
+        'BFA',
+        'BWA',
+        'CAF',
+        'CIV',
+        'CMR',
+        'COD',
+        'COG',
+        'COM',
+        'CPV',
+        'DJI',
+        'DZA',
+        'EGY',
+        'ERI',
+        'ESH',
+        'ETH',
+        'GAB',
+        'GHA',
+        'GIN',
+        'GMB',
+        'GNB',
+        'GNQ',
+        'KEN',
+        'LBR',
+        'LBY',
+        'LSO',
+        'MAR',
+        'MDG',
+        'MLI',
+        'MOZ',
+        'MRT',
+        'MUS',
+        'MWI',
+        'MYT',
+        'NAM',
+        'NER',
+        'NGA',
+        'REU',
+        'RWA',
+        'SDN',
+        'SEN',
+        'SLE',
+        'SOM',
+        'SSD',
+        'STP',
+        'SWZ',
+        'SYC',
+        'TCD',
+        'TGO',
+        'TUN',
+        'TZA',
+        'UGA',
+        'ZAF',
+        'ZMB',
+        'ZWE',
+    ],
+    'Antarctica': ['ATF', 'BVT', 'HMD'],
+    'Asia': [
+        'AFG',
+        'ARE',
+        'ARM',
+        'AZE',
+        'BGD',
+        'BHR',
+        'BRN',
+        'BTN',
+        'CHN',
+        'CYP',
+        'GEO',
+        'HKG',
+        'IDN',
+        'IND',
+        'IOT',
+        'IRN',
+        'IRQ',
+        'ISR',
+        'JOR',
+        'JPN',
+        'KAZ',
+        'KGZ',
+        'KHM',
+        'KOR',
+        'KWT',
+        'LAO',
+        'LBN',
+        'LKA',
+        'MAC',
+        'MMR',
+        'MNG',
+        'MYS',
+        'NPL',
+        'OMN',
+        'PAK',
+        'PHL',
+        'PRK',
+        'PSE',
+        'QAT',
+        'RUS',
+        'SAU',
+        'SGP',
+        'SYR',
+        'THA',
+        'TJK',
+        'TKM',
+        'TLS',
+        'TUR',
+        'TWN',
+        'UZB',
+        'VNM',
+        'YEM',
+    ],
+    'Europe': [
+        'ALB',
+        'AND',
+        'AUT',
+        'BEL',
+        'BGR',
+        'BIH',
+        'BLR',
+        'CHE',
+        'CZE',
+        'DEU',
+        'DNK',
+        'ESP',
+        'EST',
+        'FIN',
+        'FRA',
+        'FRO',
+        'GBR',
+        'GIB',
+        'GRC',
+        'HRV',
+        'HUN',
+        'IRL',
+        'ISL',
+        'ITA',
+        'LIE',
+        'LTU',
+        'LUX',
+        'LVA',
+        'MCO',
+        'MDA',
+        'MKD',
+        'MLT',
+        'MNE',
+        'NLD',
+        'NOR',
+        'POL',
+        'PRT',
+        'ROU',
+        'SJM',
+        'SMR',
+        'SRB',
+        'SVK',
+        'SVN',
+        'SWE',
+        'UKR',
+        'VAT',
+    ],
+    'North America': [
+        'ANT',
+        'ABW',
+        'AIA',
+        'ATG',
+        'BHS',
+        'BLZ',
+        'BMU',
+        'BRB',
+        'CAN',
+        'CRI',
+        'CUB',
+        'CYM',
+        'DMA',
+        'DOM',
+        'GLP',
+        'GRD',
+        'GRL',
+        'GTM',
+        'HND',
+        'HTI',
+        'JAM',
+        'KNA',
+        'LCA',
+        'MEX',
+        'MSR',
+        'MTQ',
+        'NIC',
+        'PAN',
+        'PRI',
+        'SLV',
+        'TCA',
+        'TTO',
+        'USA',
+        'VCT',
+        'VGB',
+        'VIR',
+    ],
+    'Oceania': [
+        'ASM',
+        'AUS',
+        'CCK',
+        'COK',
+        'CXR',
+        'FJI',
+        'FLK',
+        'FSM',
+        'GUM',
+        'KIR',
+        'MNP',
+        'NCL',
+        'NFK',
+        'NIU',
+        'NRU',
+        'NZL',
+        'PCN',
+        'PLW',
+        'PNG',
+        'PYF',
+        'SLB',
+        'TON',
+        'VUT',
+        'WSM',
+    ],
+    'South America': ['ARG', 'BOL', 'BRA', 'CHL', 'COL', 'ECU', 'GUF', 'GUY', 'PER', 'PRY', 'SUR', 'URY', 'VEN'],
 };
 
 const splitmix32 = (a) => () => {
@@ -136,32 +356,32 @@ const splitmix32 = (a) => () => {
     return ((t = t ^ (t >>> 15)) >>> 0) / 4294967296;
 };
 
-const WWF_TEW = Object.fromEntries(Object.entries({
-    WWF_TEW_BIOME_01:{ hex:'#008346', name:'Tropical & Subtropical Moist Broadleaf Forests' },
-    WWF_TEW_BIOME_02:{ hex:'#9DCC00', name:'Tropical & Subtropical Dry Broadleaf Forests' },
-    WWF_TEW_BIOME_03:{ hex:'#C4B72E', name:'Tropical & Subtropical Coniferous Forests' },
-    WWF_TEW_BIOME_04:{ hex:'#015C31', name:'Temperate Broadleaf & Mixed Forests' },
-    WWF_TEW_BIOME_05:{ hex:'#006E84', name:'Temperate Conifer Forests' },
-    WWF_TEW_BIOME_06:{ hex:'#FFA8BB', name:'Boreal Forests/Taiga' },
-    WWF_TEW_BIOME_07:{ hex:'#FAD505', name:'Tropical & Subtropical Grasslands, Savannas & Shrublands' },
-    WWF_TEW_BIOME_08:{ hex:'#8F7C00', name:'Temperate Grasslands, Savannas & Shrublands' },
-    WWF_TEW_BIOME_09:{ hex:'#67C7BF', name:'Flooded Grasslands & Savannas' },
-    WWF_TEW_BIOME_10:{ hex:'#993E01', name:'Montane Grasslands & Shrublands' },
-    WWF_TEW_BIOME_11:{ hex:'#C20088', name:'Tundra' },
-    WWF_TEW_BIOME_12:{ hex:'#0275DC', name:'Mediterranean Forests, Woodlands & Scrub' },
-    WWF_TEW_BIOME_13:{ hex:'#FFA405', name:'Deserts & Xeric Shrublands' },
-    WWF_TEW_BIOME_14:{ hex:'#FFCC99', name:'Mangroves' },
-    WWF_TEW_BIOME_98:{ hex:'#000000', name:'Ocean' },
-    WWF_TEW_BIOME_99:{ hex:'#000000', name:'Ocean' }
-})
-    .map(([k, v]) => {
+const WWF_TEW = Object.fromEntries(
+    Object.entries({
+        WWF_TEW_BIOME_01: { hex: '#008346', name: 'Tropical & Subtropical Moist Broadleaf Forests' },
+        WWF_TEW_BIOME_02: { hex: '#9DCC00', name: 'Tropical & Subtropical Dry Broadleaf Forests' },
+        WWF_TEW_BIOME_03: { hex: '#C4B72E', name: 'Tropical & Subtropical Coniferous Forests' },
+        WWF_TEW_BIOME_04: { hex: '#015C31', name: 'Temperate Broadleaf & Mixed Forests' },
+        WWF_TEW_BIOME_05: { hex: '#006E84', name: 'Temperate Conifer Forests' },
+        WWF_TEW_BIOME_06: { hex: '#FFA8BB', name: 'Boreal Forests/Taiga' },
+        WWF_TEW_BIOME_07: { hex: '#FAD505', name: 'Tropical & Subtropical Grasslands, Savannas & Shrublands' },
+        WWF_TEW_BIOME_08: { hex: '#8F7C00', name: 'Temperate Grasslands, Savannas & Shrublands' },
+        WWF_TEW_BIOME_09: { hex: '#67C7BF', name: 'Flooded Grasslands & Savannas' },
+        WWF_TEW_BIOME_10: { hex: '#993E01', name: 'Montane Grasslands & Shrublands' },
+        WWF_TEW_BIOME_11: { hex: '#C20088', name: 'Tundra' },
+        WWF_TEW_BIOME_12: { hex: '#0275DC', name: 'Mediterranean Forests, Woodlands & Scrub' },
+        WWF_TEW_BIOME_13: { hex: '#FFA405', name: 'Deserts & Xeric Shrublands' },
+        WWF_TEW_BIOME_14: { hex: '#FFCC99', name: 'Mangroves' },
+        WWF_TEW_BIOME_98: { hex: '#000000', name: 'Ocean' },
+        WWF_TEW_BIOME_99: { hex: '#000000', name: 'Ocean' },
+    }).map(([k, v]) => {
         v.rgb = v.hex
             .substring(1)
             .match(/(.{1,2})/g)
-            .map(_v => parseInt(_v, 16));
+            .map((_v) => parseInt(_v, 16));
 
         return [k, v];
-    })
+    }),
 );
 
 const DeckGLRenderScatterplot: any = ({
@@ -226,7 +446,11 @@ const DeckGLRenderScatterplot: any = ({
                 LIMIT 65536;`,
             };
             console.log('SELECT.text', SELECT.text);
-            SELECT.deflate = btoa(Array.from(deflate(SELECT.text)).map(v => String.fromCharCode(v)).join(''));
+            SELECT.deflate = btoa(
+                Array.from(deflate(SELECT.text))
+                    .map((v) => String.fromCharCode(v))
+                    .join(''),
+            );
             const responseMs = Date.now();
 
             let response;
@@ -253,7 +477,7 @@ const DeckGLRenderScatterplot: any = ({
                     'lat',
                     'lon',
                     'gm4326_id',
-                    'gp4326_wwf_tew_id'
+                    'gp4326_wwf_tew_id',
                 ]);
 
                 setResultCount(json.length);
@@ -270,9 +494,8 @@ const DeckGLRenderScatterplot: any = ({
                     layers: [
                         new (globalThis as any).deck.ScatterplotLayer({
                             data: json,
-                            getFillColor:d => {
-                                if(!d.gp4326_wwf_tew_id)
-                                    d.gp4326_wwf_tew_id = 'WWF_TEW_BIOME_99';
+                            getFillColor: (d) => {
+                                if (!d.gp4326_wwf_tew_id) d.gp4326_wwf_tew_id = 'WWF_TEW_BIOME_99';
 
                                 return WWF_TEW[d.gp4326_wwf_tew_id].rgb;
                             },
@@ -414,52 +637,80 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
     }, [biosampleID]);
 
     useEffect(() => {
-        if(countryID)
-            setCountryRegionID(Object.keys(regionCountries).filter(k => regionCountries[k].includes(countryID))[0]);
-        else if(
-               biomeID === 'WWF_TEW_BIOME_98'
-            || biomeID === 'WWF_TEW_BIOME_99'
-        )
-            setCountryRegionID('Ocean');
-        else
-            setCountryRegionID('');
+        if (countryID)
+            setCountryRegionID(Object.keys(regionCountries).filter((k) => regionCountries[k].includes(countryID))[0]);
+        else if (biomeID === 'WWF_TEW_BIOME_98' || biomeID === 'WWF_TEW_BIOME_99') setCountryRegionID('Ocean');
+        else setCountryRegionID('');
     }, [biomeID, countryID]);
 
     return (
         <div style={style}>
             <div ref={mapRef} style={{ height: '70vh', position: 'relative', width: '100%' }}>
                 {/* Tooltip */}
-                <div style={{ display:'flex', flexDirection:'column', gap:'8px', position: 'absolute', right: '8px', top: '8px', width: '384px', zIndex: 1 }}>
-                    {resultCount >= 1024*64 && <MapLibreDeckGLMapTooltipSection>
-                        <div style={{ color: '#E90', fontSize: '12px', fontWeight: 700 }}>
-                            <div>More than 65,536 points match your current query.</div>
-                            <div>To see them all download the full dataset.</div>
-                        </div>
-                    </MapLibreDeckGLMapTooltipSection>}
+                <div
+                    style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px',
+                        position: 'absolute',
+                        right: '8px',
+                        top: '8px',
+                        width: '384px',
+                        zIndex: 1,
+                    }}
+                >
+                    {resultCount >= 1024 * 64 && (
+                        <MapLibreDeckGLMapTooltipSection>
+                            <div style={{ color: '#E90', fontSize: '12px', fontWeight: 700 }}>
+                                <div>More than 65,536 points match your current query.</div>
+                                <div>To see them all download the full dataset.</div>
+                            </div>
+                        </MapLibreDeckGLMapTooltipSection>
+                    )}
                     <MapLibreDeckGLMapTooltipSection>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>BIOSAMPLE</span>
-                            <div style={{ color: '#FFF', display: 'inline', fontSize: '18px', fontWeight: 400, margin: '0 0 0 8px' }}>{biosampleID}</div>
+                            <div
+                                style={{
+                                    color: '#FFF',
+                                    display: 'inline',
+                                    fontSize: '18px',
+                                    fontWeight: 400,
+                                    margin: '0 0 0 8px',
+                                }}
+                            >
+                                {biosampleID}
+                            </div>
                             <div style={{ display: 'inline', margin: '0 0 0 4px', verticalAlign: 'top' }}>
-                                <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(biosampleID)} />
+                                <MapLibreDeckGLMapCopyButton
+                                    onClick={() => navigator.clipboard.writeText(biosampleID)}
+                                />
                                 <MapLibreDeckGLMapURLButton
                                     href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID}
                                 />
                             </div>
                         </div>
                         <div style={{ margin: '2px 0 0 0' }}>
-                            {biosampleID ? (
-                                <div style={{ fontSize: '14px' }}>{biosampleTitle}</div>
-                            ) : (
-                                '\u200B'
-                            )}
+                            {biosampleID ? <div style={{ fontSize: '14px' }}>{biosampleTitle}</div> : '\u200B'}
                         </div>
                         <div style={{ height: '8px' }}></div>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>BIOPROJECT</span>
-                            <div style={{ color: '#FFF', display: 'inline', fontSize: '18px', fontWeight: 400, margin: '0 0 0 8px' }}>{bioprojectID}</div>
+                            <div
+                                style={{
+                                    color: '#FFF',
+                                    display: 'inline',
+                                    fontSize: '18px',
+                                    fontWeight: 400,
+                                    margin: '0 0 0 8px',
+                                }}
+                            >
+                                {bioprojectID}
+                            </div>
                             <div style={{ display: 'inline', margin: '0 0 0 4px', verticalAlign: 'top' }}>
-                                <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(bioprojectID)} />
+                                <MapLibreDeckGLMapCopyButton
+                                    onClick={() => navigator.clipboard.writeText(bioprojectID)}
+                                />
                                 <MapLibreDeckGLMapURLButton
                                     href={'https://www.ncbi.nlm.nih.gov/bioproject/?term=' + bioprojectID}
                                 />
@@ -478,17 +729,32 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                         <div style={{ height: '8px' }}></div>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>{attributeName.toUpperCase()}</span>
-                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(attributeValue)} />
+                            <MapLibreDeckGLMapCopyButton
+                                onClick={() => navigator.clipboard.writeText(attributeValue)}
+                            />
                         </div>
                         <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{truncate(attributeValue, 40)}</div>
                     </MapLibreDeckGLMapTooltipSection>
                 </div>
 
-                {false && <div style={{ backgroundColor: 'rgba(18, 18, 18, 0.8)', borderRadius: '6px', color: '#FFF', padding: '12px 16px 16px 16px', position: 'absolute', right: '8px', top: '8px', width: '384px', zIndex: 1 }}>
-                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                        <span>{layout.toUpperCase()}</span>
-                    </div>
-                    {/* <div style={{ height: '8px' }}></div>
+                {false && (
+                    <div
+                        style={{
+                            backgroundColor: 'rgba(18, 18, 18, 0.8)',
+                            borderRadius: '6px',
+                            color: '#FFF',
+                            padding: '12px 16px 16px 16px',
+                            position: 'absolute',
+                            right: '8px',
+                            top: '8px',
+                            width: '384px',
+                            zIndex: 1,
+                        }}
+                    >
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                            <span>{layout.toUpperCase()}</span>
+                        </div>
+                        {/* <div style={{ height: '8px' }}></div>
                     <div style={{ flex: '1 0' }}>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>LAT / LON</span>
@@ -499,7 +765,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                         </div>
                         <div style={{ fontSize: '18px', margin: '2px 0 0 0' }}>{latLon}</div>
                     </div> */}
-                    {/* <div style={{ height: '8px' }}></div>
+                        {/* <div style={{ height: '8px' }}></div>
                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                         <span style={{ verticalAlign:'middle' }}>BIOME</span>
                         <span style={{ backgroundColor:biomeID ? WWF_TEW[biomeID].hex : 'transparent', display:'inline-block', height:'14px', fontSize: '14px', margin:'0 0 0 8px', verticalAlign:'middle', width:'36px' }} />
@@ -507,7 +773,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                     <div style={{ margin: '2px 0 0 0' }}>
                         <span style={{ fontSize: '14px', verticalAlign:'middle' }}>{biomeID && WWF_TEW[biomeID].name}</span>
                     </div> */}
-                    {/* <div style={{ height: '8px' }}></div>
+                        {/* <div style={{ height: '8px' }}></div>
                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                         <span>COUNTRY</span>
                     </div>
@@ -515,14 +781,15 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                         <Flag code={countryID} height="16" style={{ verticalAlign:'middle' }} />
                         <span style={{ fontSize: '14px', margin:'0 0 0 8px', verticalAlign:'middle' }}>{countryID}</span>
                     </div> */}
-                    {/* <div style={{ height: '8px' }}></div>
+                        {/* <div style={{ height: '8px' }}></div>
                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                         <span>REGION</span>
                     </div>
                     <div style={{ margin: '2px 0 0 0' }}>
                         <span style={{ fontSize: '14px' }}>{countryRegionID}</span>
                     </div> */}
-                </div>}
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -548,7 +815,19 @@ const MapLibreDeckGLMapURLButton = ({ ...props }) => (
 );
 
 const MapLibreDeckGLMapTooltipSection = ({ children, ...props }) => {
-    return <div style={{ backgroundColor: 'rgba(18, 18, 18, 0.8)', borderRadius: '6px', color: '#FFF', padding: '12px 16px 12px 16px' }} {...props}>{children}</div>;
+    return (
+        <div
+            style={{
+                backgroundColor: 'rgba(18, 18, 18, 0.8)',
+                borderRadius: '6px',
+                color: '#FFF',
+                padding: '12px 16px 12px 16px',
+            }}
+            {...props}
+        >
+            {children}
+        </div>
+    );
 };
 
 export default MapLibreDeckGLMap;

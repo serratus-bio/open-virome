@@ -260,13 +260,18 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
         );
     };
 
+    const getRowsPerPage = () => {
+        return maxWidth > 1000 ? 10 : 5;
+    };
+
     const onPageChange = (event: unknown, newPage: number) => {
         setPage(newPage);
     };
 
     const getPagedRows = () => {
-        const startIndex = page * 10;
-        const endIndex = startIndex + 10;
+        const rowsPerPage = getRowsPerPage();
+        const startIndex = page * rowsPerPage;
+        const endIndex = startIndex + rowsPerPage;
         return getResultTableRows().slice(startIndex, endIndex);
     };
 
@@ -280,7 +285,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                     total={filteredRows.length}
                     rows={getPagedRows()}
                     headers={Object.keys(filteredRows[0])}
-                    pageRows={10}
+                    pageRows={getRowsPerPage()}
                 />
             </Box>
         );

@@ -2,9 +2,10 @@ import { truncate } from '../../../common/utils/textFormatting.ts';
 import chroma from 'chroma-js';
 
 export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
-    let runsToRowData = {};
-    let data;
+    const missingLabelVal = 'N/A';
 
+    // Limit data to 1000 rows because of cytoscape performance issues
+    let data;
     const getRandomSubarray = (arr, size) => {
         var shuffled = arr.slice(0),
             i = arr.length,
@@ -18,14 +19,17 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
         }
         return shuffled.slice(0, size);
     };
-
     if (rows.length > 1000) {
         data = getRandomSubarray(rows, 1000);
     } else {
         data = rows;
     }
 
+    // Group data by run
+    let runsToRowData = {};
     data.forEach((row) => {
+        const label =
+            groupByKey === 'tax_family' ? row['tax_family'] : groupByKey === 'sotu' ? row['sotu'] : row['tax_species'];
         const rowData = {
             sotu: row['sotu'],
             run: row['run'],
@@ -35,14 +39,8 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
             node_pid: row['node_pid'],
             node_coverage: row['node_coverage'],
             gb_pid: row['gb_pid'],
-            label:
-                groupByKey === 'tax_family'
-                    ? row['tax_family']
-                    : groupByKey === 'sotu'
-                      ? row['sotu']
-                      : row['tax_species'],
+            label: label,
         };
-
         if (row['run'] in runsToRowData) {
             runsToRowData[row['run']].push(rowData);
         } else {
@@ -50,10 +48,13 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
         }
     });
 
-    // reduce to groupByKey level
+    // Group data by groupByKey (i.e. tax_species, tax_family, sotu)
     const runsToGroupedRowData = {};
     for (const run in runsToRowData) {
         const groupedRowData = runsToRowData[run].reduce((acc, row) => {
+            if (!row[groupByKey]) {
+                row[groupByKey] = missingLabelVal;
+            }
             if (row[groupByKey] in acc) {
                 acc[row[groupByKey]].push(row);
             } else {
@@ -64,47 +65,59 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
         runsToGroupedRowData[run] = groupedRowData;
     }
 
-    let sOTUsData = Object.values(runsToRowData).flat();
-    sOTUsData = sOTUsData.filter((sOTU, index, self) => self.findIndex((t) => t['sotu'] === sOTU['sotu']) === index);
-    sOTUsData.sort((a, b) => {
-        if (!a['tax_family'] || !b['tax_family']) {
+    // Color virus nodes by sOTU
+    const getColorMapping = () => {
+        const sOTUsToColor = {};
+        let sOTUsData = Object.values(runsToRowData).flat();
+        sOTUsData = sOTUsData.filter(
+            (sOTU, index, self) => self.findIndex((t) => t['sotu'] === sOTU['sotu']) === index,
+        );
+        sOTUsData.sort((a, b) => {
+            if (!a['tax_family'] || !b['tax_family']) {
+                return 0;
+            }
+            if (a['tax_family'] < b['tax_family']) {
+                return -1;
+            }
+            if (a['tax_family'] > b['tax_family']) {
+                return 1;
+            }
             return 0;
-        }
-        if (a['tax_family'] < b['tax_family']) {
-            return -1;
-        }
-        if (a['tax_family'] > b['tax_family']) {
-            return 1;
-        }
-        return 0;
-    });
-    const numSOTUS = sOTUsData.length;
-    const hueStep = 360 / numSOTUS;
-    const colors = Array.from({ length: numSOTUS }, (_, i) => chroma.hsl(hueStep * i, 1, 0.6).hex());
-    const sOTUsToColor = {};
-    sOTUsData.forEach((sOTU, index) => {
-        sOTUsToColor[sOTU['sotu']] = colors[index];
-    });
-    const getEdgeWidth = (sOTU) => {
-        return (parseInt(sOTU['node_pid']) / 100) * 15;
+        });
+        const numSOTUS = sOTUsData.length;
+        const hueStep = 360 / numSOTUS;
+        const colors = Array.from({ length: numSOTUS }, (_, i) => chroma.hsl(hueStep * i, 1, 0.6).hex());
+        sOTUsData.forEach((sOTU, index) => {
+            sOTUsToColor[sOTU['sotu']] = colors[index];
+        });
+        return sOTUsToColor;
     };
-    const getEdgeWeight = (sOTU) => {
-        return parseInt(sOTU['node_pid']) / 100;
+
+    const virusToColor = getColorMapping();
+    const numSOTUS = Object.keys(virusToColor).length;
+
+    // rescale edge weight using node_pid
+    const getEdgeWeight = (row) => {
+        return (parseInt(row['node_pid']) / 100) * 15;
     };
-    const mapWeight = (value) => {
-        // rescale input value to the output value
+
+    // Rescale edge width using coverage
+    const getEdgeWidth = (row) => {
+        let rescaledValue = row['node_coverage'];
+
         const minScale = 0;
         const maxScale = 100;
         const minRescale = 3;
         const maxRescale = 20;
 
-        if (value < minScale) {
-            value = minScale;
-        } else if (value > maxScale) {
-            value = maxScale;
+        if (rescaledValue < minScale) {
+            rescaledValue = minScale;
+        } else if (rescaledValue > maxScale) {
+            rescaledValue = maxScale;
         }
-
-        return Math.round(((value - minScale) / (maxScale - minScale)) * (maxRescale - minRescale) + minRescale);
+        return Math.round(
+            ((rescaledValue - minScale) / (maxScale - minScale)) * (maxRescale - minRescale) + minRescale,
+        );
     };
 
     const plotData = [];
@@ -129,8 +142,8 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
                     id: rowValue,
                     type: 'virus',
                     isNode: true,
-                    label: truncate(row['label'], 40) ?? 'N/A',
-                    color: sOTUsToColor[row['sotu']],
+                    label: truncate(row['label'], 40) ?? missingLabelVal,
+                    color: virusToColor[row['sotu']],
                     numSOTUS: numSOTUS,
                 },
             });
@@ -142,13 +155,87 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
                     target: rowValue,
                     isNode: false,
                     node_coverage: row['node_coverage'],
-                    width: getEdgeWidth(row['node_coverage']),
-                    weight: mapWeight(row['node_coverage']),
-                    color: sOTUsToColor[row['sotu']],
+                    width: getEdgeWidth(row),
+                    weight: getEdgeWeight(row),
+                    color: virusToColor[row['sotu']],
                     numSOTUS: numSOTUS,
                 },
             });
         });
     }
     return plotData;
+};
+
+export const getScatterPlotData = (rows = []) => {
+    const tooltipFormatter = (args) => {
+        if (!rows || !rows[args.dataIndex]) {
+            return '';
+        }
+        const componentId = rows[args.dataIndex][2] + 1;
+        const nodes = rows[args.dataIndex][0];
+        const edges = args.value[1];
+        return `${args.marker} Component: ${componentId} <br /> &ensp; &ensp; Nodes: ${nodes} <br />  &ensp; &ensp; Edges: ${edges}<br />`;
+    };
+
+    return {
+        color: '#4CB9F1',
+        xAxis: {
+            type: 'value',
+            name: 'Nodes # (Virus + Run)',
+            nameLocation: 'middle',
+            nameGap: 30,
+        },
+        yAxis: {
+            type: 'value',
+            name: 'Edges # (contigs)',
+            nameLocation: 'middle',
+            nameGap: 35,
+        },
+        grid: {
+            left: '6%',
+            right: '6%',
+            bottom: '6%',
+            containLabel: true,
+            borderColor: 'white',
+        },
+        title: {
+            show: true,
+            text: '   Virome Component Summary',
+            textStyle: {
+                color: 'white',
+                fontSize: 14,
+                fontWeight: 'normal',
+                fontStyle: 'italic',
+            },
+            left: 0,
+            top: 20,
+        },
+        dataset: {
+            dimensions: ['count', 'percentage'],
+            source: rows,
+        },
+        tooltip: {
+            trigger: 'item',
+            axisPointer: {
+                type: 'shadow',
+            },
+            formatter: tooltipFormatter,
+        },
+        legend: {
+            show: false,
+        },
+        series: [
+            {
+                name: 'Components',
+                type: 'scatter',
+                label: {
+                    show: false,
+                    color: 'white',
+                },
+                emphasis: {
+                    focus: 'series',
+                },
+            },
+        ],
+    };
 };
