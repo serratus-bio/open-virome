@@ -75,10 +75,10 @@ const Module = ({ sectionKey }) => {
             return <ViromeLayout identifiers={identifiersData} />;
         }
         if (sectionKey === 'context' && activeModule === 'geography_simple') {
-            return <EnvironmentLayout identifiers={identifiersData} layout="simple" />;
+            return <EnvironmentLayout identifiers={identifiersData} layout='simple' />;
         }
         if (sectionKey === 'context' && activeModule === 'geography_advanced') {
-            return <EnvironmentLayout identifiers={identifiersData} layout="advanced" />;
+            return <EnvironmentLayout identifiers={identifiersData} layout='advanced' />;
         }
         return (
             <Box sx={{ height: 400, width: 400 }}>

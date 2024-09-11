@@ -2,10 +2,11 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectActiveModuleBySection } from '../../../app/slice.ts';
 import { isSummaryView } from '../../../common/utils/plotHelpers.ts';
-import { getViromeGraphData } from './plotHelpers.ts';
+import { getViromeGraphData, getScatterPlotData } from './plotHelpers.ts';
 import { useGetResultQuery } from '../../../api/client.ts';
 import { moduleConfig } from '../../Module/constants.ts';
 import { handleIdKeyIrregularities } from '../../../common/utils/queryHelpers.ts';
+import { selectAllFilters, selectFiltersByType } from '../../Query/slice.ts';
 import cytoscape from 'cytoscape';
 
 import NetworkPlot from '../../../common/NetworkPlot.tsx';
@@ -18,6 +19,7 @@ import ViromeSummaryTable from './ViromeSummaryTable.tsx';
 
 const ViromeLayout = ({ identifiers }) => {
     const activeModule = useSelector((state) => selectActiveModuleBySection(state, 'palmdb'));
+    const allFilters = useSelector(selectAllFilters);
     const [randomized, setRandomized] = useState(0);
     const [activeSubgraph, setActiveSubgraph] = useState('1');
     const [isSummaryTableOpen, setIsSummaryTableOpen] = useState(false);
@@ -53,9 +55,42 @@ const ViromeLayout = ({ identifiers }) => {
         },
     );
 
+    const getFilteredResultData = () => {
+        // If virome filters are applied, we only want to plot data that matches the filters
+        // (i.e. exclude all other viruses that co-occur in the matching runs)
+        if (allFilters.length === 0 || !resultData) {
+            return resultData;
+        }
+
+        const familyFilters = allFilters.filter((filter) => filter.filterType === 'family');
+        const speciesFilters = allFilters.filter((filter) => filter.filterType === 'species');
+        const sotuFilters = allFilters.filter((filter) => filter.filterType === 'sotu');
+
+        let filteredData = resultData;
+        if (familyFilters.length > 0) {
+            filteredData = filteredData.filter((row) => {
+                return familyFilters.some((filter) => row['tax_family'] === filter.filterValue);
+            });
+        }
+
+        if (speciesFilters.length > 0) {
+            filteredData = filteredData.filter((row) => {
+                return speciesFilters.some((filter) => row['tax_species'] === filter.filterValue);
+            });
+        }
+
+        if (sotuFilters.length > 0) {
+            filteredData = filteredData.filter((row) => {
+                return sotuFilters.some((filter) => row['sotu'] === filter.filterValue);
+            });
+        }
+        return filteredData;
+    };
+
     useEffect(() => {
         if (headlessCy) {
-            const plotData = getViromeGraphData(resultData, moduleConfig[activeModule].groupByKey);
+            const filteredResultData = getFilteredResultData();
+            const plotData = getViromeGraphData(filteredResultData, moduleConfig[activeModule].groupByKey);
             headlessCy.json({ elements: plotData });
             headlessCy.ready(() => {
                 const componentLabels = getComponentOptions();
@@ -74,7 +109,8 @@ const ViromeLayout = ({ identifiers }) => {
 
     const getNetworkPlotData = () => {
         if (activeSubgraph === 'All') {
-            return getViromeGraphData(resultData, moduleConfig[activeModule].groupByKey);
+            const filteredResultData = getFilteredResultData();
+            return getViromeGraphData(filteredResultData, moduleConfig[activeModule].groupByKey);
         }
         const components = headlessCy.elements().components();
         components.sort((a, b) => b.length - a.length);
@@ -88,7 +124,7 @@ const ViromeLayout = ({ identifiers }) => {
     const getComponentOptions = () => {
         const numComponents = headlessCy.elements().components().length;
         let componentLabels;
-        if (headlessCy.elements().length < 500) {
+        if (headlessCy.elements().length < 500 || numComponents < 2) {
             componentLabels = Array.from({ length: numComponents + 1 }, (_, i) => {
                 if (i === 0) {
                     return 'All';
@@ -173,90 +209,6 @@ const ViromeLayout = ({ identifiers }) => {
         );
     };
 
-    const getScatterPlotData = () => {
-        const components = headlessCy.elements().components();
-        components.sort((a, b) => b.length - a.length);
-
-        const rows = components.map((component, index) => {
-            const nodes = component.filter((ele) => ele.isNode());
-            const edges = component.filter((ele) => ele.isEdge());
-            return [nodes.length, edges.length, index];
-        });
-
-        const tooltipFormatter = (args) => {
-            if (!rows || !rows[args.dataIndex]) {
-                return '';
-            }
-            const componentId = rows[args.dataIndex][2] + 1;
-            const nodes = rows[args.dataIndex][0];
-            const edges = args.value[1];
-            return `${args.marker} Component: ${componentId} <br /> &ensp; &ensp; Nodes: ${nodes} <br />  &ensp; &ensp; Edges: ${edges}<br />`;
-        };
-
-        return {
-            // Scatter Plot Settings - Virome Component
-            color: '#4CB9F1',
-            xAxis: {
-                type: 'value',
-                name: 'Nodes # (Virus + Run)',
-                nameLocation: 'middle',
-                nameGap: 30,
-            },
-            yAxis: {
-                type: 'value',
-                name: 'Edges # (contigs)',
-                nameLocation: 'middle',
-                nameGap: 35,
-            },
-            grid: {
-                left: '6%',
-                right: '6%',
-                bottom: '6%',
-                containLabel: true,
-                borderColor: 'white',
-            },
-            title: {
-                show: true,
-                text: '   Virome Component Summary',
-                textStyle: {
-                    color: 'white',
-                    fontSize: 14,
-                    fontWeight: 'normal',
-                    fontStyle: 'italic',
-                },
-                left: 0,
-                top: 20,
-            },
-            dataset: {
-                dimensions: ['count', 'percentage'],
-                source: rows,
-            },
-            tooltip: {
-                trigger: 'item',
-                axisPointer: {
-                    type: 'shadow',
-                },
-                formatter: tooltipFormatter,
-            },
-            legend: {
-                show: false,
-            },
-            series: [
-                {
-                    name: 'Components',
-                    type: 'scatter',
-                    label: {
-                        show: false,
-                        color: 'white',
-                    },
-                    emphasis: {
-                        focus: 'series',
-                    },
-                },
-            ],
-        };
-    };
-
     const onScatterPlotEvents = {
         click: (params) => {
             if (params.data && params.data[2] !== undefined) {
@@ -267,7 +219,17 @@ const ViromeLayout = ({ identifiers }) => {
     };
 
     const renderScatterPlot = () => {
-        const plotData = getScatterPlotData();
+        const components = headlessCy.elements().components();
+        components.sort((a, b) => b.length - a.length);
+
+        const rows = components.map((component, index) => {
+            const nodes = component.filter((ele) => ele.isNode());
+            const edges = component.filter((ele) => ele.isEdge());
+            return [nodes.length, edges.length, index];
+        });
+
+        const plotData = getScatterPlotData(rows);
+
         return <ScatterPlot plotData={plotData} styles={{ height: '70vh' }} onEvents={onScatterPlotEvents} />;
     };
 
