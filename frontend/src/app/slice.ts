@@ -21,7 +21,7 @@ const appSlice = createSlice({
         activeQueryModule: 'host',
         activeModules: {
             sra: 'host',
-            palmdb: 'species',
+            palmdb: 'sotu',
             context: 'geography_simple',
         },
         darkMode: true,

@@ -8,7 +8,7 @@ export const sectionConfig = {
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Run-Module',
     },
     palmdb: {
-        modules: ['species', 'family', 'sotu'],
+        modules: ['sotu', 'species', 'family'],
         title: 'Virome Module',
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Virome-Module',
     },
