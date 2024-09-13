@@ -6,7 +6,7 @@ import { getViromeGraphData, getScatterPlotData } from './plotHelpers.ts';
 import { useGetResultQuery } from '../../../api/client.ts';
 import { moduleConfig } from '../../Module/constants.ts';
 import { handleIdKeyIrregularities } from '../../../common/utils/queryHelpers.ts';
-import { selectAllFilters, selectFiltersByType } from '../../Query/slice.ts';
+import { selectAllFilters } from '../../Query/slice.ts';
 import cytoscape from 'cytoscape';
 
 import NetworkPlot from '../../../common/NetworkPlot.tsx';

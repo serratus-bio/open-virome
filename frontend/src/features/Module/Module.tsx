@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllFilters } from '../Query/slice.ts';
 import { selectActiveModuleBySection, setActiveModule, selectSidebarOpen } from '../../app/slice.ts';

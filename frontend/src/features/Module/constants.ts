@@ -8,7 +8,7 @@ export const sectionConfig = {
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Run-Module',
     },
     palmdb: {
-        modules: ['sotu', 'species', 'family'],
+        modules: ['sotu', 'family', 'species'],
         title: 'Virome Module',
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Virome-Module',
     },
@@ -56,8 +56,8 @@ export const moduleConfig = {
         defaultDisplay: 'figure',
     },
     species: {
-        title: 'Virus Species',
-        tag: 'Virus Species',
+        title: 'GenBank Top Hit',
+        tag: 'GenBank Top Hit',
         groupByKey: 'tax_species',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
