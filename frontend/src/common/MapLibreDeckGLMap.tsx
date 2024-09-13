@@ -171,10 +171,11 @@ const DeckGLRenderScatterplot: any = ({
     setBiomeID,
     setBiosampleID,
     setCountryID,
+    setHitCount,
     setLatLon,
-    setRunCount,
-    setSpotCount,
-    setVirusCount
+    setPalmprintHitsCount,
+    setSotuCount,
+    setSpotCount
 }) => {
     if (!DeckGLRenderScatterplot.n) DeckGLRenderScatterplot.n = 0;
 
@@ -308,8 +309,8 @@ const DeckGLRenderScatterplot: any = ({
                 });
 
                 // TOTAL READ/VIRUS COUNT
-                const SELECT_READ_VIRUS_COUNT: any = { text:`COUNT(DISTINCT(run)) AS run_n, COUNT(run) AS virus_n
-                    FROM (SELECT run
+                const SELECT_READ_VIRUS_COUNT: any = { text:`COUNT(run) AS hit_n, COUNT(DISTINCT(run)) AS palmprint_hit_n, COUNT(DISTINCT(sotu)) AS sotu_n
+                    FROM (SELECT run, sotu
                         FROM (SELECT DISTINCT(accession)
                             FROM (SELECT accession
                                 FROM bgl_gm4326_gp4326
@@ -335,11 +336,14 @@ const DeckGLRenderScatterplot: any = ({
                 if (response && response.status === 200) {
                     let json = await response.json();
 
-                    if(json.result[0].run_n !== undefined)
-                        setRunCount(parseInt(json.result[0].run_n));
+                    if(json.result[0].hit_n !== undefined)
+                        setHitCount(parseInt(json.result[0].hit_n));
 
-                    if(json.result[0].virus_n !== undefined)
-                        setVirusCount(parseInt(json.result[0].virus_n));
+                    if(json.result[0].palmprint_hit_n !== undefined)
+                        setPalmprintHitsCount(parseInt(json.result[0].palmprint_hit_n));
+
+                    if(json.result[0].sotu_n !== undefined)
+                        setSotuCount(parseInt(json.result[0].sotu_n));
                 }
             }
         }
@@ -367,11 +371,12 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
     const [biosampleTitle, setBiosampleTitle] = useState('');
     const [countryID, setCountryID] = useState('');
     const [countryRegionID, setCountryRegionID] = useState('');
+    const [hitCount, setHitCount] = useState(0);
     const [latLon, setLatLon] = useState('');
     const [mapMode, setMapMode] = useState('SAMPLES');
-    const [runCount, setRunCount] = useState(0);
+    const [palmprintHitsCount, setPalmprintHitsCount] = useState(0);
+    const [sotuCount, setSotuCount] = useState(0);
     const [spotCount, setSpotCount] = useState(0);
-    const [virusCount, setVirusCount] = useState(0);
 
     useEffect(() => {
         if (mapRef.current && globalThis.maplibregl && globalThis.deck) {
@@ -409,10 +414,11 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                     setBioprojectID,
                     setBiosampleID,
                     setCountryID,
+                    setHitCount,
                     setLatLon,
-                    setRunCount,
-                    setSpotCount,
-                    setVirusCount
+                    setPalmprintHitsCount,
+                    setSotuCount,
+                    setSpotCount
                 });
 
             if (MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE) mlglMap.on('moveend', renderScatterplot);
@@ -471,7 +477,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
         <div style={style}>
             <div style={{ alignItems:'flex-end', display:'flex', padding:'0 6px 0 6px' }}>
                 <div style={{ flex:'1 0' }}>
-                    <div style={{ color: '#EEE', fontSize: '16px', fontWeight: 700 }}>{'Showing ' + spotCount.toLocaleString() + ' geographic spots for ' + virusCount.toLocaleString() + ' palmprints found on ' + runCount.toLocaleString() + ' runs.'}</div>
+                    <div style={{ color: '#EEE', fontSize: '16px', fontWeight: 700 }}>{'Showing ' + spotCount.toLocaleString() + ' geographic spots for ' + palmprintHitsCount.toLocaleString() + ' palmprint hits, ' + sotuCount.toLocaleString() + ' sOTUs on ' + hitCount.toLocaleString() + ' runs.'}</div>
                     {spotCount >= 1024*64 && <div style={{ color: '#FA0', flex:'1 0', fontSize: '14px', fontWeight: 700 }}>The number of spots displayed is limited to 65.536. Download the dataset to get the whole list.</div>}
                 </div>
                 {layout === 'advanced' && <div style={{ alignItems:'flex-end', bottom:'2px', display:'flex', gap:'8px', height:'16px', position:'relative' }}>
