@@ -132,7 +132,7 @@ const ViromeLayout = ({ identifiers }) => {
                 return i.toString();
             });
         } else {
-            componentLabels = Array.from({ length: numComponents - 1 }, (_, i) => {
+            componentLabels = Array.from({ length: numComponents }, (_, i) => {
                 return (i + 1).toString();
             });
         }
