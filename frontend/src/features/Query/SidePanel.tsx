@@ -15,7 +15,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 const SidePanel = () => {
     const dispatch = useDispatch();
     const sidebarOpen = useSelector(selectSidebarOpen);
-    const activeModule = useSelector(selectActiveQueryModule);
+    const sectionLayout = useSelector(selectActiveQueryModule);
 
     const onItemClick = (moduleKey: string) => {
         dispatch(setActiveQueryModule(moduleKey));
@@ -59,7 +59,7 @@ const SidePanel = () => {
                             <MenuItem
                                 key={moduleKey}
                                 onClick={() => onItemClick(moduleKey)}
-                                selected={moduleKey === activeModule}
+                                selected={moduleKey === sectionLayout}
                             >
                                 <ListItemText inset>{moduleConfig[moduleKey].title}</ListItemText>
                             </MenuItem>

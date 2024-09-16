@@ -3,19 +3,28 @@
  */
 export const sectionConfig = {
     sra: {
-        modules: ['host', 'seqType', 'bioproject'],
-        title: 'Run Module',
+        title: 'SRA Run',
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Run-Module',
+        modules: ['host', 'seqType', 'bioproject'],
+        defaultDisplay: 'figure',
     },
     palmdb: {
-        modules: ['sotu', 'family', 'species'],
-        title: 'Virome Module',
+        title: 'Virome',
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Virome-Module',
+        modules: ['sotu', 'family', 'species'],
+        defaultDisplay: 'figure',
     },
-    context: {
-        modules: ['geography_simple', 'geography_advanced', 'statHost', 'tissue'],
-        title: 'Metadata Module',
-        wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Metadata-Module',
+    ecology: {
+        title: 'Ecology',
+        wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Ecology-Module',
+        modules: ['geography', 'biome'],
+        defaultDisplay: 'figure',
+    },
+    host: {
+        title: 'Host',
+        wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Host-Module',
+        modules: ['tissue', 'statHost'],
+        defaultDisplay: 'table',
     },
 };
 
@@ -29,7 +38,6 @@ export const moduleConfig = {
         groupByKey: 'organism',
         resultsTable: 'sra',
         resultsIdColumn: 'acc',
-        defaultDisplay: 'figure',
     },
     seqType: {
         title: 'Run Technology',
@@ -37,15 +45,13 @@ export const moduleConfig = {
         groupByKey: 'assay_type',
         resultsTable: 'sra',
         resultsIdColumn: 'acc',
-        defaultDisplay: 'figure',
     },
     bioproject: {
-        title: 'Bioproject',
-        tag: 'Bioproject',
+        title: 'BioProject',
+        tag: 'BioProject',
         groupByKey: 'bioproject',
         resultsTable: 'sra',
         resultsIdColumn: 'acc',
-        defaultDisplay: 'figure',
     },
     sotu: {
         title: 'sOTU',
@@ -53,7 +59,6 @@ export const moduleConfig = {
         groupByKey: 'sotu',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
-        defaultDisplay: 'figure',
     },
     species: {
         title: 'GenBank Top Hit',
@@ -61,7 +66,6 @@ export const moduleConfig = {
         groupByKey: 'tax_species',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
-        defaultDisplay: 'figure',
     },
     family: {
         title: 'Virus Family',
@@ -69,23 +73,20 @@ export const moduleConfig = {
         groupByKey: 'tax_family',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
-        defaultDisplay: 'figure',
     },
-    geography_simple: {
-        title: 'Ecology (Simple)',
-        tag: 'Ecology (Simple)',
+    geography: {
+        title: 'Geography',
+        tag: 'Geography',
         groupByKey: 'geo_attribute_value',
         resultsIdColumn: 'biosample',
         resultsTable: 'biosample_geo_virome',
-        defaultDisplay: 'figure',
     },
-    geography_advanced: {
-        title: 'Ecology (Advanced)',
-        tag: 'Ecology (Advanced)',
+    biome: {
+        title: 'Biome',
+        tag: 'Biome',
         groupByKey: 'geo_attribute_value',
         resultsIdColumn: 'biosample',
         resultsTable: 'biosample_geo_virome',
-        defaultDisplay: 'figure',
     },
     tissue: {
         title: 'Tissue',
@@ -93,7 +94,6 @@ export const moduleConfig = {
         groupByKey: 'tissue',
         resultsTable: 'biosample_tissue',
         resultsIdColumn: 'biosample',
-        defaultDisplay: 'table',
     },
     statHost: {
         title: 'Host (STAT)',
@@ -101,6 +101,5 @@ export const moduleConfig = {
         groupByKey: 'stat_host_order',
         resultsTable: 'sra_stat',
         resultsIdColumn: 'run',
-        defaultDisplay: 'table',
     },
 };

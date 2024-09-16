@@ -61,7 +61,8 @@ const App = () => {
                         <QuerySummaryText />
                         <Module sectionKey={'sra'} />
                         <Module sectionKey={'palmdb'} />
-                        <Module sectionKey={'context'} />
+                        <Module sectionKey={'ecology'} />
+                        <Module sectionKey={'host'} />
                     </Box>
                 </Box>
                 <QueryView />

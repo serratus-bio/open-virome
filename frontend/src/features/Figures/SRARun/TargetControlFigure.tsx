@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { moduleConfig } from '../../Module/constants.ts';
-import { shouldDisableFigureView, isSummaryView } from '../../../common/utils/plotHelpers.ts';
+import { shouldDisableFigureView, isSummaryView, isSimpleLayout } from '../../../common/utils/plotHelpers.ts';
 import { getTargetControlPlotData } from './plotHelpers.ts';
 import { useGetCountsQuery } from '../../../api/client.ts';
 import { formatNumber } from '../../../common/utils/textFormatting.ts';
@@ -12,7 +12,7 @@ import BarPlot from '../../../common/BarPlot.tsx';
 import PolarBarPlot from '../../../common/PolarBarPlot.tsx';
 import RadioButtonsGroup from '../../../common/RadioButtonsGroup.tsx';
 
-const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
+const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout }) => {
     const [activeCountKey, setActiveCountKey] = useState('count');
     const {
         data: targetCountData,
@@ -74,7 +74,8 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
     };
 
     const renderFigure = (seriesName) => {
-        const plotData = getTargetControlPlotData(targetCountData, controlCountData, activeCountKey);
+        const maxRows = isSimpleLayout(sectionLayout) || figureType === 'polar' ? 9 : undefined;
+        const plotData = getTargetControlPlotData(targetCountData, controlCountData, activeCountKey, maxRows);
         let totalRuns = getTotalRuns(seriesName);
         const filteredPlotData = {
             ...plotData,
@@ -179,7 +180,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType }) => {
                 ) : (
                     <Box sx={{ flex: 1, width: '100%' }}>{renderFigure('Target')}</Box>
                 )}
-                {isSummaryView(identifiers) ? null : (
+                {isSummaryView(identifiers) || isSimpleLayout(sectionLayout) ? null : (
                     <RadioButtonsGroup items={countKeys} selected={activeCountKey} onChange={onCountChange} />
                 )}
             </Box>

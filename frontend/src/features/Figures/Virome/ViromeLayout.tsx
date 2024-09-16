@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { selectActiveModuleBySection } from '../../../app/slice.ts';
-import { isSummaryView } from '../../../common/utils/plotHelpers.ts';
+import { isSummaryView, isSimpleLayout } from '../../../common/utils/plotHelpers.ts';
 import { getViromeGraphData, getScatterPlotData } from './plotHelpers.ts';
 import { useGetResultQuery } from '../../../api/client.ts';
 import { moduleConfig } from '../../Module/constants.ts';
@@ -16,14 +15,15 @@ import Typography from '@mui/material/Typography';
 import DropDownSelect from '../../../common/DropdownSelect.tsx';
 import ScatterPlot from '../../../common/ScatterPlot.tsx';
 import ViromeSummaryTable from './ViromeSummaryTable.tsx';
+import RadioButtonsGroup from '../../../common/RadioButtonsGroup.tsx';
 
-const ViromeLayout = ({ identifiers }) => {
-    const activeModule = useSelector((state) => selectActiveModuleBySection(state, 'palmdb'));
+const ViromeLayout = ({ identifiers, sectionLayout }) => {
     const allFilters = useSelector(selectAllFilters);
     const [randomized, setRandomized] = useState(0);
     const [activeSubgraph, setActiveSubgraph] = useState('1');
     const [isSummaryTableOpen, setIsSummaryTableOpen] = useState(false);
     const [selectedNetworkItem, setSelectedNetworkItem] = useState(null);
+    const [activeModule, setActiveModule] = useState('sotu');
     const [headlessCy, setHeadlessCy] = useState(
         cytoscape({
             headless: true,
@@ -105,7 +105,7 @@ const ViromeLayout = ({ identifiers }) => {
 
     useEffect(() => {
         setIsSummaryTableOpen(false);
-    }, [activeModule, identifiers]);
+    }, [sectionLayout, identifiers, activeModule]);
 
     const getNetworkPlotData = () => {
         if (activeSubgraph === 'All') {
@@ -158,8 +158,14 @@ const ViromeLayout = ({ identifiers }) => {
                         width: '100%',
                     }}
                 >
-                    <Skeleton variant='rectangular' width={'50%'} height={'70vh'} sx={{ mr: 4 }} />
-                    <Skeleton variant='rectangular' width={'50%'} height={'70vh'} />
+                    {isSimpleLayout(sectionLayout) ? (
+                        <Skeleton variant='rectangular' width={'100%'} height={'70vh'} />
+                    ) : (
+                        <>
+                            <Skeleton variant='rectangular' width={'50%'} height={'70vh'} sx={{ mr: 4 }} />
+                            <Skeleton variant='rectangular' width={'50%'} height={'70vh'} />
+                        </>
+                    )}
                 </Box>
             );
         }
@@ -189,6 +195,26 @@ const ViromeLayout = ({ identifiers }) => {
                         setActiveSubgraph(event.target.value);
                     }}
                     styles={{ width: 150 }}
+                />
+            </Box>
+        );
+    };
+
+    const renderLabelRadioButtons = () => {
+        const moduleKeys = {
+            sotu: 'sOTU',
+            family: 'Virus Family',
+            species: 'GenBank Top Hit',
+        };
+        return (
+            <Box sx={{ ml: 1 }}>
+                <RadioButtonsGroup
+                    items={moduleKeys}
+                    selected={activeModule}
+                    onChange={(event) => {
+                        setActiveModule(event.target.value);
+                    }}
+                    props={{ row: true }}
                 />
             </Box>
         );
@@ -257,22 +283,28 @@ const ViromeLayout = ({ identifiers }) => {
                         flexDirection: 'row',
                     }}
                 >
-                    <Box sx={{ flex: 1, width: '100%' }}>{renderNetworkFigure()}</Box>
-
-                    <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
-                        {renderDropdown()}
-                        {isSummaryTableOpen ? (
-                            <ViromeSummaryTable
-                                selectedItem={selectedNetworkItem}
-                                onClose={() => setIsSummaryTableOpen(false)}
-                                rows={resultData}
-                                activeModule={activeModule}
-                                maxWidth={containerRef.current.clientWidth}
-                            />
-                        ) : (
-                            renderScatterPlot()
-                        )}
+                    <Box sx={{ flex: 1, width: isSimpleLayout(sectionLayout) ? '100%' : '50%' }}>
+                        {renderNetworkFigure()}
                     </Box>
+                    {isSimpleLayout(sectionLayout) ? null : (
+                        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                {renderDropdown()}
+                                {renderLabelRadioButtons()}
+                            </Box>
+                            {isSummaryTableOpen ? (
+                                <ViromeSummaryTable
+                                    selectedItem={selectedNetworkItem}
+                                    onClose={() => setIsSummaryTableOpen(false)}
+                                    rows={resultData}
+                                    activeModule={activeModule}
+                                    maxWidth={containerRef.current.clientWidth}
+                                />
+                            ) : (
+                                renderScatterPlot()
+                            )}
+                        </Box>
+                    )}
                 </Box>
             )}
         </Box>

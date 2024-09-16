@@ -19,15 +19,15 @@ const QueryView = () => {
     const dispatch = useDispatch();
     const [searchString, setSearchString] = useState('');
     const [isTypingInterval, setIsTypingInterval] = useState(0);
-    const activeModule = useSelector(selectActiveQueryModule);
+    const activeQueryModule = useSelector(selectActiveQueryModule);
     const filters = useSelector(selectAllFilters);
-    const moduleFilters = useSelector((state) => selectFiltersByType(state, activeModule));
+    const moduleFilters = useSelector((state) => selectFiltersByType(state, activeQueryModule));
     const sidebarOpen = useSelector(selectSidebarOpen);
 
     useEffect(() => {
         setIsTypingInterval(0);
         setSearchString('');
-    }, [activeModule]);
+    }, [activeQueryModule]);
 
     const {
         data: identifiersData,
@@ -43,8 +43,8 @@ const QueryView = () => {
         isFetching: countIsFetching,
     } = useGetCountsQuery(
         {
-            filters: getFilterQuery({ filters, excludeType: activeModule }),
-            groupBy: moduleConfig[activeModule].groupByKey,
+            filters: getFilterQuery({ filters, excludeType: activeQueryModule }),
+            groupBy: moduleConfig[activeQueryModule].groupByKey,
             sortByColumn: 'count',
             sortByDirection: 'desc',
             pageStart: 0,
@@ -70,13 +70,13 @@ const QueryView = () => {
 
     const onRowClick = (row) => {
         if (row.selected) {
-            dispatch(removeFilter(`${activeModule}-${row.name}`));
+            dispatch(removeFilter(`${activeQueryModule}-${row.name}`));
             return;
         } else {
             dispatch(
                 addFilter({
-                    filterId: `${activeModule}-${row.name}`,
-                    filterType: activeModule,
+                    filterId: `${activeQueryModule}-${row.name}`,
+                    filterType: activeQueryModule,
                     filterValue: row.name,
                 }),
             );
@@ -132,7 +132,7 @@ const QueryView = () => {
                                     onRowClick={onRowClick}
                                     searchBar={
                                         <SearchBar
-                                            placeholder={`Search ${moduleConfig[activeModule].title.toLowerCase()}`}
+                                            placeholder={`Search ${moduleConfig[activeQueryModule].title.toLowerCase()}`}
                                             query={searchString}
                                             setQuery={handleSearchInput}
                                         />
