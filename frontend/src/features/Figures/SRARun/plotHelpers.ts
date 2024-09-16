@@ -10,7 +10,12 @@ export function histogramBins(values) {
     return bins;
 }
 
-export const getTargetControlPlotData = (targetRows = [], controlRows = [], countKey = 'count', maxRows = 9) => {
+export const getTargetControlPlotData = (
+    targetRows = [],
+    controlRows = [],
+    countKey = 'count',
+    maxRows = undefined,
+) => {
     let colKey = countKey;
     if (countKey === 'percent') {
         colKey = 'count';

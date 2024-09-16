@@ -6,10 +6,11 @@ import { RootState } from './store';
 type AppState = {
     sidebarOpen: boolean;
     activeQueryModule: string;
-    activeModules: {
+    sectionLayouts: {
         sra: string;
         palmdb: string;
-        context: string;
+        ecology: string;
+        host: string;
     };
     darkMode: boolean;
 };
@@ -19,10 +20,11 @@ const appSlice = createSlice({
     initialState: {
         sidebarOpen: false,
         activeQueryModule: 'host',
-        activeModules: {
-            sra: 'host',
-            palmdb: 'sotu',
-            context: 'geography_simple',
+        sectionLayouts: {
+            sra: 'simple',
+            palmdb: 'advanced',
+            ecology: 'simple',
+            host: 'simple',
         },
         darkMode: true,
     },
@@ -33,9 +35,9 @@ const appSlice = createSlice({
         toggleDarkMode: (state) => {
             state.darkMode = !state.darkMode;
         },
-        setActiveModule: (state, action) => {
-            const { sectionKey, moduleKey } = action.payload;
-            state.activeModules[sectionKey] = moduleKey;
+        setSectionLayout: (state, action) => {
+            const { sectionKey, sectionValue } = action.payload;
+            state.sectionLayouts[sectionKey] = sectionValue;
         },
         setActiveQueryModule: (state, action) => {
             state.activeQueryModule = action.payload;
@@ -47,7 +49,7 @@ export default appSlice.reducer;
 
 /* Actions */
 
-export const { toggleSidebar, toggleDarkMode, setActiveModule, setActiveQueryModule } = appSlice.actions;
+export const { toggleSidebar, toggleDarkMode, setSectionLayout, setActiveQueryModule } = appSlice.actions;
 
 /* Selectors */
 
@@ -55,9 +57,9 @@ export const selectApp = (state: RootState) => state.app;
 
 export const selectSidebarOpen = createSelector([selectApp], (app: AppState) => app.sidebarOpen);
 export const selectDarkMode = createSelector([selectApp], (app: AppState) => app.darkMode);
-export const selectActiveModules = createSelector([selectApp], (app: AppState) => app.activeModules);
-export const selectActiveModuleBySection = createSelector(
-    [selectActiveModules, (_: RootState, sectionKey: string) => sectionKey],
-    (activeModules, sectionKey) => activeModules[sectionKey],
+export const selectSectionLayouts = createSelector([selectApp], (app: AppState) => app.sectionLayouts);
+export const selectSectionLayoutBySection = createSelector(
+    [selectSectionLayouts, (_: RootState, sectionKey: string) => sectionKey],
+    (sectionLayouts, sectionKey) => sectionLayouts[sectionKey],
 );
 export const selectActiveQueryModule = createSelector([selectApp], (app: AppState) => app.activeQueryModule);

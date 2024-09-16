@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllFilters } from '../Query/slice.ts';
-import { selectActiveModuleBySection, setActiveModule, selectSidebarOpen } from '../../app/slice.ts';
-import { sectionConfig, moduleConfig } from './constants.ts';
+import { selectSectionLayoutBySection, setSectionLayout, selectSidebarOpen } from '../../app/slice.ts';
+import { sectionConfig } from './constants.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
 import { shouldDisableFigureView } from '../../common/utils/plotHelpers.ts';
 import { useGetIdentifiersQuery } from '../../api/client.ts';
+import { capitalize } from '../../common/utils/textFormatting.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -25,9 +26,9 @@ import QuestionMarkIcon from '@mui/icons-material/HelpCenter';
 const Module = ({ sectionKey }) => {
     const dispatch = useDispatch();
     const filters = useSelector(selectAllFilters);
-    const activeModule = useSelector((state) => selectActiveModuleBySection(state, sectionKey));
+    const sectionLayout = useSelector((state) => selectSectionLayoutBySection(state, sectionKey));
     const sidebarOpen = useSelector(selectSidebarOpen);
-    const [moduleDisplay, setModuleDisplay] = useState(moduleConfig[activeModule].defaultDisplay);
+    const [moduleDisplay, setModuleDisplay] = useState(sectionConfig[sectionKey].defaultDisplay);
 
     const isTableView = () => moduleDisplay === 'table';
     const isFigureView = () => moduleDisplay === 'figure';
@@ -49,7 +50,7 @@ const Module = ({ sectionKey }) => {
         if (!identifiersFetching && shouldDisableFigureView(identifiersData, sectionKey)) {
             setModuleDisplay('table');
         } else {
-            setModuleDisplay(moduleConfig[activeModule].defaultDisplay);
+            setModuleDisplay(sectionConfig[sectionKey].defaultDisplay);
         }
     }, [identifiersData]);
 
@@ -65,34 +66,34 @@ const Module = ({ sectionKey }) => {
                 </Box>
             );
         }
-        /*
-         * X
-         */
         if (sectionKey === 'sra') {
-            return <SRARunLayout identifiers={identifiersData} activeModule={activeModule} />;
+            return <SRARunLayout identifiers={identifiersData} sectionLayout={sectionLayout} />;
         }
         if (sectionKey === 'palmdb') {
-            return <ViromeLayout identifiers={identifiersData} />;
+            return <ViromeLayout identifiers={identifiersData} sectionLayout={sectionLayout} />;
         }
-        if (sectionKey === 'context' && activeModule === 'geography_simple') {
-            return <EnvironmentLayout identifiers={identifiersData} layout='simple' />;
-        }
-        if (sectionKey === 'context' && activeModule === 'geography_advanced') {
-            return <EnvironmentLayout identifiers={identifiersData} layout='advanced' />;
+        if (sectionKey === 'ecology') {
+            return <EnvironmentLayout identifiers={identifiersData} sectionLayout={sectionLayout} />;
         }
         return (
-            <Box sx={{ height: 400, width: 400 }}>
-                <Typography variant='h6'>Coming soon!</Typography>
+            <Box sx={{ height: 500, width: 400 }}>
+                <Typography variant='h6' sx={{ mt: 8 }}>
+                    Coming soon!
+                </Typography>
             </Box>
         );
     };
 
-    const onModuleChange = (event) => {
-        dispatch(setActiveModule({ sectionKey, moduleKey: event.target.value }));
+    const onLayoutChange = (event) => {
+        dispatch(setSectionLayout({ sectionKey, sectionValue: event.target.value }));
     };
 
     const onHelpClick = () => {
         window.open(sectionConfig[sectionKey]?.wikiUrl, '_blank');
+    };
+
+    const getSectionLayoutDisplayName = (sectionLayoutType) => {
+        return `${sectionConfig[sectionKey]?.title} (${capitalize(sectionLayoutType)})`;
     };
 
     return (
@@ -138,15 +139,17 @@ const Module = ({ sectionKey }) => {
                                     borderColor: '#40a9ff',
                                 },
                             }}
-                            value={activeModule}
-                            onChange={onModuleChange}
+                            value={sectionLayout}
+                            onChange={onLayoutChange}
                             variant='standard'
                         >
-                            {sectionConfig[sectionKey]?.modules.map((module) => (
-                                <MenuItem key={module} value={module} sx={{ pr: 10 }}>
-                                    {moduleConfig[module]?.title}
-                                </MenuItem>
-                            ))}
+                            {['simple', 'advanced'].map((sectionLayout) => {
+                                return (
+                                    <MenuItem key={sectionLayout} value={sectionLayout} sx={{ pr: 10 }}>
+                                        {getSectionLayoutDisplayName(sectionLayout)}
+                                    </MenuItem>
+                                );
+                            })}
                         </Select>
                     </Box>
                 </Box>
@@ -200,7 +203,7 @@ const Module = ({ sectionKey }) => {
                 {isTableView() ? (
                     <ResultsTable
                         identifiers={identifiersData}
-                        moduleKey={activeModule}
+                        moduleKey={sectionConfig[sectionKey].modules[0]}
                         shouldSkipFetching={identifiersFetching || !isTableView() || sidebarOpen}
                     />
                 ) : (

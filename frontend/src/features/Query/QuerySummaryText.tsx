@@ -91,7 +91,7 @@ const QuerySummaryText = () => {
         return (
             <Typography paragraph variant='body1'>
                 {`Query | Runs: ${formatNumber(identifiersData?.run?.totalCount)} |
-                          bioProjects: ${formatNumber(identifiersData?.bioproject?.totalCount)}`}
+                          BioProjects: ${formatNumber(identifiersData?.bioproject?.totalCount)}`}
                 {totalVirusCountData && !totalVirusCountIsFetching && !totalVirusCountError
                     ? `
                           | sOTU: ${totalVirusCountData?.length ? formatNumber(totalVirusCountData[0]?.count) : 0}`
