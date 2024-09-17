@@ -943,227 +943,48 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                         <div
                             style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
                         ></div>
-                        {topBiomes.length && (
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    fontSize: '14px',
-                                    gap: '12px',
-                                    maxHeight: '256px',
-                                    overflowY: 'scroll',
-                                }}
-                            >
-                                <div style={{ flex: '0 0' }}>
-                                    {topBiomes.map(
-                                        (v) =>
-                                            v[0] != 'null' && (
-                                                <div
-                                                    style={{
-                                                        height: 'calc(48px + 2px)',
-                                                        fontSize: '14px',
-                                                        lineHeight: '15px',
-                                                        margin: '4px 0 0 0',
-                                                        overflow: 'hidden',
-                                                        textAlign: 'right',
-                                                        textOverflow: 'ellipsis',
-                                                        width: '128px',
-                                                    }}
-                                                >
-                                                    <span style={{ position: 'relative', top: '2px' }}>
-                                                        {WWF_TEW[v[0]].name}
-                                                    </span>
-                                                </div>
-                                            ),
-                                    )}
-                                </div>
-                                <div style={{ flex: '0 0' }}>
-                                    {topBiomes.map(
-                                        (v) =>
-                                            v[0] != 'null' && (
-                                                <div
-                                                    style={{
-                                                        height: 'calc(48px + 2px)',
-                                                        fontSize: '14px',
-                                                        fontWeight: 700,
-                                                        lineHeight: '18px',
-                                                        margin: '4px 0 0 0',
-                                                        position: 'relative',
-                                                        textAlign: 'center',
-                                                        top: '2px',
-                                                        width: '64px',
-                                                    }}
-                                                >
-                                                    <div>{v[1].toLocaleString()}</div>
-                                                    <div>{((v[1] / siteCount) * 100).toFixed(2) + '%'}</div>
-                                                </div>
-                                            ),
-                                    )}
-                                </div>
-                                <div style={{ flex: '1 0' }}>
-                                    {topBiomes.map(
-                                        (v) =>
-                                            v[0] != 'null' && (
-                                                <div
-                                                    style={{
-                                                        height: 'calc(48px + 2px)',
-                                                        margin: '4px 0 0 0',
-                                                        position: 'relative',
-                                                    }}
-                                                >
-                                                    <div
-                                                        style={{
-                                                            backgroundColor: WWF_TEW[v[0]].hex,
-                                                            height: '100%',
-                                                            position: 'relative',
-                                                            width: (v[1] / topBiomes[0][1]) * 100 + '%',
-                                                        }}
-                                                    ></div>
-                                                </div>
-                                            ),
-                                    )}
-                                </div>
-                            </div>
-                        )}
+                        {topBiomes.length && <div style={{ display:'flex', fontSize:'14px', gap:'12px', maxHeight:'256px', overflowY:'scroll' }}>
+                            <div style={{ flex:'0 0' }}>{topBiomes.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', fontSize:'14px', lineHeight:'15px', margin:'4px 0 0 0', overflow:'hidden', textAlign:'right', textOverflow:'ellipsis', width:'128px' }}><span style={{ position:'relative', top:'2px' }}>{WWF_TEW[v[0]].name}</span></div>)}</div>
+                            <div style={{ flex:'0 0' }}>{topBiomes.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', fontSize:'14px', fontWeight:700, lineHeight:'18px', margin:'4px 0 0 0', position:'relative', textAlign:'center', top:'4px', width:'48px' }}>
+                                <div>{v[1].toLocaleString()}</div>
+                                <div style={{ left:'1px', position:'relative' }}>{(v[1]/siteCount*100).toFixed(2) + '%'}</div>
+                            </div>)}</div>
+                            <div style={{ flex:'1 0' }}>{topBiomes.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', position:'relative' }}>
+                                <div style={{ backgroundColor:WWF_TEW[v[0]].hex, height:'100%', position:'relative', width:(v[1]/topBiomes[0][1]*100) + '%' }}></div>
+                            </div>)}</div>
+                        </div>}
                     </div>
                     <div style={{ flex: '1 0' }}>
                         <div style={{ color: '#CCC', fontSize: '14px', fontWeight: 700 }}>Top Countries</div>
                         <div
                             style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
                         ></div>
-                        {topCountries.length && (
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    fontSize: '14px',
-                                    gap: '12px',
-                                    maxHeight: '256px',
-                                    overflowY: 'scroll',
-                                }}
-                            >
-                                <div style={{ flex: '0 0' }}>
-                                    {topCountries.map(
-                                        (v) =>
-                                            v[0] !== 'null' && (
-                                                <div
-                                                    style={{
-                                                        height: '24px',
-                                                        margin: '4px 0 0 0',
-                                                        textAlign: 'right',
-                                                        width: '64px',
-                                                    }}
-                                                >
-                                                    <span style={{ position: 'relative', top: '2px' }}>{v[0]}</span>
-                                                    <Flag
-                                                        code={v[0]}
-                                                        height='14'
-                                                        style={{
-                                                            margin: '0 0 0 4px',
-                                                            verticalAlign: 'middle',
-                                                            width: '24px',
-                                                        }}
-                                                    />
-                                                </div>
-                                            ),
-                                    )}
-                                </div>
-                                <div style={{ flex: '1 0' }}>
-                                    {topCountries.map(
-                                        (v) =>
-                                            v[0] !== 'null' && (
-                                                <div
-                                                    style={{
-                                                        height: '24px',
-                                                        margin: '4px 0 0 0',
-                                                        position: 'relative',
-                                                    }}
-                                                >
-                                                    <div
-                                                        style={{
-                                                            backgroundColor: '#AAA',
-                                                            height: '100%',
-                                                            position: 'relative',
-                                                            width: (v[1] / topCountries[0][1]) * 100 + '%',
-                                                        }}
-                                                    >
-                                                        <div
-                                                            style={{
-                                                                color: '#000',
-                                                                fontWeight: 700,
-                                                                letterSpacing: '0.2px',
-                                                                position: 'absolute',
-                                                                textAlign: 'center',
-                                                                top: '1px',
-                                                                width: '100%',
-                                                            }}
-                                                        >
-                                                            {v[1].toLocaleString() +
-                                                                ' (' +
-                                                                ((v[1] / siteCount) * 100).toFixed(2) +
-                                                                '%)'}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ),
-                                    )}
-                                </div>
-                            </div>
-                        )}
+                        {topCountries.length && <div style={{ display:'flex', fontSize:'14px', gap:'12px', maxHeight:'256px', overflowY:'scroll' }}>
+                            <div style={{ flex:'0 0' }}>{topCountries.map(v => v[0] !== 'null' && <div style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', textAlign:'right', width:'64px' }}><span style={{ position:'relative', top:'2px' }}>{v[0]}</span><Flag code={v[0]} height='14' style={{ margin:'0 0 0 4px', verticalAlign: 'middle', width:'24px' }} /></div>)}</div>
+                            <div style={{ flex:'0 0' }}>{topCountries.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', fontSize:'14px', fontWeight:700, lineHeight:'18px', margin:'4px 0 0 0', position:'relative', textAlign:'center', top:'4px', width:'48px' }}>
+                                <div>{v[1].toLocaleString()}</div>
+                                <div style={{ left:'1px', position:'relative' }}>{(v[1]/siteCount*100).toFixed(2) + '%'}</div>
+                            </div>)}</div>
+                            <div style={{ flex:'1 0' }}>{topCountries.map(v => v[0] !== 'null' && <div style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', position:'relative' }}>
+                                <div style={{ backgroundColor:'#AAA', height:'100%', position:'relative', width:(v[1]/topCountries[0][1]*100) + '%' }}></div>
+                            </div>)}</div>
+                        </div>}
                     </div>
                     <div style={{ flex: '1 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '14px', fontWeight: 700 }}>Top sOTUS</div>
+                        <div style={{ color: '#CCC', fontSize: '14px', fontWeight: 700 }}>Top sOTUs</div>
                         <div
                             style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
                         ></div>
-                        {topSOTUs.length && (
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    fontSize: '14px',
-                                    gap: '12px',
-                                    maxHeight: '256px',
-                                    overflowY: 'scroll',
-                                }}
-                            >
-                                <div style={{ flex: '0 0' }}>
-                                    {topSOTUs.map((v) => (
-                                        <div style={{ height: '24px', margin: '4px 0 0 0', textAlign: 'right' }}>
-                                            <span style={{ position: 'relative', top: '2px' }}>{v[0]}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                                <div style={{ flex: '1 0' }}>
-                                    {topSOTUs.map((v) => (
-                                        <div style={{ height: '24px', margin: '4px 0 0 0', position: 'relative' }}>
-                                            <div
-                                                style={{
-                                                    backgroundColor: '#AAA',
-                                                    height: '100%',
-                                                    position: 'relative',
-                                                    width: (v[1] / topSOTUs[0][1]) * 100 + '%',
-                                                }}
-                                            >
-                                                <div
-                                                    style={{
-                                                        color: '#000',
-                                                        fontWeight: 700,
-                                                        letterSpacing: '0.2px',
-                                                        position: 'absolute',
-                                                        textAlign: 'center',
-                                                        top: '1px',
-                                                        width: '100%',
-                                                    }}
-                                                >
-                                                    {v[1].toLocaleString() +
-                                                        ' (' +
-                                                        ((v[1] / sOTUCount) * 100).toFixed(2) +
-                                                        '%)'}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        {topSOTUs.length && <div style={{ display:'flex', fontSize:'14px', gap:'12px', maxHeight:'256px', overflowY:'scroll' }}>
+                            <div style={{ flex:'0 0' }}>{topSOTUs.map(v => <div style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', textAlign:'right' }}><span style={{ position:'relative', top:'2px' }}>{v[0]}</span></div>)}</div>
+                            <div style={{ flex:'0 0' }}>{topSOTUs.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', fontSize:'14px', fontWeight:700, lineHeight:'18px', margin:'4px 0 0 0', position:'relative', textAlign:'center', top:'4px', width:'48px' }}>
+                                <div>{v[1].toLocaleString()}</div>
+                                <div style={{ left:'1px', position:'relative' }}>{(v[1]/sOTUCount*100).toFixed(2) + '%'}</div>
+                            </div>)}</div>
+                            <div style={{ flex:'1 0' }}>{topSOTUs.map(v => <div style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', position:'relative' }}>
+                                <div style={{ backgroundColor:'#AAA', height:'100%', position:'relative', width:(v[1]/topSOTUs[0][1]*100) + '%' }}></div>
+                            </div>)}</div>
+                        </div>}
                     </div>
                 </div>
             )}
