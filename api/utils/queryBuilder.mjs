@@ -84,7 +84,7 @@ export const hasNoGroupByFilters = (filters, groupBy) => {
     return !filters.filter((filter) => filter.groupByKey !== groupBy).length > 0;
 };
 
-export const getCachedCountsQuery = (groupBy) => {
+export const getCachedCountsQuery = (groupBy, searchStringQuery) => {
     const groupByToMaterializedView = {
         organism: 'counts_sra_organism',
         bioproject: 'counts_sra_bioproject',
@@ -98,6 +98,7 @@ export const getCachedCountsQuery = (groupBy) => {
     };
     return `
         SELECT * FROM ${groupByToMaterializedView[groupBy]}
+        ${searchStringQuery}
     `;
 };
 
@@ -116,11 +117,12 @@ export const getSearchStringClause = (searchString, filters, groupBy) => {
     return `WHERE ${likeStatements.join(' OR ')}`;
 };
 
-export const getGroupedCountsByFilters = ({ filters, groupBy }) => {
+export const getGroupedCountsByFilters = ({ filters, groupBy, searchStringQuery }) => {
     const tableJoin = getMinimalJoinSubQuery(filters, groupBy);
     return `
         SELECT ${groupBy} as name${hasNoGroupByFilters(filters, groupBy) ? '' : `, COUNT(*) as count`}
         FROM (${tableJoin}) as open_virome
+        ${searchStringQuery}
         GROUP BY ${groupBy}
     `;
 };

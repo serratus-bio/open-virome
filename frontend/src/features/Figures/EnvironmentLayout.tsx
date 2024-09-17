@@ -11,6 +11,7 @@ const EnvironmentLayout = ({ identifiers, sectionLayout }) => {
                 alignItems: 'center',
                 width: '100%',
                 height: '100%',
+                mb: 10,
             }}
         >
             <MapPlot identifiers={identifiers} layout={sectionLayout} />

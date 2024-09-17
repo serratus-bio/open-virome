@@ -112,7 +112,7 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
             nodeRepulsion: (node) => 450000,
             // Ideal edge (non nested) length
             idealEdgeLength: (edge) => {
-                return Math.min(edge.data().weight * edge.data().numSOTUS * 1.5, 100);
+                return Math.min(edge.data().weight * edge.data().numSOTUS * 10, 200);
             },
             // Divisor to compute edge forces
             edgeElasticity: (edge) => {

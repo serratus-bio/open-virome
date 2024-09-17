@@ -94,7 +94,7 @@ const QuerySummaryText = () => {
                           BioProjects: ${formatNumber(identifiersData?.bioproject?.totalCount)}`}
                 {totalVirusCountData && !totalVirusCountIsFetching && !totalVirusCountError
                     ? `
-                          | sOTU: ${totalVirusCountData?.length ? formatNumber(totalVirusCountData[0]?.count) : 0}`
+                          | sOTUs: ${totalVirusCountData?.length ? formatNumber(totalVirusCountData[0]?.count) : 0}`
                     : ''}
             </Typography>
         );

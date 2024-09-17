@@ -4,6 +4,7 @@ import { store } from './store.ts';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { selectDarkMode } from './slice.ts';
+import { selectAllFilters } from '../features/Query/slice.ts';
 
 import SidePanel from '../features/Query/SidePanel.tsx';
 import AppToolbar from './Toolbar.tsx';
@@ -13,6 +14,7 @@ import Module from '../features/Module/Module.tsx';
 import QueryView from '../features/Query/QueryView.tsx';
 import Toolbar from '@mui/material/Toolbar';
 import Footer from './Footer.tsx';
+import OnboardingMessage from '../features/Query/OnboardingMessage.tsx';
 
 const AppWrapper = () => {
     return (
@@ -24,6 +26,7 @@ const AppWrapper = () => {
 
 const App = () => {
     const darkMode = useSelector(selectDarkMode);
+    const filters = useSelector(selectAllFilters);
 
     const theme = createTheme({
         palette: {
@@ -58,11 +61,17 @@ const App = () => {
                         sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'left', ml: '3%' }}
                     >
                         <Toolbar />
-                        <QuerySummaryText />
-                        <Module sectionKey={'sra'} />
-                        <Module sectionKey={'palmdb'} />
-                        <Module sectionKey={'ecology'} />
-                        <Module sectionKey={'host'} />
+                        {filters.length > 0 ? (
+                            <>
+                                <QuerySummaryText />
+                                <Module sectionKey={'sra'} />
+                                <Module sectionKey={'palmdb'} />
+                                <Module sectionKey={'ecology'} />
+                                <Module sectionKey={'host'} />
+                            </>
+                        ) : (
+                            <OnboardingMessage />
+                        )}
                     </Box>
                 </Box>
                 <QueryView />
