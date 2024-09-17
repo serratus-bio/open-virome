@@ -16,14 +16,10 @@ export const apiSlice = createApi({
             response.text().then((text) => {
                 try {
                     return JSON.parse(text);
-                } catch (e) {
-                    console.error('Error parsing JSON response', e);
-                }
+                } catch {}
                 try {
                     return JSON.parse(atob(text));
-                } catch (e) {
-                    console.error('Error parsing base64 response', e);
-                }
+                } catch {}
             }),
     }),
     keepUnusedDataFor: 10,
