@@ -446,17 +446,13 @@ const DeckGLRenderScatterplot: any = ({
                 ${identifierClauses.length > 0 ? ` AND (${identifierClauses.join(' OR ')})` : ''}
                 LIMIT 65536;`,
             };
-            console.log('SELECT.text', SELECT.text);
-            SELECT.deflate = btoa(
-                Array.from(deflate(SELECT.text))
-                    .map((v) => String.fromCharCode(v))
-                    .join(''),
-            );
+            // console.debug('SELECT.text', SELECT.text);
+            SELECT.deflate = btoa(Array.from(deflate(SELECT.text)).map(v => String.fromCharCode(v)).join(''));
             const responseMs = Date.now();
 
             let response: any = undefined;
             try {
-                console.debug('[DEBUG]', 'DeckGLRenderScatterplot.SELECT', SELECT);
+                // console.debug('[DEBUG]', 'DeckGLRenderScatterplot.SELECT', SELECT);
 
                 response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
                     body: JSON.stringify({ SELECT: SELECT.deflate, array: true, deflate: true }),
@@ -483,12 +479,12 @@ const DeckGLRenderScatterplot: any = ({
 
                 setSpotCount(json.length);
 
-                console.debug(
-                    '[DEBUG]',
-                    'DeckGLRenderScatterplot.json',
-                    json.length.toLocaleString() + ' points',
-                    (Date.now() - responseMs).toLocaleString() + ' ms',
-                );
+                // console.debug(
+                //     '[DEBUG]',
+                //     'DeckGLRenderScatterplot.json',
+                //     json.length.toLocaleString() + ' points',
+                //     (Date.now() - responseMs).toLocaleString() + ' ms',
+                // );
 
                 mbOverlay.setProps({
                     interleaved: true,
@@ -551,11 +547,7 @@ const DeckGLRenderScatterplot: any = ({
 
                 response = undefined;
                 try {
-                    console.debug(
-                        '[DEBUG]',
-                        'DeckGLRenderScatterplot.SELECT_READ_VIRUS_COUNT',
-                        SELECT_READ_VIRUS_COUNT,
-                    );
+                    // console.debug('[DEBUG]', 'DeckGLRenderScatterplot.SELECT_READ_VIRUS_COUNT', SELECT_READ_VIRUS_COUNT);
 
                     response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
                         body: JSON.stringify({ SELECT: SELECT_READ_VIRUS_COUNT.deflate, deflate: true }),
