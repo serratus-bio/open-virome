@@ -15,6 +15,25 @@ const LOGAN_RDS_PROXY_LAMBDA_ENDPOINT = 'https://omdmrhz5lb2nrbmodjtm5fxhqq0uevz
 const MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE = false;
 
 // SEND TO UTIL FUNCTIONS
+const aggregateArray128 = a => {
+    let o:any = undefined;
+
+    for(const v of a) {
+        if(!o)
+            o = {};
+
+        if(!o[v])
+            o[v] = 0;
+
+        ++o[v];
+    }
+
+    if(o)
+        return Object.keys(o)
+            .sort((a, b) => o[b]-o[a])
+            .slice(0, 128)
+            .map(k => [k, o[k]]);
+};
 const arrayMapColumns = (a, c) => a.map((v) => Object.fromEntries(c.map((_v, _i) => [_v, v[_i]])));
 const bioprojectIDFromBiosample: any = async (biosample) => {
     if (!bioprojectIDFromBiosample._) bioprojectIDFromBiosample._ = {};
@@ -394,8 +413,11 @@ const DeckGLRenderScatterplot: any = ({
     setHitCount,
     setLatLon,
     setPalmprintHitsCount,
-    setSotuCount,
-    setSpotCount,
+    setSOTUCount,
+    setSiteCount,
+    setTopBiomes,
+    setTopCountries,
+    setTopSOTUs,
 }) => {
     if (!DeckGLRenderScatterplot.n) DeckGLRenderScatterplot.n = 0;
 
@@ -467,7 +489,7 @@ const DeckGLRenderScatterplot: any = ({
                 let json = await response.json();
                 const zoomDriftFactor = Math.pow(2, (16 - mlglMap.getZoom()) / 8) / 8000;
 
-                json = arrayMapColumns(json.result, [
+                json.result = arrayMapColumns(json.result, [
                     'accession',
                     'attribute_name',
                     'attribute_value',
@@ -477,20 +499,22 @@ const DeckGLRenderScatterplot: any = ({
                     'gp4326_wwf_tew_id',
                 ]);
 
-                setSpotCount(json.length);
-
                 // console.debug(
                 //     '[DEBUG]',
                 //     'DeckGLRenderScatterplot.json',
-                //     json.length.toLocaleString() + ' points',
+                //     json.result.length.toLocaleString() + ' points',
                 //     (Date.now() - responseMs).toLocaleString() + ' ms',
                 // );
+
+                setSiteCount(json.result.length);
+                setTopBiomes(aggregateArray128(json.result.map(v => v.gp4326_wwf_tew_id)));
+                setTopCountries(aggregateArray128(json.result.map(v => v.gm4326_id)));
 
                 mbOverlay.setProps({
                     interleaved: true,
                     layers: [
                         new (globalThis as any).deck.ScatterplotLayer({
-                            data: json,
+                            data: json.result,
                             getFillColor: (d) => {
                                 if (!d.gp4326_wwf_tew_id) d.gp4326_wwf_tew_id = 'WWF_TEW_BIOME_99';
 
@@ -527,17 +551,15 @@ const DeckGLRenderScatterplot: any = ({
                     ],
                 });
 
-                // TOTAL READ/VIRUS COUNT
                 const SELECT_READ_VIRUS_COUNT: any = {
-                    text: `COUNT(run) AS hit_n, COUNT(DISTINCT(run)) AS palmprint_hit_n, COUNT(DISTINCT(sotu)) AS sotu_n
-                    FROM (SELECT run, sotu
+                    text: `run, palm_id, sotu
                         FROM (SELECT DISTINCT(accession)
                             FROM (SELECT accession
                                 FROM bgl_gm4326_gp4326
                                 WHERE palm_virome = TRUE
                                 ${identifierClauses.length > 0 ? ` AND (${identifierClauses.join(' OR ')})` : ''}
                                 LIMIT 65536)) AS t
-                        JOIN palm_virome ON t.accession = palm_virome.bio_sample);`,
+                        JOIN palm_virome ON t.accession = palm_virome.bio_sample`,
                 };
                 SELECT_READ_VIRUS_COUNT.deflate = btoa(
                     Array.from(deflate(SELECT_READ_VIRUS_COUNT.text))
@@ -547,10 +569,10 @@ const DeckGLRenderScatterplot: any = ({
 
                 response = undefined;
                 try {
-                    // console.debug('[DEBUG]', 'DeckGLRenderScatterplot.SELECT_READ_VIRUS_COUNT', SELECT_READ_VIRUS_COUNT);
+                    console.debug('[DEBUG]', 'DeckGLRenderScatterplot.SELECT_READ_VIRUS_COUNT', SELECT_READ_VIRUS_COUNT);
 
                     response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
-                        body: JSON.stringify({ SELECT: SELECT_READ_VIRUS_COUNT.deflate, deflate: true }),
+                        body: JSON.stringify({ SELECT: SELECT_READ_VIRUS_COUNT.deflate, array: true, deflate: true }),
                         headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
                         method: 'POST',
                     });
@@ -561,12 +583,12 @@ const DeckGLRenderScatterplot: any = ({
                 if (response && response.status === 200) {
                     let json = await response.json();
 
-                    if (json.result[0].hit_n !== undefined) setHitCount(parseInt(json.result[0].hit_n));
+                    setHitCount(json.result.length);
+                    setPalmprintHitsCount(new Set(json.result.map(v => v[1])).size);
 
-                    if (json.result[0].palmprint_hit_n !== undefined)
-                        setPalmprintHitsCount(parseInt(json.result[0].palmprint_hit_n));
-
-                    if (json.result[0].sotu_n !== undefined) setSotuCount(parseInt(json.result[0].sotu_n));
+                    const sOTUArray = json.result.map(v => v[2]);
+                    setSOTUCount(new Set(sOTUArray).size);
+                    setTopSOTUs(aggregateArray128(sOTUArray));
                 }
             }
         }
@@ -598,8 +620,11 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
     const [latLon, setLatLon] = useState('');
     const [mapMode, setMapMode] = useState('SAMPLES');
     const [palmprintHitsCount, setPalmprintHitsCount] = useState(0);
-    const [sotuCount, setSotuCount] = useState(0);
-    const [spotCount, setSpotCount] = useState(0);
+    const [sOTUCount, setSOTUCount] = useState(0);
+    const [siteCount, setSiteCount] = useState(0);
+    const [topBiomes, setTopBiomes] = useState([]);
+    const [topCountries, setTopCountries] = useState([]);
+    const [topSOTUs, setTopSOTUs] = useState([]);
 
     useEffect(() => {
         if (mapRef.current && globalThis.maplibregl && globalThis.deck) {
@@ -640,8 +665,11 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                     setHitCount,
                     setLatLon,
                     setPalmprintHitsCount,
-                    setSotuCount,
-                    setSpotCount,
+                    setSOTUCount,
+                    setSiteCount,
+                    setTopBiomes,
+                    setTopCountries,
+                    setTopSOTUs,
                 });
 
             if (MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE) mlglMap.on('moveend', renderScatterplot);
@@ -714,16 +742,16 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                 <div style={{ flex: '1 0' }}>
                     <div style={{ color: '#EEE', fontSize: '16px', fontWeight: 700 }}>
                         {'Showing ' +
-                            spotCount.toLocaleString() +
-                            ' geographic spots for ' +
+                            siteCount.toLocaleString() +
+                            ' geographic sites for ' +
                             palmprintHitsCount.toLocaleString() +
-                            ' palmprint hits, ' +
-                            sotuCount.toLocaleString() +
+                            ' palmprints, ' +
+                            sOTUCount.toLocaleString() +
                             ' sOTUs on ' +
                             hitCount.toLocaleString() +
-                            ' runs.'}
+                            ' hits.'}
                     </div>
-                    {spotCount >= 1024 * 64 && (
+                    {siteCount >= 1024 * 64 && (
                         <div style={{ color: '#FA0', flex: '1 0', fontSize: '14px', fontWeight: 700 }}>
                             The number of spots displayed is limited to 65.536. Download the dataset to get the whole
                             list.
@@ -898,20 +926,6 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                                     <span style={{ fontSize: '14px' }}>{countryRegionID}</span>
                                 </div>
                             </MapLibreDeckGLMapTooltipSection>
-                            <MapLibreDeckGLMapTooltipSection>
-                                <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                                    BIOLOGICAL FEATURES
-                                </div>
-                                <div
-                                    style={{
-                                        backgroundColor: '#CCC',
-                                        height: '1px',
-                                        margin: '4px 0 4px 0',
-                                        width: '100%',
-                                    }}
-                                ></div>
-                                <div style={{ fontSize: '14px' }}>...</div>
-                            </MapLibreDeckGLMapTooltipSection>
                         </>
                     )}
                 </div>
@@ -919,18 +933,48 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
             {!isSimpleLayout(layout) && (
                 <div style={{ display: 'flex', gap: '24px', margin: '16px 0 0 0', padding: '0 8px 0 8px' }}>
                     <div style={{ flex: '1 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>CONTIGS</div>
+                        <div style={{ color: '#CCC', fontSize: '14px', fontWeight: 700 }}>Top Biomes</div>
                         <div
                             style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
                         ></div>
-                        <div style={{ fontSize: '16px' }}>...</div>
+                        {topBiomes.length && <div style={{ display:'flex', fontSize:'14px', gap:'12px', maxHeight:'256px', overflowY:'scroll' }}>
+                            <div style={{ flex:'0 0' }}>{topBiomes.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', fontSize:'14px', lineHeight:'15px', margin:'4px 0 0 0', overflow:'hidden', textAlign:'right', textOverflow:'ellipsis', width:'128px' }}><span style={{ position:'relative', top:'2px' }}>{WWF_TEW[v[0]].name}</span></div>)}</div>
+                            <div style={{ flex:'0 0' }}>{topBiomes.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', fontSize:'14px', fontWeight:700, lineHeight:'18px', margin:'4px 0 0 0', position:'relative', textAlign:'center', top:'2px', width:'64px' }}>
+                                <div>{v[1].toLocaleString()}</div>
+                                <div>{(v[1]/siteCount*100).toFixed(2) + '%'}</div>
+                            </div>)}</div>
+                            <div style={{ flex:'1 0' }}>{topBiomes.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', position:'relative' }}>
+                                <div style={{ backgroundColor:WWF_TEW[v[0]].hex, height:'100%', position:'relative', width:(v[1]/topBiomes[0][1]*100) + '%' }}></div>
+                            </div>)}</div>
+                        </div>}
                     </div>
                     <div style={{ flex: '1 0' }}>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>STATISTICS</div>
+                        <div style={{ color: '#CCC', fontSize: '14px', fontWeight: 700 }}>Top Countries</div>
                         <div
                             style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
                         ></div>
-                        <div style={{ fontSize: '16px' }}>...</div>
+                        {topCountries.length && <div style={{ display:'flex', fontSize:'14px', gap:'12px', maxHeight:'256px', overflowY:'scroll' }}>
+                            <div style={{ flex:'0 0' }}>{topCountries.map(v => v[0] !== 'null' && <div style={{ height:'24px', margin:'4px 0 0 0', textAlign:'right', width:'64px' }}><span style={{ position:'relative', top:'2px' }}>{v[0]}</span><Flag code={v[0]} height='14' style={{ margin:'0 0 0 4px', verticalAlign: 'middle', width:'24px' }} /></div>)}</div>
+                            <div style={{ flex:'1 0' }}>{topCountries.map(v => v[0] !== 'null' && <div style={{ height:'24px', margin:'4px 0 0 0', position:'relative' }}>
+                                <div style={{ backgroundColor:'#AAA', height:'100%', position:'relative', width:(v[1]/topCountries[0][1]*100) + '%' }}>
+                                    <div style={{ color:'#000', fontWeight:700, letterSpacing:'0.2px', position:'absolute', textAlign:'center', top:'1px', width:'100%' }}>{v[1].toLocaleString() + ' (' + (v[1]/siteCount*100).toFixed(2) + '%)'}</div>
+                                </div>
+                            </div>)}</div>
+                        </div>}
+                    </div>
+                    <div style={{ flex: '1 0' }}>
+                        <div style={{ color: '#CCC', fontSize: '14px', fontWeight: 700 }}>Top sOTUS</div>
+                        <div
+                            style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
+                        ></div>
+                        {topSOTUs.length && <div style={{ display:'flex', fontSize:'14px', gap:'12px', maxHeight:'256px', overflowY:'scroll' }}>
+                            <div style={{ flex:'0 0' }}>{topSOTUs.map(v => <div style={{ height:'24px', margin:'4px 0 0 0', textAlign:'right' }}><span style={{ position:'relative', top:'2px' }}>{v[0]}</span></div>)}</div>
+                            <div style={{ flex:'1 0' }}>{topSOTUs.map(v => <div style={{ height:'24px', margin:'4px 0 0 0', position:'relative' }}>
+                                <div style={{ backgroundColor:'#AAA', height:'100%', position:'relative', width:(v[1]/topSOTUs[0][1]*100) + '%' }}>
+                                    <div style={{ color:'#000', fontWeight:700, letterSpacing:'0.2px', position:'absolute', textAlign:'center', top:'1px', width:'100%' }}>{v[1].toLocaleString() + ' (' + (v[1]/sOTUCount*100).toFixed(2) + '%)'}</div>
+                                </div>
+                            </div>)}</div>
+                        </div>}
                     </div>
                 </div>
             )}
