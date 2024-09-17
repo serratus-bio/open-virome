@@ -8,6 +8,8 @@ import Toolbar from '@mui/material/Toolbar';
 import FilterTags from '../features/Query/FilterTags.tsx';
 import IconButton from '@mui/material/IconButton';
 import TuneIcon from '@mui/icons-material/Tune';
+import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
 
 const AppToolbar = () => {
     const dispatch = useDispatch();
@@ -61,7 +63,11 @@ const AppToolbar = () => {
                     <TuneIcon fontSize='large' />
                 </IconButton>
                 {/* OV */}
-                <b> Open Virome </b>
+                <Box sx={{ minWidth: 150, ml: 2 }}>
+                    <Typography variant='h5' noWrap sx={{ display: open ? 'none' : 'block' }}>
+                        Open Virome
+                    </Typography>
+                </Box>
                 <FilterTags />
             </Toolbar>
         </AppBar>

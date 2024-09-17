@@ -7,6 +7,8 @@ import { moduleConfig } from '../Module/constants.ts';
 import Chip from '@mui/material/Chip';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
 const FilterTags = () => {
     const filters = useSelector(selectAllFilters);
@@ -29,28 +31,44 @@ const FilterTags = () => {
     };
 
     return (
-        <Box
-            sx={{
-                ml: 4,
-                flexGrow: 1,
-                display: 'flex',
-                justifyContent: 'left',
-                flexWrap: 'nowrap',
-                overflow: 'auto',
-                maxWidth: 970,
-                borderRadius: 2,
-            }}
-        >
-            <Stack spacing={1} direction='row'>
-                {filters.map((filter, index) => (
-                    <Chip
-                        key={filter.filterId}
-                        label={getFilterDisplayText(filter)}
-                        onDelete={() => onFilterDelete(filter.filterId)}
-                        onClick={() => onFilterClick(filter.filterType)}
-                    />
-                ))}
-            </Stack>
+        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+            <Box
+                sx={{
+                    ml: 4,
+                    flexGrow: 1,
+                    display: 'flex',
+                    justifyContent: 'left',
+                    flexWrap: 'nowrap',
+                    overflow: 'auto',
+                    maxWidth: '60vw',
+                    borderRadius: 2,
+                }}
+            >
+                <Stack spacing={1} direction='row'>
+                    {filters.map((filter) => (
+                        <Chip
+                            key={filter.filterId}
+                            label={getFilterDisplayText(filter)}
+                            onDelete={() => onFilterDelete(filter.filterId)}
+                            onClick={() => onFilterClick(filter.filterType)}
+                        />
+                    ))}
+                </Stack>
+            </Box>
+            {filters.length > 0 ? (
+                <Button
+                    onClick={() => {
+                        filters.forEach((filter) => {
+                            onFilterDelete(filter.filterId);
+                        });
+                    }}
+                    variant='text'
+                    size='small'
+                    sx={{ ml: 1 }}
+                >
+                    <Typography variant='body2'>Clear All</Typography>
+                </Button>
+            ) : null}
         </Box>
     );
 };
