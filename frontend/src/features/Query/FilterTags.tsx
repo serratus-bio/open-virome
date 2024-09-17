@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectAllFilters, removeFilter } from './slice.ts';
+import { selectAllFilters, removeFilter, removeAllFilters } from './slice.ts';
 import { setActiveQueryModule, selectSidebarOpen, toggleSidebar } from '../../app/slice.ts';
 import { moduleConfig } from '../Module/constants.ts';
 
@@ -30,6 +30,10 @@ const FilterTags = () => {
         }
     };
 
+    const onClearAllFilters = () => {
+        dispatch(removeAllFilters());
+    };
+
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
             <Box
@@ -56,16 +60,7 @@ const FilterTags = () => {
                 </Stack>
             </Box>
             {filters.length > 0 ? (
-                <Button
-                    onClick={() => {
-                        filters.forEach((filter) => {
-                            onFilterDelete(filter.filterId);
-                        });
-                    }}
-                    variant='text'
-                    size='small'
-                    sx={{ ml: 1 }}
-                >
+                <Button onClick={() => onClearAllFilters()} variant='text' size='small' sx={{ ml: 1 }}>
                     <Typography variant='body2'>Clear All</Typography>
                 </Button>
             ) : null}

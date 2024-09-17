@@ -21,6 +21,7 @@ const filtersSlice = createSlice({
     initialState: emptyInitialState,
     reducers: {
         addFilter: filtersAdapter.addOne,
+        addManyFilters: filtersAdapter.addMany,
         removeFilter: filtersAdapter.removeOne,
         removeAllFilters: filtersAdapter.removeAll,
     },
@@ -30,7 +31,7 @@ export default filtersSlice.reducer;
 
 /* Actions */
 
-export const { addFilter, removeFilter, removeAllFilters } = filtersSlice.actions;
+export const { addFilter, addManyFilters, removeFilter, removeAllFilters } = filtersSlice.actions;
 
 /* Selectors */
 
