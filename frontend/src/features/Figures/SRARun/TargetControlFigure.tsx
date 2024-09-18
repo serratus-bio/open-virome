@@ -74,7 +74,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout
     };
 
     const renderFigure = (seriesName) => {
-        const maxRows = isSimpleLayout(sectionLayout) ? (figureType === 'polar' ? 4 : 9) : undefined;
+        const maxRows = figureType === 'polar' ? 4 : isSimpleLayout(sectionLayout) ? 9 : undefined;
         const plotData = getTargetControlPlotData(targetCountData, controlCountData, activeCountKey, maxRows);
         let totalRuns = getTotalRuns(seriesName);
         const filteredPlotData = {

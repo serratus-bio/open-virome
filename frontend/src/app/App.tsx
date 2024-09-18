@@ -10,11 +10,11 @@ import SidePanel from '../features/Query/SidePanel.tsx';
 import AppToolbar from './Toolbar.tsx';
 import Box from '@mui/material/Box';
 import QuerySummaryText from '../features/Query/QuerySummaryText.tsx';
+import OnboardingMessage from '../features/Query/OnboardingMessage.tsx';
 import Module from '../features/Module/Module.tsx';
 import QueryView from '../features/Query/QueryView.tsx';
 import Toolbar from '@mui/material/Toolbar';
 import Footer from './Footer.tsx';
-import OnboardingMessage from '../features/Query/OnboardingMessage.tsx';
 
 const AppWrapper = () => {
     return (

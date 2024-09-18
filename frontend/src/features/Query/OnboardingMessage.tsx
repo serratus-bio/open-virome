@@ -428,12 +428,14 @@ const OnbaordingPage = () => {
         return (
             <Card
                 sx={{
-                    '& .MuiPaper-root': { backgroundImage: 'none' },
+                    backgroundColor: 'transparent',
+                    backgroundImage: 'none',
                 }}
             >
                 <CardActionArea
                     onClick={() => onClickExampleFilter(name)}
                     sx={{
+                        backgroundColor: 'rgba(29, 30, 32, 0.6)',
                         padding: 2,
                         margin: 2,
                         display: 'flex',
@@ -442,7 +444,7 @@ const OnbaordingPage = () => {
                         justifyContent: 'center',
                         alignItems: 'flex-start',
                         borderWidth: 1,
-                        borderColor: 'white',
+                        borderColor: 'rgba(255, 255, 255, 0.48)',
                         borderRadius: 8,
                         borderStyle: 'solid',
                         height: 150,
@@ -499,7 +501,16 @@ const OnbaordingPage = () => {
                 </Typography>
                 {` or click an example below.`}
             </Typography>
-            <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', mt: 8 }}>
+            <Box
+                sx={{
+                    backgroundColor: 'transparent',
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    mt: 8,
+                }}
+            >
                 {getExampleFilter('Eimeria')}
                 {getExampleFilter('Neuronal')}
                 {getExampleFilter('Tundra')}
