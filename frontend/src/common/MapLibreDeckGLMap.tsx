@@ -401,6 +401,7 @@ const WWF_TEW = Object.fromEntries(
 
 const DeckGLRenderScatterplot: any = ({
     identifiers,
+    mapMode,
     mbOverlay,
     mlglMap,
     setAttributeName,
@@ -410,8 +411,12 @@ const DeckGLRenderScatterplot: any = ({
     setCountryID,
     setHitCount,
     setLatLon,
+    setPalmID,
     setPalmprintHitsCount,
+    setRunID,
+    setSOTU,
     setSOTUCount,
+    setSequence,
     setSiteCount,
     setTopBiomes,
     setTopCountries,
@@ -459,144 +464,176 @@ const DeckGLRenderScatterplot: any = ({
 
             const identifierClauses = getIdClauses(identifiers?.biosample?.single, identifiers?.biosample?.range);
 
-            const SELECT: any = {
-                text: `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, gm4326_id, gp4326_wwf_tew_id
-                FROM bgl_gm4326_gp4326
-                WHERE palm_virome = TRUE
-                ${identifierClauses.length > 0 ? ` AND (${identifierClauses.join(' OR ')})` : ''}
-                LIMIT 65536;`,
-            };
-            // console.debug('SELECT.text', SELECT.text);
-            SELECT.deflate = btoa(
-                Array.from(deflate(SELECT.text))
-                    .map((v) => String.fromCharCode(v))
-                    .join(''),
-            );
-            const responseMs = Date.now();
-
-            let response: any = undefined;
-            try {
-                // console.debug('[DEBUG]', 'DeckGLRenderScatterplot.SELECT', SELECT);
-
-                response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
-                    body: JSON.stringify({ SELECT: SELECT.deflate, array: true, deflate: true }),
-                    headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
-                    method: 'POST',
-                });
-            } catch (error) {
-                console.error(error);
-            }
-
-            if (response && response.status === 200) {
-                let json = await response.json();
-                const zoomDriftFactor = Math.pow(2, (16 - mlglMap.getZoom()) / 8) / 8000;
-
-                json.result = arrayMapColumns(json.result, [
-                    'accession',
-                    'attribute_name',
-                    'attribute_value',
-                    'lat',
-                    'lon',
-                    'gm4326_id',
-                    'gp4326_wwf_tew_id',
-                ]);
-
-                // console.debug(
-                //     '[DEBUG]',
-                //     'DeckGLRenderScatterplot.json',
-                //     json.result.length.toLocaleString() + ' points',
-                //     (Date.now() - responseMs).toLocaleString() + ' ms',
-                // );
-
-                setSiteCount(json.result.length);
-                setTopBiomes(aggregateArray128(json.result.map((v) => v.gp4326_wwf_tew_id)));
-                setTopCountries(aggregateArray128(json.result.map((v) => v.gm4326_id)));
-
-                mbOverlay.setProps({
-                    interleaved: true,
-                    layers: [
-                        new (globalThis as any).deck.ScatterplotLayer({
-                            data: json.result,
-                            getFillColor: (d) => {
-                                if (!d.gp4326_wwf_tew_id) d.gp4326_wwf_tew_id = 'WWF_TEW_BIOME_99';
-
-                                return WWF_TEW[d.gp4326_wwf_tew_id].rgb;
-                            },
-                            getPosition: (d) => {
-                                const prng = splitmix32(cyrb128(d.accession)[0]);
-
-                                return [
-                                    d.lon + gaussianRandom(prng) * zoomDriftFactor,
-                                    d.lat + gaussianRandom(prng) * zoomDriftFactor,
-                                    0,
-                                ];
-                            },
-                            id: 'scatterplotLayer',
-                            onClick: (info, event) => {
-                                if (info.object) {
-                                    setAttributeName(info.object.attribute_name);
-                                    setAttributeValue(info.object.attribute_value);
-
-                                    setBiomeID(info.object.gp4326_wwf_tew_id);
-                                    setBiosampleID(info.object.accession);
-
-                                    setCountryID(info.object.gm4326_id);
-
-                                    setLatLon([info.object.lat, info.object.lon].join(','));
-                                }
-                            },
-                            opacity: 0.8,
-                            pickable: true,
-                            radiusMaxPixels: 16,
-                            radiusMinPixels: 6,
-                        }),
-                    ],
-                });
-
-                const SELECT_READ_VIRUS_COUNT: any = {
-                    text: `run, palm_id, sotu
-                        FROM (SELECT DISTINCT(accession)
-                            FROM (SELECT accession
-                                FROM bgl_gm4326_gp4326
-                                WHERE palm_virome = TRUE
-                                ${identifierClauses.length > 0 ? ` AND (${identifierClauses.join(' OR ')})` : ''}
-                                LIMIT 65536)) AS t
-                        JOIN palm_virome ON t.accession = palm_virome.bio_sample`,
+            const selectBGLJSON = await (async () => {
+                const SELECT: any = {
+                    text: `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, gm4326_id, gp4326_wwf_tew_id
+                    FROM bgl_gm4326_gp4326
+                    WHERE palm_virome = TRUE
+                    ${identifierClauses.length > 0 ? ` AND (${identifierClauses.join(' OR ')})` : ''}
+                    LIMIT 65536;`,
                 };
-                SELECT_READ_VIRUS_COUNT.deflate = btoa(
-                    Array.from(deflate(SELECT_READ_VIRUS_COUNT.text))
+                SELECT.deflate = btoa(
+                    Array.from(deflate(SELECT.text))
                         .map((v) => String.fromCharCode(v))
                         .join(''),
                 );
-
-                response = undefined;
+    
+                let response: any = undefined;
                 try {
-                    console.debug(
-                        '[DEBUG]',
-                        'DeckGLRenderScatterplot.SELECT_READ_VIRUS_COUNT',
-                        SELECT_READ_VIRUS_COUNT,
-                    );
-
                     response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
-                        body: JSON.stringify({ SELECT: SELECT_READ_VIRUS_COUNT.deflate, array: true, deflate: true }),
+                        body: JSON.stringify({ SELECT: SELECT.deflate, array: true, deflate: true }),
                         headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
                         method: 'POST',
                     });
                 } catch (error) {
                     console.error(error);
                 }
-
+    
                 if (response && response.status === 200) {
                     let json = await response.json();
 
-                    setHitCount(json.result.length);
-                    setPalmprintHitsCount(new Set(json.result.map((v) => v[1])).size);
+                    json.result = arrayMapColumns(json.result, [
+                        'accession',
+                        'attribute_name',
+                        'attribute_value',
+                        'lat',
+                        'lon',
+                        'gm4326_id',
+                        'gp4326_wwf_tew_id',
+                    ]);
 
-                    const sOTUArray = json.result.map((v) => v[2]);
-                    setSOTUCount(new Set(sOTUArray).size);
-                    setTopSOTUs(aggregateArray128(sOTUArray));
+                    return json;
                 }
+            })();
+
+            const selectPalmVirome = await (async () => {
+                const SELECT: any = {
+                    text: `run, bio_sample, palm_id, sotu
+                    FROM (SELECT DISTINCT(accession)
+                        FROM (SELECT accession
+                            FROM bgl_gm4326_gp4326
+                            WHERE palm_virome = TRUE
+                            ${identifierClauses.length > 0 ? ` AND (${identifierClauses.join(' OR ')})` : ''}
+                            LIMIT 65536)) AS t
+                    JOIN palm_virome ON t.accession = palm_virome.bio_sample;`,
+                };
+                SELECT.deflate = btoa(
+                    Array.from(deflate(SELECT.text))
+                        .map((v) => String.fromCharCode(v))
+                        .join(''),
+                );
+    
+                let response: any = undefined;
+                try {
+                    response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
+                        body: JSON.stringify({ SELECT: SELECT.deflate, array: true, deflate: true }),
+                        headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
+                        method: 'POST',
+                    });
+                } catch (error) {
+                    console.error(error);
+                }
+    
+                if (response && response.status === 200)
+                    return await response.json();
+            })();
+
+            if(mapMode === 'CONTIGS') {
+                const o = Object.fromEntries(selectBGLJSON
+                    .result
+                    .map(v => [v.accession, v]));
+                
+                selectBGLJSON.result = selectPalmVirome.result.map(v => ({
+                    ...o[v[1]],
+                    run:v[0],
+                    palm_id:v[2],
+                    sotu:v[3]
+                }));
             }
+
+            setSiteCount(selectBGLJSON.result.length);
+            setTopBiomes(aggregateArray128(selectBGLJSON.result.map((v) => v.gp4326_wwf_tew_id)));
+            setTopCountries(aggregateArray128(selectBGLJSON.result.map((v) => v.gm4326_id)));
+            
+            const zoomDriftFactor = Math.pow(2, (16 - mlglMap.getZoom()) / 8) / 8000;
+
+            mbOverlay.setProps({
+                interleaved: true,
+                layers: [
+                    new (globalThis as any).deck.ScatterplotLayer({
+                        data: selectBGLJSON.result,
+                        getFillColor: (d) => {
+                            if (!d.gp4326_wwf_tew_id) d.gp4326_wwf_tew_id = 'WWF_TEW_BIOME_99';
+
+                            return WWF_TEW[d.gp4326_wwf_tew_id].rgb;
+                        },
+                        getPosition: (d) => {
+                            const prng = splitmix32(cyrb128(d.accession)[0]);
+
+                            return [
+                                d.lon + gaussianRandom(prng) * zoomDriftFactor,
+                                d.lat + gaussianRandom(prng) * zoomDriftFactor,
+                                0,
+                            ];
+                        },
+                        id: 'scatterplotLayer',
+                        onClick: async (info, event) => {
+                            if (info.object) {
+                                setAttributeName(info.object.attribute_name);
+                                setAttributeValue(info.object.attribute_value);
+
+                                setBiomeID(info.object.gp4326_wwf_tew_id);
+                                setBiosampleID(info.object.accession);
+
+                                setCountryID(info.object.gm4326_id);
+
+                                setLatLon([info.object.lat, info.object.lon].join(','));
+
+                                if(mapMode === 'CONTIGS') {
+                                    setRunID(info.object.run);
+                                    setPalmID(info.object.palm_id);
+                                    setSOTU(info.object.sotu);
+
+                                    const selectPalmViromeRun = await (async () => {
+                                        let response: any = undefined;
+                                        try {
+                                            response = await fetch(LOGAN_RDS_PROXY_LAMBDA_ENDPOINT, {
+                                                body: JSON.stringify({ SELECT: 'node_coverage, node_seq FROM palm_virome WHERE run = \'' + info.object.run + '\';' }),
+                                                headers: { Authorization: LOGAN_RDS_PROXY_LAMBDA_AUTHORIZATION_HEADER },
+                                                method: 'POST',
+                                            });
+                                        } catch (error) {
+                                            console.error(error);
+                                        }
+                            
+                                        if (response && response.status === 200)
+                                            return await response.json();
+                                    })();
+
+                                    setSequence([
+                                        '>' + info.object.run + '_' + info.object.sotu + '_coverage' + selectPalmViromeRun.result[0].node_coverage,
+                                        selectPalmViromeRun.result[0].node_seq.match(/.{1,80}/g),
+                                        ''
+                                    ]
+                                        .flat()
+                                        .join('\n'));
+                                }
+                            }
+                        },
+                        opacity: 0.8,
+                        pickable: true,
+                        radiusMaxPixels: 16,
+                        radiusMinPixels: 6,
+                    }),
+                ],
+            });
+
+            setHitCount(selectPalmVirome.result.length);
+            setPalmprintHitsCount(new Set(selectPalmVirome.result.map((v) => v[2])).size);
+
+            const sOTUArray = selectPalmVirome.result.map((v) => v[3]);
+            setSOTUCount(new Set(sOTUArray).size);
+            setTopSOTUs(aggregateArray128(sOTUArray));
         }
 
         --DeckGLRenderScatterplot.n;
@@ -625,7 +662,11 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
     const [hitCount, setHitCount] = useState(0);
     const [latLon, setLatLon] = useState('');
     const [mapMode, setMapMode] = useState('SAMPLES');
+    const [palmID, setPalmID] = useState('');
     const [palmprintHitsCount, setPalmprintHitsCount] = useState(0);
+    const [runID, setRunID] = useState('');
+    const [sequence, setSequence] = useState('');
+    const [sOTU, setSOTU] = useState('');
     const [sOTUCount, setSOTUCount] = useState(0);
     const [siteCount, setSiteCount] = useState(0);
     const [topBiomes, setTopBiomes] = useState([]);
@@ -660,6 +701,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
             const renderScatterplot = () =>
                 DeckGLRenderScatterplot({
                     identifiers,
+                    mapMode,
                     mbOverlay,
                     mlglMap,
                     setAttributeName,
@@ -670,7 +712,11 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                     setCountryID,
                     setHitCount,
                     setLatLon,
+                    setPalmID,
                     setPalmprintHitsCount,
+                    setRunID,
+                    setSequence,
+                    setSOTU,
                     setSOTUCount,
                     setSiteCount,
                     setTopBiomes,
@@ -687,7 +733,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                 mapDiv.remove();
             };
         }
-    }, [identifiers]);
+    }, [identifiers, mapMode]);
 
     useEffect(() => {
         if (bioprojectID)
@@ -932,6 +978,39 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                                     <span style={{ fontSize: '14px' }}>{countryRegionID}</span>
                                 </div>
                             </MapLibreDeckGLMapTooltipSection>
+                            {mapMode === 'CONTIGS'  && <MapLibreDeckGLMapTooltipSection>
+                                <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                                    PALMPRINT HIT
+                                </div>
+                                <div
+                                    style={{
+                                        backgroundColor: '#CCC',
+                                        height: '1px',
+                                        margin: '4px 0 4px 0',
+                                        width: '100%',
+                                    }}
+                                ></div>
+                                <div style={{ height: '2px' }}></div>
+                                <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                                    RUN ID
+                                </div>
+                                <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{runID}</div>
+                                <div style={{ height: '8px' }}></div>
+                                <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                                    PALM ID
+                                </div>
+                                <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{palmID}</div>
+                                <div style={{ height: '8px' }}></div>
+                                <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                                    sOTU
+                                </div>
+                                <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{sOTU}</div>
+                                <div style={{ height: '8px' }}></div>
+                                <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                                    SEQUENCE
+                                </div>
+                                <textarea defaultValue={sequence} rows="4" style={{ backgroundColor:'transparent', color:'#FFF', fontSize: '14px', margin: '2px 0 0 0', overflowWrap:'normal', padding:'4px 4px 4px 4px', resize:'none', width:'100%' }} />
+                            </MapLibreDeckGLMapTooltipSection>}
                         </>
                     )}
                 </div>
@@ -944,12 +1023,12 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                             style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
                         ></div>
                         {topBiomes.length && <div style={{ display:'flex', fontSize:'14px', gap:'12px', maxHeight:'256px', overflowY:'scroll' }}>
-                            <div style={{ flex:'0 0' }}>{topBiomes.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', fontSize:'14px', lineHeight:'15px', margin:'4px 0 0 0', overflow:'hidden', textAlign:'right', textOverflow:'ellipsis', width:'128px' }}><span style={{ position:'relative', top:'2px' }}>{WWF_TEW[v[0]].name}</span></div>)}</div>
-                            <div style={{ flex:'0 0' }}>{topBiomes.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', fontSize:'14px', fontWeight:700, lineHeight:'18px', margin:'4px 0 0 0', position:'relative', textAlign:'center', top:'4px', width:'48px' }}>
+                            <div style={{ flex:'0 0' }}>{topBiomes.map((v, i) => v[0] != 'null' && <div key={i} style={{ height:'calc(48px + 2px)', fontSize:'14px', lineHeight:'15px', margin:'4px 0 0 0', overflow:'hidden', textAlign:'right', textOverflow:'ellipsis', width:'128px' }}><span style={{ position:'relative', top:'2px' }}>{WWF_TEW[v[0]].name}</span></div>)}</div>
+                            <div style={{ flex:'0 0' }}>{topBiomes.map((v, i) => v[0] != 'null' && <div key={i} style={{ height:'calc(48px + 2px)', fontSize:'14px', fontWeight:700, lineHeight:'18px', margin:'4px 0 0 0', position:'relative', textAlign:'center', top:'4px', width:'48px' }}>
                                 <div>{v[1].toLocaleString()}</div>
                                 <div style={{ left:'1px', position:'relative' }}>{(v[1]/siteCount*100).toFixed(2) + '%'}</div>
                             </div>)}</div>
-                            <div style={{ flex:'1 0' }}>{topBiomes.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', position:'relative' }}>
+                            <div style={{ flex:'1 0' }}>{topBiomes.map((v, i) => v[0] != 'null' && <div key={i} style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', position:'relative' }}>
                                 <div style={{ backgroundColor:WWF_TEW[v[0]].hex, height:'100%', position:'relative', width:(v[1]/topBiomes[0][1]*100) + '%' }}></div>
                             </div>)}</div>
                         </div>}
@@ -960,12 +1039,12 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                             style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
                         ></div>
                         {topCountries.length && <div style={{ display:'flex', fontSize:'14px', gap:'12px', maxHeight:'256px', overflowY:'scroll' }}>
-                            <div style={{ flex:'0 0' }}>{topCountries.map(v => v[0] !== 'null' && <div style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', textAlign:'right', width:'64px' }}><span style={{ position:'relative', top:'2px' }}>{v[0]}</span><Flag code={v[0]} height='14' style={{ margin:'0 0 0 4px', verticalAlign: 'middle', width:'24px' }} /></div>)}</div>
-                            <div style={{ flex:'0 0' }}>{topCountries.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', fontSize:'14px', fontWeight:700, lineHeight:'18px', margin:'4px 0 0 0', position:'relative', textAlign:'center', top:'4px', width:'48px' }}>
+                            <div style={{ flex:'0 0' }}>{topCountries.map((v, i) => v[0] !== 'null' && <div key={i} style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', textAlign:'right', width:'48px' }}><div style={{ position:'relative', top:'2px' }}>{v[0]}</div><Flag code={v[0]} height='14' style={{ margin:'0 0 0 4px', verticalAlign: 'middle', width:'24px' }} /></div>)}</div>
+                            <div style={{ flex:'0 0' }}>{topCountries.map((v, i) => v[0] != 'null' && <div key={i} style={{ height:'calc(48px + 2px)', fontSize:'14px', fontWeight:700, lineHeight:'18px', margin:'4px 0 0 0', position:'relative', textAlign:'center', top:'4px', width:'48px' }}>
                                 <div>{v[1].toLocaleString()}</div>
                                 <div style={{ left:'1px', position:'relative' }}>{(v[1]/siteCount*100).toFixed(2) + '%'}</div>
                             </div>)}</div>
-                            <div style={{ flex:'1 0' }}>{topCountries.map(v => v[0] !== 'null' && <div style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', position:'relative' }}>
+                            <div style={{ flex:'1 0' }}>{topCountries.map((v, i) => v[0] !== 'null' && <div key={i} style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', position:'relative' }}>
                                 <div style={{ backgroundColor:'#AAA', height:'100%', position:'relative', width:(v[1]/topCountries[0][1]*100) + '%' }}></div>
                             </div>)}</div>
                         </div>}
@@ -976,12 +1055,12 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                             style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
                         ></div>
                         {topSOTUs.length && <div style={{ display:'flex', fontSize:'14px', gap:'12px', maxHeight:'256px', overflowY:'scroll' }}>
-                            <div style={{ flex:'0 0' }}>{topSOTUs.map(v => <div style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', textAlign:'right' }}><span style={{ position:'relative', top:'2px' }}>{v[0]}</span></div>)}</div>
-                            <div style={{ flex:'0 0' }}>{topSOTUs.map(v => v[0] != 'null' && <div style={{ height:'calc(48px + 2px)', fontSize:'14px', fontWeight:700, lineHeight:'18px', margin:'4px 0 0 0', position:'relative', textAlign:'center', top:'4px', width:'48px' }}>
+                            <div style={{ flex:'0 0' }}>{topSOTUs.map((v, i) => <div key={i} style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', textAlign:'right' }}><span style={{ position:'relative', top:'2px' }}>{v[0]}</span></div>)}</div>
+                            <div style={{ flex:'0 0' }}>{topSOTUs.map((v, i) => v[0] != 'null' && <div key={i} style={{ height:'calc(48px + 2px)', fontSize:'14px', fontWeight:700, lineHeight:'18px', margin:'4px 0 0 0', position:'relative', textAlign:'center', top:'4px', width:'48px' }}>
                                 <div>{v[1].toLocaleString()}</div>
                                 <div style={{ left:'1px', position:'relative' }}>{(v[1]/sOTUCount*100).toFixed(2) + '%'}</div>
                             </div>)}</div>
-                            <div style={{ flex:'1 0' }}>{topSOTUs.map(v => <div style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', position:'relative' }}>
+                            <div style={{ flex:'1 0' }}>{topSOTUs.map((v, i) => <div key={i} style={{ height:'calc(48px + 2px)', margin:'4px 0 0 0', position:'relative' }}>
                                 <div style={{ backgroundColor:'#AAA', height:'100%', position:'relative', width:(v[1]/topSOTUs[0][1]*100) + '%' }}></div>
                             </div>)}</div>
                         </div>}
