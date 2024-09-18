@@ -428,16 +428,16 @@ const OnbaordingPage = () => {
         return (
             <Card
                 sx={{
-                    backgroundColor: 'transparent',
-                    backgroundImage: 'none',
+                    borderWidth: 1,
+                    borderColor: 'rgba(255, 255, 255, 0.48)',
+                    borderRadius: 8,
+                    margin: 2,
                 }}
             >
                 <CardActionArea
                     onClick={() => onClickExampleFilter(name)}
                     sx={{
-                        backgroundColor: 'rgba(29, 30, 32, 0.6)',
                         padding: 2,
-                        margin: 2,
                         display: 'flex',
                         flex: 1,
                         flexDirection: 'column',

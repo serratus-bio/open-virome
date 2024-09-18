@@ -49,7 +49,6 @@ const AppToolbar = () => {
             <Toolbar sx={{ width: '100%', pl: 0 }}>
                 {/* Query Builder Icon */}
                 <IconButton
-                    color='white'
                     aria-label='open drawer'
                     onClick={handleDrawerOpen}
                     edge='start'
