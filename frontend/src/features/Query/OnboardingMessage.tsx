@@ -375,11 +375,6 @@ const OnbaordingPage = () => {
                 filterValue: 'neuronal cell',
             },
             {
-                filterId: 'tissue-non neuronal',
-                filterType: 'tissue',
-                filterValue: 'non neuronal',
-            },
-            {
                 filterId: 'tissue-neuronal precursor',
                 filterType: 'tissue',
                 filterValue: 'neuronal precursor',
