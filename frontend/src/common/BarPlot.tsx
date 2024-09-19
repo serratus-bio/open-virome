@@ -44,7 +44,7 @@ const BarPlot = ({ plotData = {}, styles = {}, onEvents = {} }) => {
 
     options.series.forEach((obj) => {
         if (obj.label != null) {
-            obj.label.position = ['50%', 2];
+            obj.label.position = 'inside';
         }
     });
 

@@ -122,8 +122,7 @@ const Module = ({ sectionKey }) => {
                         {/* Pull-down Menu Module Select */}
                         <Select
                             sx={{
-                                'backgroundColor': '#28282800',
-                                'fontSize': 26,
+                                'fontSize': 30,
                                 '.MuiOutlinedInput-notchedOutline': {
                                     borderColor: '#40a9ff',
                                 },

@@ -69,15 +69,15 @@ app.post('/counts', async (req, res) => {
         if (!idColumn) {
             return res.status(400).json({ error: 'groupBy is required!' });
         }
-        // Counts for total (used by tables)
+        // Counts for total (used by results table pagination)
         query = getTotalCountsQuery({
             ids,
             idRanges,
             idColumn,
             table: table,
         });
-        // Counts for figures and plots
     } else if (idColumn && ids.length > 0) {
+        // Counts for figures and plots
         query = getGroupedCountsByIdentifiers({
             ids,
             idRanges,
@@ -85,12 +85,12 @@ app.post('/counts', async (req, res) => {
             groupBy,
             table: table,
         });
-        // Query filter counts from materialized view if no filters applied
     } else if (hasNoGroupByFilters(filters, groupBy)) {
+        // Counts for filters, from materialized view if no filters applied
         const searchStringQuery = getSearchStringClause(searchString, filters, groupBy);
         query = getCachedCountsQuery(groupBy, searchStringQuery);
-        // Query filter counts from main table if filters applied
     } else {
+        // Counts for filters, from main table if filters applied
         const searchStringQuery = getSearchStringClause(searchString, filters, groupBy);
         query = getGroupedCountsByFilters({
             filters,

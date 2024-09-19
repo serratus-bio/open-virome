@@ -146,14 +146,14 @@ const QueryView = () => {
                             ) : (
                                 <Box>
                                     <Typography component={'span'} variant='body2' sx={{ textAlign: 'left' }}>
-                                        {`Total rows: ${countData && countData?.length >= 100000 ? '≥' : ''}${countData ? formatNumber(countData.length) : ''}.`}
+                                        {`Total rows: ${countData && countData?.length >= 100000 ? '≥' : ''}${countData ? formatNumber(countData.length) : ''}`}
                                     </Typography>
                                     <Typography component={'span'} variant='body2' sx={{ mt: 1, textAlign: 'left' }}>
                                         {`${
                                             identifiersData &&
                                             identifiersData?.run?.totalCount >= 0 &&
                                             identifiersData?.bioproject?.totalCount >= 0
-                                                ? ` Matching BioProjects: ${identifiersData?.bioproject ? formatNumber(identifiersData.bioproject.totalCount) : ''}. Matching Sequences: ${identifiersData?.run ? formatNumber(identifiersData.run.totalCount) : ''}.`
+                                                ? ` Matching BioProjects: ${identifiersData?.bioproject ? formatNumber(identifiersData.bioproject.totalCount) : ''}. Matching Sequences: ${identifiersData?.run ? formatNumber(identifiersData.run.totalCount) : ''}`
                                                 : ''
                                         }`}
                                     </Typography>

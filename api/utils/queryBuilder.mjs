@@ -1,3 +1,5 @@
+const SHOULD_EXCLUDE_NON_VIRUS = true;
+
 export const handleIdKeyIrregularities = (key, table) => {
     const tableToRemappedKey = {
         sra: {
@@ -86,19 +88,20 @@ export const hasNoGroupByFilters = (filters, groupBy) => {
 
 export const getCachedCountsQuery = (groupBy, searchStringQuery) => {
     const groupByToMaterializedView = {
-        organism: 'counts_sra_organism',
-        bioproject: 'counts_sra_bioproject',
-        assay_type: 'counts_sra_assay_type',
-        tax_species: 'counts_palm_virome_tax_species',
-        tax_family: 'counts_palm_virome_tax_family',
-        sotu: 'counts_palm_virome_sotu',
-        tissue: 'counts_biosample_tissue',
-        geo_attribute_value: 'counts_biosample_geographical_location',
-        stat_host_order: 'counts_sra_stat',
+        organism: 'ov_counts_sra_organism',
+        bioproject: 'ov_counts_sra_bioproject',
+        assay_type: 'ov_counts_sra_assay_type',
+        tax_species: 'ov_counts_palm_virome_tax_species',
+        tax_family: 'ov_counts_palm_virome_tax_family',
+        sotu: 'ov_counts_palm_virome_sotu',
+        tissue: 'ov_counts_biosample_tissue',
+        geo_attribute_value: 'ov_counts_biosample_geographical_location',
+        stat_host_order: 'ov_counts_sra_stat',
     };
     return `
         SELECT * FROM ${groupByToMaterializedView[groupBy]}
         ${searchStringQuery}
+        ${searchStringQuery.length > 0 ? 'AND' : 'WHERE'} virus_only = ${SHOULD_EXCLUDE_NON_VIRUS}
     `;
 };
 
@@ -127,10 +130,11 @@ export const getGroupedCountsByFilters = ({ filters, groupBy, searchStringQuery 
     `;
 };
 
-export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
+export const getMinimalJoinSubQuery = (filters, groupBy = undefined, excludeNonVirus = SHOULD_EXCLUDE_NON_VIRUS) => {
     const filterTypes = filters.map((filter) => filter.groupByKey);
 
     const tableToInnerSelect = {
+        ov_identifiers: 'run_id, bioproject, biosample, has_virus',
         sra: 'acc as run_id, bioproject as bioproject, biosample as biosample, organism as organism, assay_type',
         sra_stat: 'run as run_id, name as stat_host_order',
         biosample_tissue: 'biosample_id as biosample, tissue',
@@ -139,6 +143,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
     };
 
     const tableToColumn = {
+        ov_identifiers: ['run_id', 'bioproject', 'biosample', 'has_virus'],
         sra: ['acc', 'bioproject', 'biosample', 'organism', 'assay_type'],
         sra_stat: ['run_id', 'stat_host_order'],
         palm_virome: ['run', 'sotu', 'tax_species', 'tax_family'],
@@ -147,6 +152,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
     };
 
     const tableToJoinKey = {
+        ov_identifiers: 'run_id',
         sra: 'run_id',
         sra_stat: 'run_id',
         palm_virome: 'run_id',
@@ -170,22 +176,26 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
     }
 
     // Default join order has sra table first, remove duplicate tables
-    tables = ['sra', ...tables.filter((table) => table !== 'sra')];
+    tables = ['ov_identifiers', ...tables.filter((table) => table !== 'ov_identifiers')];
     tables = [...new Set(tables)];
 
     // Helper to build join statements
     const buildJoinStatement = (table, index, selectStatement, whereStatement, tableJoinKey) => {
         if (index === 0) {
+            const hasVirusConditional = excludeNonVirus
+                ? `${whereStatement.length > 0 ? 'AND' : 'WHERE'} has_virus = true`
+                : '';
             return `(
                 SELECT ${selectStatement} FROM ${table}
                 ${whereStatement}
+                ${hasVirusConditional}
             ) as ${table}`;
         } else {
             return `INNER JOIN (
                 SELECT ${selectStatement}
                 FROM ${table}
                 ${whereStatement}
-            ) as ${table} ON sra.${tableJoinKey} = ${table}.${tableJoinKey}`;
+            ) as ${table} ON ov_identifiers.${tableJoinKey} = ${table}.${tableJoinKey}`;
         }
     };
 
@@ -211,7 +221,9 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined) => {
     });
 
     // Construct select statements
-    const selectStatements = ['sra.run_id as run_id, sra.biosample as biosample, sra.bioproject as bioproject'];
+    const selectStatements = [
+        'ov_identifiers.run_id as run_id, ov_identifiers.biosample as biosample, ov_identifiers.bioproject as bioproject',
+    ];
     if (groupBy !== undefined && !selectStatements[0].includes(groupBy)) {
         const groupByTable = tables.find((table) => tableToColumn[table].includes(groupBy));
         selectStatements.push(`${groupByTable}.${groupBy} as ${groupBy}`);
