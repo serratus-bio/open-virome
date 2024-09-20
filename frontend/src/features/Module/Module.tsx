@@ -11,7 +11,7 @@ import { capitalize } from '../../common/utils/textFormatting.ts';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import SRARunLayout from '../Figures/SRARun/SRARunLayout.tsx';
-import EnvironmentLayout from '../Figures/EnvironmentLayout.tsx';
+import EcologyLayout from '../Figures/Ecology/EcologyLayout.tsx';
 import ViromeLayout from '../Figures/Virome/ViromeLayout.tsx';
 import IconButton from '@mui/material/IconButton';
 import TableIcon from '@mui/icons-material/TableRows';
@@ -42,7 +42,7 @@ const Module = ({ sectionKey }) => {
             filters: getFilterQuery({ filters }),
         },
         {
-            skip: sidebarOpen,
+            skip: sidebarOpen, // Skip fetching when sidebar is open
         },
     );
 
@@ -73,7 +73,7 @@ const Module = ({ sectionKey }) => {
             return <ViromeLayout identifiers={identifiersData} sectionLayout={sectionLayout} />;
         }
         if (sectionKey === 'ecology') {
-            return <EnvironmentLayout identifiers={identifiersData} sectionLayout={sectionLayout} />;
+            return <EcologyLayout identifiers={identifiersData} sectionLayout={sectionLayout} />;
         }
         return (
             <Box sx={{ height: 500, width: 400 }}>

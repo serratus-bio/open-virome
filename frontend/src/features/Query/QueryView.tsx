@@ -153,7 +153,7 @@ const QueryView = () => {
                                             identifiersData &&
                                             identifiersData?.run?.totalCount >= 0 &&
                                             identifiersData?.bioproject?.totalCount >= 0
-                                                ? ` Matching BioProjects: ${identifiersData?.bioproject ? formatNumber(identifiersData.bioproject.totalCount) : ''}. Matching Sequences: ${identifiersData?.run ? formatNumber(identifiersData.run.totalCount) : ''}`
+                                                ? `. Matching BioProjects: ${identifiersData?.bioproject ? formatNumber(identifiersData.bioproject.totalCount) : ''}. Matching Sequences: ${identifiersData?.run ? formatNumber(identifiersData.run.totalCount) : ''}`
                                                 : ''
                                         }`}
                                     </Typography>

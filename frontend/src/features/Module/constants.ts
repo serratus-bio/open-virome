@@ -79,14 +79,14 @@ export const moduleConfig = {
         tag: 'Geography',
         groupByKey: 'geo_attribute_value',
         resultsIdColumn: 'biosample',
-        resultsTable: 'biosample_geo_virome',
+        resultsTable: 'biosample_geographical_location',
     },
     biome: {
         title: 'Biome',
         tag: 'Biome',
-        groupByKey: 'geo_attribute_value',
+        groupByKey: 'biome_attribute_value',
         resultsIdColumn: 'biosample',
-        resultsTable: 'biosample_geo_virome',
+        resultsTable: 'bgl_gm4326_gp4326',
     },
     tissue: {
         title: 'Tissue',
