@@ -395,7 +395,13 @@ const OnbaordingPage = () => {
                 filterValue: 'neuronal precursor cell',
             },
         ],
-        Tundra: [],
+        Tundra: [
+            {
+                filterId: 'biome-WWF_TEW_BIOME_11',
+                filterType: 'biome',
+                filterValue: 'WWF_TEW_BIOME_11',
+            },
+        ],
     };
 
     const onClickFilterText = () => {

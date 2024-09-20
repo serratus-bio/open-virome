@@ -1,8 +1,8 @@
 import React from 'react';
 import Box from '@mui/material/Box';
-import MapPlot from '../../common/MapLibreDeckGLMap.tsx';
+import MapPlot from '../../../common/MapLibreDeckGLMap.tsx';
 
-const EnvironmentLayout = ({ identifiers, sectionLayout }) => {
+const EcologyLayout = ({ identifiers, sectionLayout }) => {
     return (
         <Box
             sx={{
@@ -19,4 +19,4 @@ const EnvironmentLayout = ({ identifiers, sectionLayout }) => {
     );
 };
 
-export default React.memo(EnvironmentLayout);
+export default React.memo(EcologyLayout);
