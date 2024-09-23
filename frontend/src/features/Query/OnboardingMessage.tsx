@@ -38,11 +38,6 @@ const OnbaordingPage = () => {
                 filterValue: 'Eimeria tenella',
             },
             {
-                filterId: 'host-Ochsenheimeria urella',
-                filterType: 'host',
-                filterValue: 'Ochsenheimeria urella',
-            },
-            {
                 filterId: 'host-Eimeria falciformis',
                 filterType: 'host',
                 filterValue: 'Eimeria falciformis',
