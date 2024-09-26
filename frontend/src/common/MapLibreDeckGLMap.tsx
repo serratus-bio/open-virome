@@ -54,42 +54,40 @@ const bioprojectIDFromBiosample: any = async (biosample) => {
 
     return bioprojectIDFromBiosample._[biosample];
 };
-const pickMostRelevantGeographicalAttibute = result => {
-    let o:any = undefined;
+const pickMostRelevantGeographicalAttibute = (result) => {
+    let o: any = undefined;
 
     const isLatLon = (name, value) => {
-        if(/lat/.test(name) && /lon/.test(name))
-            return true;
+        if (/lat/.test(name) && /lon/.test(name)) return true;
 
-        if(value.replace(/[^.0-9]/g, '').length/value.length > 0.6)
-            return true;
+        if (value.replace(/[^.0-9]/g, '').length / value.length > 0.6) return true;
 
         return false;
     };
 
-    for(const attribute of result) {
-        if(!o)
-            o = {};
+    for (const attribute of result) {
+        if (!o) o = {};
 
-        if(!o[attribute.accession])
-            o[attribute.accession] = [];
+        if (!o[attribute.accession]) o[attribute.accession] = [];
 
         o[attribute.accession].push(attribute);
     }
 
-    for(const k of Object.keys(o))
+    for (const k of Object.keys(o))
         o[k] = o[k].sort((a, b) => {
             const aLatLon = isLatLon(a.attribute_name, a.attribute_value);
             const bLatLon = isLatLon(b.attribute_name, b.attribute_value);
 
             return aLatLon !== bLatLon
-                ? Number(bLatLon)-Number(aLatLon)
+                ? Number(bLatLon) - Number(aLatLon)
                 : a.attribute_value.length !== b.attribute_value.length
-                    ? b.attribute_value.length-a.attribute_value.length
-                    : a.attribute_name.length-b.attribute_name.length;
+                  ? b.attribute_value.length - a.attribute_value.length
+                  : a.attribute_name.length - b.attribute_name.length;
         });
 
-    return Object.values(o).map(v => v[0]).flat();
+    return Object.values(o)
+        .map((v) => v[0])
+        .flat();
 };
 const selectBioproject: any = async (accession) => {
     if (!selectBioproject._) selectBioproject._ = {};
@@ -296,7 +294,7 @@ const DeckGLRenderScatterplot: any = ({
                     return json;
                 }
             })();
-            
+
             selectBGLJSON.result = pickMostRelevantGeographicalAttibute(selectBGLJSON.result);
 
             const selectPalmVirome = await (async () => {
