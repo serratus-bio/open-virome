@@ -102,6 +102,7 @@ export const getCachedCountsQuery = (groupBy, searchStringQuery) => {
         geo_attribute_value: 'ov_counts_biosample_geographical_location',
         biome_attribute_value: 'ov_counts_bgl_gm4326_gp4326',
         stat_host_order: 'ov_counts_sra_stat',
+        sex: 'ov_counts_biosample_sex',
     };
     return `
         SELECT * FROM ${groupByToMaterializedView[groupBy]}
@@ -144,6 +145,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined, excludeNonV
         sra_stat: 'run as run_id, name as stat_host_order',
         palm_virome: 'run as run_id, sotu, tax_species, tax_family',
         biosample_tissue: 'biosample_id as biosample, tissue',
+        biosample_sex: 'biosample, sex',
         biosample_geographical_location: 'accession as biosample, attribute_value as geo_attribute_value',
         bgl_gm4326_gp4326: 'accession as biosample, gp4326_wwf_tew_id as biome_attribute_value',
     };
@@ -154,6 +156,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined, excludeNonV
         sra_stat: ['run_id', 'stat_host_order'],
         palm_virome: ['run', 'sotu', 'tax_species', 'tax_family'],
         biosample_tissue: ['biosample_id', 'tissue'],
+        biosample_sex: ['biosample', 'sex'],
         biosample_geographical_location: ['accession', 'geo_attribute_value'],
         bgl_gm4326_gp4326: ['accession', 'biome_attribute_value'],
     };
@@ -164,6 +167,7 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined, excludeNonV
         sra_stat: 'run_id',
         palm_virome: 'run_id',
         biosample_tissue: 'biosample',
+        biosample_sex: 'biosample',
         biosample_geographical_location: 'biosample',
         bgl_gm4326_gp4326: 'biosample',
     };
