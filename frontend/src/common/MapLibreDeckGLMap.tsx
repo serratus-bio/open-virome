@@ -408,9 +408,9 @@ const DeckGLRenderScatterplot: any = ({
                                                 info.object.run +
                                                 '_' +
                                                 info.object.sotu +
-                                                '_coverage' +
+                                                '_coverage_' +
                                                 selectPalmViromeRun.result[0].node_coverage,
-                                            selectPalmViromeRun.result[0].node_seq.match(/.{1,80}/g),
+                                            selectPalmViromeRun.result[0].node_seq.match(/.{1,30}/g),
                                             '',
                                         ]
                                             .flat()
@@ -650,6 +650,29 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                     }}
                 >
                     <MapLibreDeckGLMapTooltipSection>
+                        {mapMode === 'CONTIGS' && <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                            <span>RUN ID</span>
+                            <div
+                                style={{
+                                    color: '#FFF',
+                                    display: 'inline',
+                                    fontSize: '18px',
+                                    fontWeight: 400,
+                                    margin: '0 0 0 8px',
+                                }}
+                            >
+                                {runID}
+                            </div>
+                            <div style={{ display: 'inline', margin: '0 0 0 4px', verticalAlign: 'top' }}>
+                                <MapLibreDeckGLMapCopyButton
+                                    onClick={() => navigator.clipboard.writeText(runID)}
+                                />
+                                <MapLibreDeckGLMapURLButton
+                                    href={'https://www.ncbi.nlm.nih.gov/sra/?term=' + runID}
+                                />
+                            </div>
+                        </div>}
+                            
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                             <span>BIOSAMPLE</span>
                             <div
@@ -791,16 +814,20 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                                         }}
                                     ></div>
                                     <div style={{ height: '2px' }}></div>
-                                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>RUN ID</div>
-                                    <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{runID}</div>
-                                    <div style={{ height: '8px' }}></div>
                                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>PALM ID</div>
                                     <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{palmID}</div>
                                     <div style={{ height: '8px' }}></div>
                                     <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>sOTU</div>
                                     <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{sOTU}</div>
                                     <div style={{ height: '8px' }}></div>
-                                    <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>SEQUENCE</div>
+                                    {/* <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>SEQUENCE</div> */}
+                                    {/* '' */}
+                                    <div style={{ color: '#CCC', display: 'inline', fontSize: '12px', fontWeight: 700, margin: '0 0 0 4px', verticalAlign: 'top' }}>
+                                        <div style={{ display:'inline' }}>SEQUENCE BLAST</div>
+                                        <MapLibreDeckGLMapURLButton
+                                            href={'https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&USER_FORMAT_DEFAULTS=on&SET_SAVED_SEARCH=true&PAGE=Proteins&PROGRAM=blastp&QUERY=' + sequence + '&JOB_TITLE=palmID_u648495&GAPCOSTS=11%201&DATABASE=nr&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=0.05&WORD_SIZE=6&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&PROG_DEFAULTS=on&SHOW_OVERVIEW=on&SHOW_LINKOUT=on&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML'}
+                                        />
+                                    </div>
                                     <textarea
                                         defaultValue={sequence}
                                         rows='4'
