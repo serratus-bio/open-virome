@@ -822,11 +822,11 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                                     <div style={{ height: '8px' }}></div>
                                     {/* <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>SEQUENCE</div> */}
                                     {/* '' */}
-                                    <div style={{ color: '#CCC', display: 'inline', fontSize: '12px', fontWeight: 700, margin: '0 0 0 4px', verticalAlign: 'top' }}>
-                                        <div style={{ display:'inline' }}>SEQUENCE BLAST</div>
-                                        <MapLibreDeckGLMapURLButton
-                                            href={'https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&USER_FORMAT_DEFAULTS=on&SET_SAVED_SEARCH=true&PAGE=Proteins&PROGRAM=blastp&QUERY=' + sequence + '&JOB_TITLE=palmID_u648495&GAPCOSTS=11%201&DATABASE=nr&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=0.05&WORD_SIZE=6&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&PROG_DEFAULTS=on&SHOW_OVERVIEW=on&SHOW_LINKOUT=on&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML'}
-                                        />
+                                    <div style={{ color: '#CCC', display: 'inline', fontSize: '12px', fontWeight: 700, margin: '0 0 0 4px' }}>
+                                        <div style={{ display:'inline', verticalAlign:'top' }}>SEQUENCE [BLAST<MapLibreDeckGLMapURLButton
+                                            fontSize="16px"
+                                            href={'https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&USER_FORMAT_DEFAULTS=on&SET_SAVED_SEARCH=true&PAGE=Proteins&PROGRAM=blastp&QUERY=' + sequence.split(/\n/).slice(1).join('') + '&JOB_TITLE=' + sequence.split(/\n/)[0].substring(1) + '&GAPCOSTS=11%201&DATABASE=nr&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=0.05&WORD_SIZE=6&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&PROG_DEFAULTS=on&SHOW_OVERVIEW=on&SHOW_LINKOUT=on&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML'}
+                                        />]</div>
                                     </div>
                                     <textarea
                                         defaultValue={sequence}
@@ -1135,11 +1135,14 @@ const MapLibreDeckGLMapCopyButton = ({ ...props }) => (
         {...props}
     />
 );
-const MapLibreDeckGLMapURLButton = ({ ...props }) => (
-    <a style={{ color: '#FFF', margin: '4px 0 0 6px', userSelect: 'none' }} target='_blank' {...props}>
-        <MdOpenInNew style={{ fontSize: '18px', verticalAlign: 'bottom' }} />
-    </a>
-);
+const MapLibreDeckGLMapURLButton = ({ fontSize, ...props }) => {
+    if(!fontSize)
+        fontSize = '18px';
+
+    return <a style={{ color: '#FFF', margin: '4px 0 0 6px', userSelect: 'none' }} target='_blank' {...props}>
+        <MdOpenInNew style={{ fontSize, verticalAlign: 'bottom' }} />
+    </a>;
+};
 
 const MapLibreDeckGLMapTooltipSection = ({ children, ...props }) => {
     return (
