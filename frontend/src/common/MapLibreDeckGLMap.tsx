@@ -57,6 +57,10 @@ const bioprojectIDFromBiosample: any = async (biosample) => {
 const pickMostRelevantGeographicalAttibute = (result) => {
     let o: any = undefined;
 
+    console.log('result', result);
+
+    return result; 
+
     const isLatLon = (name, value) => {
         if (/lat/.test(name) && /lon/.test(name)) return true;
 
@@ -460,7 +464,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
     const [countryRegionID, setCountryRegionID] = useState('');
     const [hitCount, setHitCount] = useState(0);
     const [latLon, setLatLon] = useState('');
-    const [mapMode, setMapMode] = useState('SAMPLES');
+    const [mapMode, setMapMode] = useState('CONTIGS');
     const [palmID, setPalmID] = useState('');
     const [palmprintHitsCount, setPalmprintHitsCount] = useState(0);
     const [runID, setRunID] = useState('');
@@ -594,13 +598,13 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                     <div style={{ color: '#EEE', fontSize: '16px', fontWeight: 700 }}>
                         {'Showing ' +
                             siteCount.toLocaleString() +
-                            ' geographic sites for ' +
+                            ' geographic locations for ' +
                             palmprintHitsCount.toLocaleString() +
-                            ' palmprints, ' +
+                            ' contigs, representing ' +
                             sOTUCount.toLocaleString() +
-                            ' sOTUs on ' +
+                            ' unique sOTUs, from ' +
                             hitCount.toLocaleString() +
-                            ' hits.'}
+                            ' libraries.'}
                     </div>
                     {siteCount >= 1024 * 64 && (
                         <div style={{ color: '#FA0', flex: '1 0', fontSize: '14px', fontWeight: 700 }}>
