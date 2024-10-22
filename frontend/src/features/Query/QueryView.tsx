@@ -1,104 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectSidebarOpen, toggleSidebar, selectActiveQueryModule } from '../../app/slice.ts';
 import { moduleConfig } from '../Module/constants.ts';
-import { useGetCountsQuery, useGetIdentifiersQuery } from '../../api/client.ts';
-import { addFilter, removeFilter, selectAllFilters, selectFiltersByType } from './slice.ts';
-import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
-import { formatNumber } from '../../common/utils/textFormatting.ts';
 
-import SearchBar from '../../common/SearchBar.tsx';
-import VirtualizedTable from '../../common/VirtualizedTable.tsx';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Skeleton from '@mui/material/Skeleton';
 import Modal from '@mui/material/Modal';
 import Slide from '@mui/material/Slide';
+import FilterTable from './FilterTable.tsx';
+import SRAIdsInput from './SRAIdsInput.tsx';
 
 const QueryView = () => {
     const dispatch = useDispatch();
-    const [searchString, setSearchString] = useState('');
-    const [isTypingInterval, setIsTypingInterval] = useState(0);
     const activeQueryModule = useSelector(selectActiveQueryModule);
-    const filters = useSelector(selectAllFilters);
-    const moduleFilters = useSelector((state) => selectFiltersByType(state, activeQueryModule));
     const sidebarOpen = useSelector(selectSidebarOpen);
-
-    useEffect(() => {
-        setIsTypingInterval(0);
-        setSearchString('');
-    }, [activeQueryModule]);
-
-    const {
-        data: identifiersData,
-        error: identifiersError,
-        isFetching: identifiersFetching,
-    } = useGetIdentifiersQuery({
-        filters: getFilterQuery({ filters }),
-    });
-
-    const {
-        data: countData,
-        error: countError,
-        isFetching: countIsFetching,
-    } = useGetCountsQuery(
-        {
-            filters: getFilterQuery({ filters, excludeType: activeQueryModule }),
-            groupBy: moduleConfig[activeQueryModule].groupByKey,
-            sortByColumn: 'count',
-            sortByDirection: 'desc',
-            pageStart: 0,
-            pageEnd: 100000,
-            searchString: searchString,
-        },
-        {
-            skip: isTypingInterval > 0,
-        },
-    );
-
-    useEffect(() => {
-        const isTypingDelay = setTimeout(async () => {
-            setIsTypingInterval(0);
-        }, 500);
-        return () => clearTimeout(isTypingDelay);
-    }, [isTypingInterval]);
-
-    const handleSearchInput = (query) => {
-        setSearchString(query);
-        setIsTypingInterval(isTypingInterval + 1);
-    };
-
-    const onRowClick = (row) => {
-        if (row.selected) {
-            dispatch(removeFilter(`${activeQueryModule}-${row.name}`));
-            return;
-        } else {
-            dispatch(
-                addFilter({
-                    filterId: `${activeQueryModule}-${row.name}`,
-                    filterType: activeQueryModule,
-                    filterValue: row.name,
-                }),
-            );
-        }
-    };
-
-    const getRows = (countData, searchString, moduleFilters) => {
-        const addFilterState = (rows) => {
-            return rows.map((row) => {
-                const filterState = moduleFilters.find((filter) => filter.filterValue === row.name);
-                return {
-                    ...row,
-                    selected: !!filterState,
-                };
-            });
-        };
-        if (!countData) {
-            return [];
-        }
-        let rows = addFilterState(countData);
-        return rows;
-    };
 
     return (
         <Modal
@@ -123,43 +37,11 @@ const QueryView = () => {
                             backgroundColor: '#252427',
                         }}
                     >
-                        <Box>
-                            {countIsFetching || !countData ? (
-                                <Skeleton variant='rounded' height={'70vh'} />
-                            ) : (
-                                <VirtualizedTable
-                                    rows={getRows(countData, searchString, moduleFilters)}
-                                    onRowClick={onRowClick}
-                                    searchBar={
-                                        <SearchBar
-                                            placeholder={`Search ${moduleConfig[activeQueryModule].title.toLowerCase()}`}
-                                            query={searchString}
-                                            setQuery={handleSearchInput}
-                                        />
-                                    }
-                                />
-                            )}
-                        </Box>
-                        <Box sx={{ mb: 2, mt: 4, ml: 2 }}>
-                            {!identifiersData || identifiersFetching || countIsFetching ? (
-                                <Skeleton variant='rounded' height={20} width={'80%'} />
-                            ) : (
-                                <Box>
-                                    <Typography component={'span'} variant='body2' sx={{ textAlign: 'left' }}>
-                                        {`Total rows: ${countData && countData?.length >= 100000 ? '≥' : ''}${countData ? formatNumber(countData.length) : ''}`}
-                                    </Typography>
-                                    <Typography component={'span'} variant='body2' sx={{ mt: 1, textAlign: 'left' }}>
-                                        {`${
-                                            identifiersData &&
-                                            identifiersData?.run?.totalCount >= 0 &&
-                                            identifiersData?.bioproject?.totalCount >= 0
-                                                ? `. Matching BioProjects: ${identifiersData?.bioproject ? formatNumber(identifiersData.bioproject.totalCount) : ''}. Matching Sequences: ${identifiersData?.run ? formatNumber(identifiersData.run.totalCount) : ''}`
-                                                : ''
-                                        }`}
-                                    </Typography>
-                                </Box>
-                            )}
-                        </Box>
+                        {moduleConfig[activeQueryModule].queryBuilderDisplay === 'input' ? (
+                            <SRAIdsInput />
+                        ) : (
+                            <FilterTable />
+                        )}
                     </Box>
                 </Slide>
             </Box>

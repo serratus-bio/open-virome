@@ -128,7 +128,7 @@ app.post('/identifiers', async (req, res) => {
     }
     const subquery = getMinimalJoinSubQuery(filters);
     const query = `
-        SELECT run_id, bioproject, biosample
+        SELECT DISTINCT run_id, bioproject, biosample
         FROM (${subquery}) as open_virome
     `;
 

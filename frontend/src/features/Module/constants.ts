@@ -5,7 +5,7 @@ export const sectionConfig = {
     sra: {
         title: 'SRA Run',
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Run-Module',
-        modules: ['host', 'seqType', 'bioproject'],
+        modules: ['host', 'seqType', 'runId', 'biosample', 'bioproject'],
         defaultDisplay: 'figure',
     },
     palmdb: {
@@ -38,6 +38,7 @@ export const moduleConfig = {
         groupByKey: 'organism',
         resultsTable: 'sra',
         resultsIdColumn: 'acc',
+        queryBuilderDisplay: 'table',
     },
     seqType: {
         title: 'Run Technology',
@@ -45,6 +46,7 @@ export const moduleConfig = {
         groupByKey: 'assay_type',
         resultsTable: 'sra',
         resultsIdColumn: 'acc',
+        queryBuilderDisplay: 'table',
     },
     bioproject: {
         title: 'BioProject',
@@ -52,6 +54,23 @@ export const moduleConfig = {
         groupByKey: 'bioproject',
         resultsTable: 'sra',
         resultsIdColumn: 'acc',
+        queryBuilderDisplay: 'table',
+    },
+    runId: {
+        title: 'Run ID',
+        tag: 'Run ID',
+        groupByKey: 'acc',
+        resultsTable: 'sra',
+        resultsIdColumn: 'acc',
+        queryBuilderDisplay: 'input',
+    },
+    biosample: {
+        title: 'BioSample',
+        tag: 'BioSample',
+        groupByKey: 'biosample',
+        resultsTable: 'sra',
+        resultsIdColumn: 'acc',
+        queryBuilderDisplay: 'input',
     },
     sotu: {
         title: 'sOTU',
@@ -59,6 +78,7 @@ export const moduleConfig = {
         groupByKey: 'sotu',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
+        queryBuilderDisplay: 'table',
     },
     species: {
         title: 'GenBank Top Hit',
@@ -66,6 +86,7 @@ export const moduleConfig = {
         groupByKey: 'tax_species',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
+        queryBuilderDisplay: 'table',
     },
     family: {
         title: 'Virus Family',
@@ -73,6 +94,7 @@ export const moduleConfig = {
         groupByKey: 'tax_family',
         resultsTable: 'palm_virome',
         resultsIdColumn: 'run',
+        queryBuilderDisplay: 'table',
     },
     geography: {
         title: 'Geography',
@@ -80,6 +102,7 @@ export const moduleConfig = {
         groupByKey: 'geo_attribute_value',
         resultsIdColumn: 'biosample',
         resultsTable: 'biosample_geographical_location',
+        queryBuilderDisplay: 'table',
     },
     biome: {
         title: 'Biome',
@@ -87,6 +110,7 @@ export const moduleConfig = {
         groupByKey: 'biome_attribute_value',
         resultsIdColumn: 'biosample',
         resultsTable: 'bgl_gm4326_gp4326',
+        queryBuilderDisplay: 'table',
     },
     tissue: {
         title: 'Tissue',
@@ -94,6 +118,7 @@ export const moduleConfig = {
         groupByKey: 'tissue',
         resultsTable: 'biosample_tissue',
         resultsIdColumn: 'biosample',
+        queryBuilderDisplay: 'table',
     },
     statHost: {
         title: 'Host (STAT)',
@@ -101,6 +126,7 @@ export const moduleConfig = {
         groupByKey: 'stat_host_order',
         resultsTable: 'sra_stat',
         resultsIdColumn: 'run',
+        queryBuilderDisplay: 'table',
     },
     sex: {
         title: 'Sex',
@@ -108,5 +134,6 @@ export const moduleConfig = {
         groupByKey: 'sex',
         resultsTable: 'biosample_sex',
         resultsIdColumn: 'biosample',
+        queryBuilderDisplay: 'table',
     },
 };

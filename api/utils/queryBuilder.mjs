@@ -174,11 +174,8 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined, excludeNonV
 
     // Helper function to get tables based on filters or groupBy
     const getRelevantTables = (keys) => {
-        return [
-            ...new Set(
-                keys.flatMap((key) => Object.keys(tableToColumn).filter((table) => tableToColumn[table].includes(key))),
-            ),
-        ];
+        // only return first table that contains the key
+        return keys.map((key) => Object.keys(tableToColumn).find((table) => tableToColumn[table].includes(key)));
     };
 
     // Determine relevant tables from filters and groupBy

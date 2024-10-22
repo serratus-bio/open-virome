@@ -35,7 +35,7 @@ const FilterTags = () => {
     };
 
     return (
-        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', flexWrap: 'nowrap' }}>
             <Box
                 sx={{
                     ml: 4,
