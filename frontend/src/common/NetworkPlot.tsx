@@ -57,7 +57,6 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
         {
             selector: 'edge',
             style: {
-                label: 'data(node_coverage)',
                 width: 'data(weight)',
                 lineColor: 'data(color)',
                 opacity: 0.5,
@@ -109,14 +108,19 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
             /* incremental layout options */
 
             // Node repulsion (non overlapping) multiplier
-            nodeRepulsion: (node) => 450000,
+            nodeRepulsion: (node) => {
+                if (node.data().type === 'virus') {
+                    return Math.min(node.data().numSOTUS * 20000, 500000);
+                }
+                return 20000;
+            },
             // Ideal edge (non nested) length
             idealEdgeLength: (edge) => {
-                return Math.min(edge.data().weight * edge.data().numSOTUS * 10, 200);
+                return Math.min(edge.data().weight * edge.data().numSOTUS, 100);
             },
             // Divisor to compute edge forces
             edgeElasticity: (edge) => {
-                return edge.data().weight * 0.6;
+                return edge.data().weight * 0.1;
             },
             // Nesting factor (multiplier) to compute ideal edge length for nested edges
             nestingFactor: 0.1,
