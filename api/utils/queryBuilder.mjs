@@ -123,7 +123,7 @@ export const getSearchStringClause = (searchString, filters, groupBy) => {
     const likeStatements = searchStrings.map((searchString) => {
         return `LOWER(${columnName}) LIKE LOWER('%${searchString}%')`;
     });
-    return `WHERE ${likeStatements.join(' OR ')}`;
+    return `WHERE (${likeStatements.join(' OR ')})`;
 };
 
 export const getGroupedCountsByFilters = ({ filters, groupBy, searchStringQuery }) => {
