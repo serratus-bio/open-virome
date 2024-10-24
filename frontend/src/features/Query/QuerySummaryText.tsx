@@ -1,38 +1,31 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { selectSidebarOpen, toggleSidebar } from '../../app/slice.ts';
+import { useSelector } from 'react-redux';
 import { selectAllFilters } from './slice.ts';
 import { useGetIdentifiersQuery, useGetCountsQuery } from '../../api/client.ts';
 import { getFilterQuery, handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
 import { formatNumber } from '../../common/utils/textFormatting.ts';
 import { moduleConfig } from '../Module/constants.ts';
+import { isSummaryView } from '../../common/utils/plotHelpers.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
 
 const QuerySummaryText = () => {
-    const dispatch = useDispatch();
     const filters = useSelector(selectAllFilters);
-    const sidebarOpen = useSelector(selectSidebarOpen);
 
     const {
         data: identifiersData,
         error: identifiersError,
         isFetching: identifiersFetching,
-    } = useGetIdentifiersQuery(
-        {
-            filters: getFilterQuery({ filters }),
-        },
-        {
-            skip: sidebarOpen,
-        },
-    );
+    } = useGetIdentifiersQuery({
+        filters: getFilterQuery({ filters }),
+    });
 
     const {
-        data: totalVirusCountData,
-        error: totalVirusCountError,
-        isFetching: totalVirusCountIsFetching,
+        data: totalVirusContigCountData,
+        error: totalVirusContigCountError,
+        isFetching: totalVirusContigCountIsFetching,
     } = useGetCountsQuery(
         {
             idColumn: moduleConfig['sotu'].resultsIdColumn,
@@ -45,35 +38,28 @@ const QuerySummaryText = () => {
                 : [],
         },
         {
-            skip: sidebarOpen || !identifiersData,
+            skip: !identifiersData,
         },
     );
 
-    const onClickFilterText = () => {
-        dispatch(toggleSidebar());
-    };
+    const {
+        data: sotuCountData,
+        error: sotuCountError,
+        isFetching: sotuCountIsFetching,
+    } = useGetCountsQuery(
+        {
+            filters: getFilterQuery({ filters }),
+            groupBy: moduleConfig['sotu'].groupByKey,
+            sortByColumn: 'count',
+            sortByDirection: 'desc',
+            pageStart: 0,
+        },
+        {
+            skip: !identifiersData || isSummaryView(identifiersData),
+        },
+    );
 
     const getQuerySummaryText = () => {
-        if (filters.length === 0) {
-            return (
-                <>
-                    <Typography paragraph component='span' variant='body1'>
-                        {`Dataset is too large. `}
-                    </Typography>
-                    <Typography
-                        onClick={onClickFilterText}
-                        paragraph
-                        variant='body1'
-                        component='span'
-                        color='primary'
-                        style={{ cursor: 'pointer' }}
-                    >
-                        {`Add filters in the query builder.`}
-                    </Typography>
-                </>
-            );
-        }
-
         if (!identifiersData || identifiersFetching) {
             return <Skeleton variant='text' width={400} />;
         }
@@ -86,15 +72,25 @@ const QuerySummaryText = () => {
             );
         }
 
+        if (isSummaryView(identifiersData)) {
+            return '';
+        }
+
         /* Current Query Selection Stats */
         /* TODO: make returned counts monospace font */
         return (
             <Typography paragraph variant='body1'>
-                {`Query | Runs: ${formatNumber(identifiersData?.run?.totalCount)} |
-                          BioProjects: ${formatNumber(identifiersData?.bioproject?.totalCount)}`}
-                {totalVirusCountData && !totalVirusCountIsFetching && !totalVirusCountError
+                {`Query
+                    | BioProjects: ${formatNumber(identifiersData?.bioproject?.totalCount)}
+                    | Runs: ${formatNumber(identifiersData?.run?.totalCount)}
+                          `}
+                {sotuCountData && !sotuCountIsFetching && !sotuCountError
                     ? `
-                          | sOTUs: ${totalVirusCountData?.length ? formatNumber(totalVirusCountData[0]?.count) : 0}`
+                          | Viruses (sOTU): ${sotuCountData?.length ? formatNumber(sotuCountData?.length) : 0}`
+                    : ''}
+                {totalVirusContigCountData && !totalVirusContigCountIsFetching && !totalVirusContigCountError
+                    ? `
+                          | Contigs: ${totalVirusContigCountData?.length ? formatNumber(totalVirusContigCountData[0]?.count) : 0}`
                     : ''}
             </Typography>
         );

@@ -129,7 +129,7 @@ export const getSearchStringClause = (searchString, filters, groupBy) => {
 export const getGroupedCountsByFilters = ({ filters, groupBy, searchStringQuery }) => {
     const tableJoin = getMinimalJoinSubQuery(filters, groupBy);
     return `
-        SELECT ${groupBy} as name${hasNoGroupByFilters(filters, groupBy) ? '' : `, COUNT(*) as count`}
+        SELECT ${groupBy} as name, COUNT(*) as count
         FROM (${tableJoin}) as open_virome
         ${searchStringQuery}
         GROUP BY ${groupBy}

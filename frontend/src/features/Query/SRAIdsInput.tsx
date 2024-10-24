@@ -5,6 +5,7 @@ import { formatNumber } from '../../common/utils/textFormatting.ts';
 import { selectAllFilters, addFilter, removeFilter } from './slice.ts';
 import { selectActiveQueryModule } from '../../app/slice.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
+import { moduleConfig } from '../Module/constants.ts';
 
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
@@ -13,7 +14,7 @@ import Skeleton from '@mui/material/Skeleton';
 import Button from '@mui/material/Button';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import FormHelperText from '@mui/material/FormHelperText';
-import { moduleConfig } from '../Module/constants.ts';
+import QuerySummaryText from './QuerySummaryText.tsx';
 
 const SRAIdsInput = () => {
     const dispatch = useDispatch();
@@ -172,22 +173,8 @@ const SRAIdsInput = () => {
                     <input type='file' accept='.txt' hidden onChange={handleFileUpload} />
                 </Button>
             </Box>
-            <Box sx={{ mb: 2, mt: 4 }}>
-                {!identifiersData || identifiersFetching ? (
-                    <Skeleton variant='rounded' height={20} width={'80%'} />
-                ) : (
-                    <Box>
-                        <Typography component={'span'} variant='body2' sx={{ mt: 1, textAlign: 'left' }}>
-                            {`${
-                                identifiersData &&
-                                identifiersData?.run?.totalCount >= 0 &&
-                                identifiersData?.bioproject?.totalCount >= 0
-                                    ? `Matching Sequences: ${identifiersData?.run ? formatNumber(identifiersData.run.totalCount) : ''}, BioProjects: ${identifiersData?.bioproject ? formatNumber(identifiersData.bioproject.totalCount) : ''}, BioSamples: ${identifiersData?.biosample ? formatNumber(identifiersData.biosample.totalCount) : ''}`
-                                    : ''
-                            }`}
-                        </Typography>
-                    </Box>
-                )}
+            <Box sx={{ mb: 2, mt: 6 }}>
+                <QuerySummaryText />
             </Box>
         </Box>
     );
