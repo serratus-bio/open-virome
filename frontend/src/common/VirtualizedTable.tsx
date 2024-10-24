@@ -154,7 +154,7 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick, sea
     }, [rows.length]);
 
     return (
-        <Paper style={{ height: '80vh', width: '100%' }}>
+        <Paper style={{ height: '75vh', width: '100%' }}>
             <TableVirtuoso
                 data={rows}
                 components={VirtuosoTableComponents}

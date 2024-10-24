@@ -119,7 +119,7 @@ const FilterTable = () => {
         <>
             <Box>
                 {(countIsFetching || !countData) && searchString.length === 0 ? (
-                    <Skeleton variant='rounded' height={'70vh'} />
+                    <Skeleton variant='rounded' height={'80vh'} />
                 ) : (
                     <VirtualizedTable
                         rows={getRows(countData, searchString, moduleFilters)}

@@ -141,37 +141,39 @@ const SRAIdsInput = () => {
     };
 
     return (
-        <Box sx={{ margin: 4 }}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', mb: 1 }}>
-                <TextField
-                    id='outlined-multiline-static'
-                    multiline
-                    rows={4}
-                    sx={{ backgroundColor: 'rgba(40, 40, 40, 0.3)' }}
-                    defaultValue={inputIdString}
-                    onChange={(event) => handleIdsChange(event)}
-                    helperText={'Enter search terms seperated by comma or whitespace'}
-                    label={`Search ${moduleConfig[activeQueryModule].title}`}
-                    autoFocus
-                />
-            </Box>
-
-            {!identifiersFetching && isTypingInterval == 0 && getMissingIdList().length > 0 ? (
-                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <FormHelperText sx={{ color: '#FFCCCB' }}>
-                        {`${getMissingIdList().length} identifiers have no matches (${getMissingIdList().join(', ')}).`}
-                    </FormHelperText>
+        <Box sx={{ mt: 4, mb: 2, ml: 2, mr: 2 }}>
+            <Box sx={{ height: '75vh' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', mb: 1 }}>
+                    <TextField
+                        id='outlined-multiline-static'
+                        multiline
+                        rows={4}
+                        sx={{ backgroundColor: 'rgba(40, 40, 40, 0.3)' }}
+                        defaultValue={inputIdString}
+                        onChange={(event) => handleIdsChange(event)}
+                        helperText={'Enter search terms seperated by comma or whitespace'}
+                        label={`Search ${moduleConfig[activeQueryModule].title}`}
+                        autoFocus
+                    />
                 </Box>
-            ) : null}
 
-            <Box sx={{ display: 'flex', flexDirection: 'column', mt: 4, ml: 1, mb: 4 }}>
-                <Typography variant='body2' sx={{ mt: 4, textAlign: 'left', mb: 2 }}>
-                    {`Or upload a .txt file with ${moduleConfig[activeQueryModule].title}s`}
-                </Typography>
-                <Button component='label' variant='outlined' startIcon={<UploadFileIcon />} sx={{ width: 200 }}>
-                    Upload File
-                    <input type='file' accept='.txt' hidden onChange={handleFileUpload} />
-                </Button>
+                {!identifiersFetching && isTypingInterval == 0 && getMissingIdList().length > 0 ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                        <FormHelperText sx={{ color: '#FFCCCB' }}>
+                            {`${getMissingIdList().length} identifiers have no matches (${getMissingIdList().join(', ')}).`}
+                        </FormHelperText>
+                    </Box>
+                ) : null}
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', mt: 4, ml: 1, mb: 4 }}>
+                    <Typography variant='body2' sx={{ mt: 4, textAlign: 'left', mb: 2 }}>
+                        {`Or upload a .txt file with ${moduleConfig[activeQueryModule].title}s`}
+                    </Typography>
+                    <Button component='label' variant='outlined' startIcon={<UploadFileIcon />} sx={{ width: 200 }}>
+                        Upload File
+                        <input type='file' accept='.txt' hidden onChange={handleFileUpload} />
+                    </Button>
+                </Box>
             </Box>
             <Box sx={{ mb: 2, mt: 6 }}>
                 <QuerySummaryText />
