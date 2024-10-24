@@ -95,6 +95,23 @@ const FilterTable = () => {
             return [];
         }
         let rows = addFilterState(countData);
+
+        // If search string is present, sort rows by search term match count
+        if (searchString.length > 0) {
+            const searchTerms = searchString.split(/[\s,]+/);
+            rows = rows.sort((a, b) => {
+                if (!a.name || !b.name) {
+                    return 0;
+                }
+                const aScore = searchTerms.reduce((acc, term) => {
+                    return acc + (a.name.toLowerCase().includes(term.toLowerCase()) ? 1 : 0);
+                }, 0);
+                const bScore = searchTerms.reduce((acc, term) => {
+                    return acc + (b.name.toLowerCase().includes(term.toLowerCase()) ? 1 : 0);
+                }, 0);
+                return bScore - aScore;
+            });
+        }
         return rows;
     };
 
