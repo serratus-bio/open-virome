@@ -65,6 +65,8 @@ app.post('/counts', async (req, res) => {
 
     let query = ``;
 
+    const useMaterializedView = hasNoGroupByFilters(filters, groupBy) && pageEnd === 100000;
+
     if (!groupBy) {
         if (!idColumn) {
             return res.status(400).json({ error: 'groupBy is required!' });
@@ -85,7 +87,7 @@ app.post('/counts', async (req, res) => {
             groupBy,
             table: table,
         });
-    } else if (hasNoGroupByFilters(filters, groupBy)) {
+    } else if (useMaterializedView) {
         // Counts for filters, from materialized view if no filters applied
         const searchStringQuery = getSearchStringClause(searchString, filters, groupBy);
         query = getCachedCountsQuery(groupBy, searchStringQuery);
