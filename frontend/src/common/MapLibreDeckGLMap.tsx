@@ -86,7 +86,7 @@ const pickMostRelevantGeographicalAttibute = (result) => {
         });
 
     return Object.values(o)
-        .map((v:any) => v[0])
+        .map((v: any) => v[0])
         .flat();
 };
 const selectBioproject: any = async (accession) => {
@@ -654,9 +654,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                     }}
                 >
                     <MapLibreDeckGLMapTooltipSection>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                            RUN METADATA
-                        </div>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>RUN METADATA</div>
                         <div
                             style={{
                                 backgroundColor: '#CCC',
@@ -666,35 +664,59 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                             }}
                         ></div>
                         <div style={{ height: '4px' }}></div>
-                        {mapMode === 'CONTIGS' && <>
-                            <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>RUN ID</div>
-                            <div style={{
+                        {mapMode === 'CONTIGS' && (
+                            <>
+                                <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>RUN ID</div>
+                                <div
+                                    style={{
+                                        color: '#CCC',
+                                        display: 'inline',
+                                        fontSize: '16px',
+                                        fontWeight: 700,
+                                    }}
+                                >
+                                    {runID}
+                                </div>
+                                <div
+                                    style={{
+                                        alignItems: 'flex-end',
+                                        display: 'inline-flex',
+                                        gap: '8px',
+                                        margin: '0 0 0 8px',
+                                        position: 'relative',
+                                        top: '2px',
+                                    }}
+                                >
+                                    <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(runID)} />
+                                    <MapLibreDeckGLMapURLButton
+                                        href={'https://www.ncbi.nlm.nih.gov/sra/?term=' + runID}
+                                    />
+                                </div>
+                            </>
+                        )}
+                        <div style={{ height: '8px' }}></div>
+                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>BIOSAMPLE</div>
+                        <div
+                            style={{
                                 color: '#CCC',
                                 display: 'inline',
                                 fontSize: '16px',
-                                fontWeight: 700
-                            }}>{runID}</div>
-                            <div style={{ alignItems: 'flex-end', display: 'inline-flex', gap: '8px', margin: '0 0 0 8px', position: 'relative', top: '2px' }}>
-                                <MapLibreDeckGLMapCopyButton
-                                    onClick={() => navigator.clipboard.writeText(runID)}
-                                />
-                                <MapLibreDeckGLMapURLButton
-                                    href={'https://www.ncbi.nlm.nih.gov/sra/?term=' + runID}
-                                />
-                            </div>
-                        </>}
-                        <div style={{ height: '8px' }}></div>
-                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>BIOSAMPLE</div>
-                        <div style={{
-                            color: '#CCC',
-                            display: 'inline',
-                            fontSize: '16px',
-                            fontWeight: 700
-                        }}>{biosampleID}</div>
-                        <div style={{ alignItems: 'flex-end', display: 'inline-flex', gap: '8px', margin: '0 0 0 8px', position: 'relative', top: '2px' }}>
-                            <MapLibreDeckGLMapCopyButton
-                                onClick={() => navigator.clipboard.writeText(biosampleID)}
-                            />
+                                fontWeight: 700,
+                            }}
+                        >
+                            {biosampleID}
+                        </div>
+                        <div
+                            style={{
+                                alignItems: 'flex-end',
+                                display: 'inline-flex',
+                                gap: '8px',
+                                margin: '0 0 0 8px',
+                                position: 'relative',
+                                top: '2px',
+                            }}
+                        >
+                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(biosampleID)} />
                             <MapLibreDeckGLMapURLButton
                                 href={'https://www.ncbi.nlm.nih.gov/biosample/?term=' + biosampleID}
                             />
@@ -704,16 +726,27 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                         </div>
                         <div style={{ height: '8px' }}></div>
                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>BIOPROJECT</div>
-                        <div style={{
-                            color: '#CCC',
-                            display: 'inline',
-                            fontSize: '16px',
-                            fontWeight: 700
-                        }}>{bioprojectID}</div>
-                        <div style={{ alignItems: 'flex-end', display: 'inline-flex', gap: '8px', margin: '0 0 0 8px', position: 'relative', top: '2px' }}>
-                            <MapLibreDeckGLMapCopyButton
-                                onClick={() => navigator.clipboard.writeText(bioprojectID)}
-                            />
+                        <div
+                            style={{
+                                color: '#CCC',
+                                display: 'inline',
+                                fontSize: '16px',
+                                fontWeight: 700,
+                            }}
+                        >
+                            {bioprojectID}
+                        </div>
+                        <div
+                            style={{
+                                alignItems: 'flex-end',
+                                display: 'inline-flex',
+                                gap: '8px',
+                                margin: '0 0 0 8px',
+                                position: 'relative',
+                                top: '2px',
+                            }}
+                        >
+                            <MapLibreDeckGLMapCopyButton onClick={() => navigator.clipboard.writeText(bioprojectID)} />
                             <MapLibreDeckGLMapURLButton
                                 href={'https://www.ncbi.nlm.nih.gov/bioproject/?term=' + bioprojectID}
                             />
@@ -749,11 +782,22 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                                 ></div>
                                 <div style={{ height: '4px' }}></div>
                                 <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>ATTRIBUTE NAME</div>
-                                <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{truncate(attributeName + ': ' + attributeValue, 40)}</div>
+                                <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>
+                                    {truncate(attributeName + ': ' + attributeValue, 40)}
+                                </div>
                                 <div style={{ height: '8px' }}></div>
                                 <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                                     <span>LAT / LON</span>
-                                    <div style={{ alignItems: 'flex-end', display: 'inline-flex', gap: '8px', margin: '0 0 0 8px', position: 'relative', top: '2px' }}>
+                                    <div
+                                        style={{
+                                            alignItems: 'flex-end',
+                                            display: 'inline-flex',
+                                            gap: '8px',
+                                            margin: '0 0 0 8px',
+                                            position: 'relative',
+                                            top: '2px',
+                                        }}
+                                    >
                                         <MapLibreDeckGLMapCopyButton
                                             onClick={() => navigator.clipboard.writeText(latLon)}
                                         />
@@ -782,19 +826,25 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                                     <span style={{ fontSize: '14px' }}>{biomeID && WWF_TEW[biomeID].name}</span>
                                 </div>
                                 <div style={{ height: '8px' }}></div>
-                                <div style={{ display:'flex' }}>
-                                    <div style={{ flex:'1 0' }}>
+                                <div style={{ display: 'flex' }}>
+                                    <div style={{ flex: '1 0' }}>
                                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                                             <span>COUNTRY</span>
                                         </div>
                                         <div style={{ margin: '2px 0 0 0' }}>
                                             <Flag code={countryID} height='16' style={{ verticalAlign: 'middle' }} />
-                                            <span style={{ fontSize: '14px', margin: '0 0 0 8px', verticalAlign: 'middle' }}>
+                                            <span
+                                                style={{
+                                                    fontSize: '14px',
+                                                    margin: '0 0 0 8px',
+                                                    verticalAlign: 'middle',
+                                                }}
+                                            >
                                                 {countryID}
                                             </span>
                                         </div>
                                     </div>
-                                    <div style={{ flex:'1 0' }}>
+                                    <div style={{ flex: '1 0' }}>
                                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                                             <span>REGION</span>
                                         </div>
@@ -819,22 +869,42 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                                         }}
                                     ></div>
                                     <div style={{ height: '4px' }}></div>
-                                    <div style={{ display:'flex' }}>
-                                        <div style={{ flex:'1 0' }}>
-                                            <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>PALM ID</div>
+                                    <div style={{ display: 'flex' }}>
+                                        <div style={{ flex: '1 0' }}>
+                                            <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                                                PALM ID
+                                            </div>
                                             <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{palmID}</div>
                                         </div>
-                                        <div style={{ flex:'1 0' }}>
+                                        <div style={{ flex: '1 0' }}>
                                             <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>sOTU</div>
                                             <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{sOTU}</div>
                                         </div>
                                     </div>
                                     <div style={{ height: '8px' }}></div>
-                                    <div style={{ color: '#CCC', display: 'inline', fontSize: '12px', fontWeight: 700, margin: '0 0 0 4px' }}>
-                                        <div style={{ display:'inline', verticalAlign:'top' }}>SEQUENCE [BLAST<MapLibreDeckGLMapURLButton
-                                            fontSize="16px"
-                                            href={'https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&USER_FORMAT_DEFAULTS=on&SET_SAVED_SEARCH=true&PAGE=Proteins&PROGRAM=blastp&QUERY=' + sequence.split(/\n/).slice(1).join('') + '&JOB_TITLE=' + sequence.split(/\n/)[0].substring(1) + '&GAPCOSTS=11%201&DATABASE=nr&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=0.05&WORD_SIZE=6&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&PROG_DEFAULTS=on&SHOW_OVERVIEW=on&SHOW_LINKOUT=on&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML'}
-                                        />]</div>
+                                    <div
+                                        style={{
+                                            color: '#CCC',
+                                            display: 'inline',
+                                            fontSize: '12px',
+                                            fontWeight: 700,
+                                            margin: '0 0 0 4px',
+                                        }}
+                                    >
+                                        <div style={{ display: 'inline', verticalAlign: 'top' }}>
+                                            SEQUENCE [BLAST
+                                            <MapLibreDeckGLMapURLButton
+                                                fontSize='16px'
+                                                href={
+                                                    'https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE_TYPE=BlastSearch&USER_FORMAT_DEFAULTS=on&SET_SAVED_SEARCH=true&PAGE=Proteins&PROGRAM=blastp&QUERY=' +
+                                                    sequence.split(/\n/).slice(1).join('') +
+                                                    '&JOB_TITLE=' +
+                                                    sequence.split(/\n/)[0].substring(1) +
+                                                    '&GAPCOSTS=11%201&DATABASE=nr&BLAST_PROGRAMS=blastp&MAX_NUM_SEQ=100&SHORT_QUERY_ADJUST=on&EXPECT=0.05&WORD_SIZE=6&MATRIX_NAME=BLOSUM62&COMPOSITION_BASED_STATISTICS=2&PROG_DEFAULTS=on&SHOW_OVERVIEW=on&SHOW_LINKOUT=on&ALIGNMENT_VIEW=Pairwise&MASK_CHAR=2&MASK_COLOR=1&GET_SEQUENCE=on&NEW_VIEW=on&NUM_OVERVIEW=100&DESCRIPTIONS=100&ALIGNMENTS=100&FORMAT_OBJECT=Alignment&FORMAT_TYPE=HTML'
+                                                }
+                                            />
+                                            ]
+                                        </div>
                                     </div>
                                     <textarea
                                         rows='4'
@@ -1136,18 +1206,19 @@ const MapLibreDeckGLMapCopyButton = ({ ...props }) => (
             color: '#FFF',
             cursor: 'pointer',
             fontSize: '16px',
-            userSelect: 'none'
+            userSelect: 'none',
         }}
         {...props}
     />
 );
 const MapLibreDeckGLMapURLButton = ({ fontSize, ...props }) => {
-    if(!fontSize)
-        fontSize = '18px';
+    if (!fontSize) fontSize = '18px';
 
-    return <a style={{ color: '#FFF', userSelect: 'none' }} target='_blank' {...props}>
-        <MdOpenInNew style={{ fontSize, verticalAlign: 'bottom' }} />
-    </a>;
+    return (
+        <a style={{ color: '#FFF', userSelect: 'none' }} target='_blank' {...props}>
+            <MdOpenInNew style={{ fontSize, verticalAlign: 'bottom' }} />
+        </a>
+    );
 };
 
 const MapLibreDeckGLMapTooltipSection = ({ children, ...props }) => {

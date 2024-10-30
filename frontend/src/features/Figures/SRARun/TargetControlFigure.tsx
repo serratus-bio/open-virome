@@ -41,7 +41,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout
             idRanges: identifiers ? identifiers['bioproject'].range : [],
             groupBy: moduleConfig[moduleKey].groupByKey,
             pageStart: isSummaryView(identifiers) ? 0 : undefined,
-            pageEnd: isSummaryView(identifiers) ? (moduleKey === 'host' ? 10 : 4) : undefined,
+            pageEnd: isSummaryView(identifiers) ? (moduleKey === 'label' ? 10 : 4) : undefined,
             sortBy: isSummaryView(identifiers) ? activeCountKey : undefined,
         },
         {

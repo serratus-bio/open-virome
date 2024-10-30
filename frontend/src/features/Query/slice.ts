@@ -23,6 +23,7 @@ const filtersSlice = createSlice({
         addFilter: filtersAdapter.addOne,
         addManyFilters: filtersAdapter.addMany,
         removeFilter: filtersAdapter.removeOne,
+        removeManyFilters: filtersAdapter.removeMany,
         removeAllFilters: filtersAdapter.removeAll,
     },
 });
@@ -31,7 +32,7 @@ export default filtersSlice.reducer;
 
 /* Actions */
 
-export const { addFilter, addManyFilters, removeFilter, removeAllFilters } = filtersSlice.actions;
+export const { addFilter, addManyFilters, removeFilter, removeAllFilters, removeManyFilters } = filtersSlice.actions;
 
 /* Selectors */
 

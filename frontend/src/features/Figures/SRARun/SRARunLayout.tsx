@@ -13,7 +13,7 @@ const SRARunLayout = ({ identifiers, sectionLayout }) => {
                 <Box sx={{ flex: 1, width: '100%' }}>
                     <TargetControlFigure
                         identifiers={identifiers}
-                        moduleKey={'host'}
+                        moduleKey={'label'}
                         figureType={'bar'}
                         sectionLayout={sectionLayout}
                     />
@@ -28,7 +28,7 @@ const SRARunLayout = ({ identifiers, sectionLayout }) => {
                     <Box sx={{ flex: 1, width: '100%', mb: 4 }}>
                         <TargetControlFigure
                             identifiers={identifiers}
-                            moduleKey={'host'}
+                            moduleKey={'label'}
                             figureType={'bar'}
                             sectionLayout={sectionLayout}
                         />

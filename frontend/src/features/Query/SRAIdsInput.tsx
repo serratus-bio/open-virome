@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useGetIdentifiersQuery } from '../../api/client.ts';
-import { formatNumber } from '../../common/utils/textFormatting.ts';
-import { selectAllFilters, addFilter, removeFilter } from './slice.ts';
+import { selectAllFilters, addManyFilters, removeManyFilters } from './slice.ts';
 import { selectActiveQueryModule } from '../../app/slice.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
 import { moduleConfig } from '../Module/constants.ts';
@@ -10,7 +9,6 @@ import { moduleConfig } from '../Module/constants.ts';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import Skeleton from '@mui/material/Skeleton';
 import Button from '@mui/material/Button';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import FormHelperText from '@mui/material/FormHelperText';
@@ -37,6 +35,10 @@ const SRAIdsInput = () => {
         }, 500);
         return () => clearTimeout(isTypingDelay);
     }, [isTypingInterval]);
+
+    useEffect(() => {
+        setInputIdString(getIdStringFromFilters());
+    }, [activeQueryModule]);
 
     const getIdentifierKey = () => {
         const mapping = {
@@ -102,19 +104,22 @@ const SRAIdsInput = () => {
         const existingIdFilters = filters.filter((filter) => filter.filterType === activeQueryModule);
         const complement = existingIdFilters.filter((filter) => !intersection.includes(filter.filterValue));
 
+        let newFilters = [];
         for (const id of intersection) {
             if (!existingIdFilters.find((filter) => filter.filterValue === id)) {
-                dispatch(
-                    addFilter({
-                        filterId: `${activeQueryModule}-${id}`,
-                        filterType: activeQueryModule,
-                        filterValue: id,
-                    }),
-                );
+                newFilters.push({
+                    filterId: `${activeQueryModule}-${id}`,
+                    filterType: activeQueryModule,
+                    filterValue: id,
+                });
             }
         }
-        for (const filter of complement) {
-            dispatch(removeFilter(filter.filterId));
+        if (newFilters.length > 0) {
+            dispatch(addManyFilters(newFilters));
+        }
+        const removeIds = complement.map((filter) => filter.filterId);
+        if (removeIds.length > 0) {
+            dispatch(removeManyFilters(removeIds));
         }
     }, [identifiersData]);
 
@@ -140,6 +145,12 @@ const SRAIdsInput = () => {
         reader.readAsText(file);
     };
 
+    const getMissingIdListMessage = () => {
+        const missingIds = getMissingIdList();
+        const queriedIds = getIdListFromInput();
+        return `${missingIds.length}/${queriedIds.length} identifiers have no matches (${missingIds.slice(0, 10).join(', ')}${missingIds.length > 10 ? ', ...' : ''})`;
+    };
+
     return (
         <Box sx={{ mt: 4, mb: 2, ml: 2, mr: 2 }}>
             <Box sx={{ height: '75vh' }}>
@@ -153,15 +164,14 @@ const SRAIdsInput = () => {
                         onChange={(event) => handleIdsChange(event)}
                         helperText={'Enter search terms seperated by comma or whitespace'}
                         label={`Search ${moduleConfig[activeQueryModule].title}`}
+                        value={inputIdString}
                         autoFocus
                     />
                 </Box>
 
                 {!identifiersFetching && isTypingInterval == 0 && getMissingIdList().length > 0 ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <FormHelperText sx={{ color: '#FFCCCB' }}>
-                            {`${getMissingIdList().length} identifiers have no matches (${getMissingIdList().join(', ')}).`}
-                        </FormHelperText>
+                        <FormHelperText sx={{ color: '#FFCCCB' }}>{getMissingIdListMessage()}</FormHelperText>
                     </Box>
                 ) : null}
 
