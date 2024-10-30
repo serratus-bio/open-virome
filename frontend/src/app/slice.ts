@@ -19,7 +19,7 @@ const appSlice = createSlice({
     name: 'app',
     initialState: {
         sidebarOpen: false,
-        activeQueryModule: 'host',
+        activeQueryModule: 'label',
         sectionLayouts: {
             sra: 'simple',
             palmdb: 'advanced',

@@ -5,7 +5,7 @@ export const sectionConfig = {
     sra: {
         title: 'SRA Run',
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Run-Module',
-        modules: ['host', 'seqType', 'runId', 'biosample', 'bioproject'],
+        modules: ['label', 'seqType', 'runId', 'biosample', 'bioproject'],
         defaultDisplay: 'figure',
     },
     palmdb: {
@@ -32,7 +32,7 @@ export const sectionConfig = {
  * Module Labels and defaults
  */
 export const moduleConfig = {
-    host: {
+    label: {
         title: 'Run Label',
         tag: 'Run Label',
         groupByKey: 'organism',

@@ -12,34 +12,34 @@ import BrainIcon from '@mui/icons-material/Diversity2';
 import GeoIcon from '@mui/icons-material/TravelExplore';
 import Logo from '../../common/assets/ov_hex_dark.png';
 
-const OnbaordingPage = () => {
+const OnbaordingMessage = () => {
     const dispatch = useDispatch();
 
     const exampleFilters = {
         Eimeria: [
             {
-                filterId: 'host-Eimeria stiedai',
-                filterType: 'host',
+                filterId: 'label-Eimeria stiedai',
+                filterType: 'label',
                 filterValue: 'Eimeria stiedai',
             },
             {
-                filterId: 'host-Eimeria maxima',
-                filterType: 'host',
+                filterId: 'label-Eimeria maxima',
+                filterType: 'label',
                 filterValue: 'Eimeria maxima',
             },
             {
-                filterId: 'host-Eimeria necatrix',
-                filterType: 'host',
+                filterId: 'label-Eimeria necatrix',
+                filterType: 'label',
                 filterValue: 'Eimeria necatrix',
             },
             {
-                filterId: 'host-Eimeria tenella',
-                filterType: 'host',
+                filterId: 'label-Eimeria tenella',
+                filterType: 'label',
                 filterValue: 'Eimeria tenella',
             },
             {
-                filterId: 'host-Eimeria falciformis',
-                filterType: 'host',
+                filterId: 'label-Eimeria falciformis',
+                filterType: 'label',
                 filterValue: 'Eimeria falciformis',
             },
         ],
@@ -205,4 +205,4 @@ const OnbaordingPage = () => {
     );
 };
 
-export default OnbaordingPage;
+export default OnbaordingMessage;
