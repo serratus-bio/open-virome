@@ -3,8 +3,11 @@ import { Provider, useSelector } from 'react-redux';
 import { store } from './store.ts';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { selectDarkMode } from './slice.ts';
+import { selectDarkMode, selectSidebarOpen } from './slice.ts';
 import { selectAllFilters } from '../features/Query/slice.ts';
+import { useGetIdentifiersQuery } from '../api/client.ts';
+import { getFilterQuery } from '../common/utils/queryHelpers.ts';
+import { isSummaryView } from '../common/utils/plotHelpers.ts';
 
 import SidePanel from '../features/Query/SidePanel.tsx';
 import AppToolbar from './Toolbar.tsx';
@@ -15,6 +18,7 @@ import QueryView from '../features/Query/QueryView.tsx';
 import Toolbar from '@mui/material/Toolbar';
 import Footer from './Footer.tsx';
 import OnboardingMessage from '../features/Query/OnboardingMessage.tsx';
+import NoResultsMessage from '../features/Query/NoResultsMessage.tsx';
 
 const AppWrapper = () => {
     return (
@@ -27,12 +31,26 @@ const AppWrapper = () => {
 const App = () => {
     const darkMode = useSelector(selectDarkMode);
     const filters = useSelector(selectAllFilters);
+    const sidebarOpen = useSelector(selectSidebarOpen);
 
     const theme = createTheme({
         palette: {
             mode: darkMode ? 'dark' : 'light',
         },
     });
+
+    const {
+        data: identifiersData,
+        error: identifiersError,
+        isFetching: identifiersFetching,
+    } = useGetIdentifiersQuery(
+        {
+            filters: getFilterQuery({ filters }),
+        },
+        {
+            skip: sidebarOpen, // Skip fetching when sidebar is open
+        },
+    );
 
     const getContainerStyles = () => ({
         flexGrow: 1,
@@ -48,6 +66,13 @@ const App = () => {
         marginRight: `0px`,
         backgroundColor: 'rgba(29, 30, 32, 0.6)',
     });
+
+    const showOnboardingMessage = () => {
+        return filters.length === 0;
+    };
+    const showNoResultsMessage = () => {
+        return filters.length > 0 && !identifiersFetching && isSummaryView(identifiersData);
+    };
 
     return (
         <ThemeProvider theme={theme}>
@@ -67,7 +92,11 @@ const App = () => {
                         }}
                     >
                         <Toolbar />
-                        {filters.length > 0 ? (
+                        {showOnboardingMessage() ? (
+                            <OnboardingMessage />
+                        ) : showNoResultsMessage() ? (
+                            <NoResultsMessage />
+                        ) : (
                             <>
                                 <QuerySummaryText />
                                 <Module sectionKey={'sra'} />
@@ -75,8 +104,6 @@ const App = () => {
                                 <Module sectionKey={'ecology'} />
                                 <Module sectionKey={'host'} />
                             </>
-                        ) : (
-                            <OnboardingMessage />
                         )}
                     </Box>
                 </Box>
