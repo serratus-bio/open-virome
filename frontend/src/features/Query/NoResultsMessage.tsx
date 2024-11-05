@@ -1,6 +1,6 @@
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { toggleSidebar } from '../../app/slice.ts';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleSidebar, togglePalmprintOnly, selectPalmprintOnly } from '../../app/slice.ts';
 import { removeAllFilters } from './slice.ts';
 
 import Box from '@mui/material/Box';
@@ -9,10 +9,15 @@ import Logo from '../../common/assets/ov_hex_dark.png';
 
 const NoResultsMessage = () => {
     const dispatch = useDispatch();
+    const palmprintOnly = useSelector(selectPalmprintOnly);
 
     const onClickFilterText = () => {
         dispatch(removeAllFilters());
         dispatch(toggleSidebar());
+    };
+
+    const onClickPalmprintOnly = () => {
+        dispatch(togglePalmprintOnly());
     };
 
     return (
@@ -38,7 +43,7 @@ const NoResultsMessage = () => {
                 src={Logo}
                 onClick={onClickFilterText}
             />
-            <Typography variant='h6'>{`No viruses could be found for the current filters.`}</Typography>
+            <Typography variant='h6'>{`No results found.`}</Typography>
             <Typography variant='h6'>
                 <Typography
                     onClick={onClickFilterText}
@@ -50,7 +55,22 @@ const NoResultsMessage = () => {
                 >
                     {`Clear filters`}
                 </Typography>
-                {` or try again later.`}
+                {palmprintOnly ? (
+                    <>
+                        {', include runs '}
+                        <Typography
+                            onClick={onClickPalmprintOnly}
+                            paragraph
+                            variant='h6'
+                            component='span'
+                            color='primary'
+                            style={{ cursor: 'pointer' }}
+                        >
+                            {`without viruses,`}
+                        </Typography>
+                    </>
+                ) : null}
+                {' or try again later.'}
             </Typography>
         </Box>
     );

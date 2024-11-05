@@ -188,11 +188,38 @@ const WWF_TEW = Object.fromEntries(
     }),
 );
 
+const getIdClauses = (ids = [], idRanges = []) => {
+    const clauses = [];
+    const idColumn = 'accession';
+    if (ids.length > 0) {
+        clauses.push(`${idColumn} IN (${ids.map((id) => `'${id}'`).join(',')})`);
+    }
+    if (idRanges.length > 0) {
+        idRanges.forEach((range) => {
+            const [start, end] = range;
+            clauses.push(`${idColumn} BETWEEN '${start}' AND '${end}'`);
+        });
+    }
+    return clauses;
+};
+const getWhereClause = (palmprintOnly, identifiers) => {
+    const identifierClauses = getIdClauses(identifiers?.biosample?.single, identifiers?.biosample?.range);
+    const conditions = [];
+    if (palmprintOnly) {
+        conditions.push('palm_virome = true');
+    }
+    if (identifierClauses.length > 0) {
+        conditions.push(`(${identifierClauses.join(' OR ')})`);
+    }
+    return conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+};
+
 const DeckGLRenderScatterplot: any = ({
     identifiers,
     mapMode,
     mbOverlay,
     mlglMap,
+    palmprintOnly,
     setAttributeName,
     setAttributeValue,
     setBiomeID,
@@ -236,30 +263,11 @@ const DeckGLRenderScatterplot: any = ({
                     .join(',') +
                 '))';
 
-            // TODO: Query can be moved to open-virome API after consolodating data in logan DB
-            const getIdClauses = (ids = [], idRanges = []) => {
-                const clauses = [];
-                const idColumn = 'accession';
-                if (ids.length > 0) {
-                    clauses.push(`${idColumn} IN (${ids.map((id) => `'${id}'`).join(',')})`);
-                }
-                if (idRanges.length > 0) {
-                    idRanges.forEach((range) => {
-                        const [start, end] = range;
-                        clauses.push(`${idColumn} BETWEEN '${start}' AND '${end}'`);
-                    });
-                }
-                return clauses;
-            };
-
-            const identifierClauses = getIdClauses(identifiers?.biosample?.single, identifiers?.biosample?.range);
-
             const selectBGLJSON = await (async () => {
                 const SELECT: any = {
                     text: `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, gm4326_id, gp4326_wwf_tew_id
                     FROM bgl_gm4326_gp4326
-                    WHERE palm_virome = TRUE
-                    ${identifierClauses.length > 0 ? ` AND (${identifierClauses.join(' OR ')})` : ''}
+                    ${getWhereClause(palmprintOnly, identifiers)}
                     LIMIT 65536;`,
                 };
                 SELECT.deflate = btoa(
@@ -304,8 +312,7 @@ const DeckGLRenderScatterplot: any = ({
                     FROM (SELECT DISTINCT(accession)
                         FROM (SELECT accession
                             FROM bgl_gm4326_gp4326
-                            WHERE palm_virome = TRUE
-                            ${identifierClauses.length > 0 ? ` AND (${identifierClauses.join(' OR ')})` : ''}
+                            ${getWhereClause(palmprintOnly, identifiers)}
                             LIMIT 65536)) AS t
                     JOIN palm_virome ON t.accession = palm_virome.bio_sample;`,
                 };
@@ -443,7 +450,7 @@ const DeckGLRenderScatterplot: any = ({
     });
 };
 
-const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
+const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) => {
     style = {
         ...{ height: '100%', position: 'relative', width: '100%' },
         ...style,
@@ -506,6 +513,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, style = {} }) => {
                     mapMode,
                     mbOverlay,
                     mlglMap,
+                    palmprintOnly,
                     setAttributeName,
                     setAttributeValue,
                     setBiomeID,

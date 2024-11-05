@@ -13,7 +13,7 @@ import ScatterPlot from '../../../common/ScatterPlot.tsx';
 import Skeleton from '@mui/material/Skeleton';
 import Box from '@mui/material/Box';
 
-const BioprojectFigure = ({ identifiers }) => {
+const BioprojectFigure = ({ identifiers, palmprintOnly }) => {
     const {
         data: targetCountData = [],
         error: targetCountError,
@@ -25,6 +25,7 @@ const BioprojectFigure = ({ identifiers }) => {
             idRanges: identifiers ? identifiers['run'].range : [],
             groupBy: moduleConfig['bioproject'].groupByKey,
             pageEnd: isSummaryView(identifiers) ? 100 : undefined,
+            palmprintOnly,
         },
         {
             skip: shouldDisableFigureView(identifiers) || isSummaryView(identifiers),
@@ -42,6 +43,7 @@ const BioprojectFigure = ({ identifiers }) => {
             idRanges: identifiers ? identifiers['bioproject'].range : [],
             groupBy: moduleConfig['bioproject'].groupByKey,
             pageEnd: isSummaryView(identifiers) ? 1000 : undefined,
+            palmprintOnly,
         },
         {
             skip: shouldDisableFigureView(identifiers),
@@ -77,11 +79,6 @@ const BioprojectFigure = ({ identifiers }) => {
                 />
             </Box>
         );
-    };
-
-    const sectionStyle = {
-        mt: 2,
-        mb: 2,
     };
 
     return (

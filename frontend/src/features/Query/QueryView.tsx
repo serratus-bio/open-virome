@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectSidebarOpen, toggleSidebar, selectActiveQueryModule } from '../../app/slice.ts';
+import { selectSidebarOpen, toggleSidebar, selectActiveQueryModule, selectPalmprintOnly } from '../../app/slice.ts';
 import { moduleConfig } from '../Module/constants.ts';
 
 import Box from '@mui/material/Box';
@@ -13,6 +13,7 @@ const QueryView = () => {
     const dispatch = useDispatch();
     const activeQueryModule = useSelector(selectActiveQueryModule);
     const sidebarOpen = useSelector(selectSidebarOpen);
+    const palmprintOnly = useSelector(selectPalmprintOnly);
 
     return (
         <Modal
@@ -38,9 +39,9 @@ const QueryView = () => {
                         }}
                     >
                         {moduleConfig[activeQueryModule].queryBuilderDisplay === 'input' ? (
-                            <SRAIdsInput />
+                            <SRAIdsInput palmprintOnly={palmprintOnly} />
                         ) : (
-                            <FilterTable />
+                            <FilterTable palmprintOnly={palmprintOnly} />
                         )}
                     </Box>
                 </Slide>

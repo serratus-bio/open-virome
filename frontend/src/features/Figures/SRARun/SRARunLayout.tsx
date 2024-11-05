@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import TargetControlFigure from './TargetControlFigure.tsx';
 import BioprojectFigure from './BioprojectFigure.tsx';
 
-const SRARunLayout = ({ identifiers, sectionLayout }) => {
+const SRARunLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
     const getFigures = () => {
         if (isSimpleLayout(sectionLayout)) {
             return (
@@ -16,6 +16,7 @@ const SRARunLayout = ({ identifiers, sectionLayout }) => {
                         moduleKey={'label'}
                         figureType={'bar'}
                         sectionLayout={sectionLayout}
+                        palmprintOnly={palmprintOnly}
                     />
                 </Box>
             );
@@ -25,30 +26,32 @@ const SRARunLayout = ({ identifiers, sectionLayout }) => {
                     <Typography variant='h6' sx={{ mt: 4, mb: 4 }}>
                         {`Run Label`}
                     </Typography>
-                    <Box sx={{ flex: 1, width: '100%', mb: 4 }}>
+                    <Box sx={{ flex: 1, width: '100%', mb: 2 }}>
                         <TargetControlFigure
                             identifiers={identifiers}
                             moduleKey={'label'}
                             figureType={'bar'}
                             sectionLayout={sectionLayout}
+                            palmprintOnly={palmprintOnly}
                         />
                     </Box>
                     <Typography variant='h6' sx={{ mt: 4, mb: 4 }}>
                         {`Run Technology`}
                     </Typography>
-                    <Box sx={{ flex: 1, width: '100%', mb: 4 }}>
+                    <Box sx={{ flex: 1, width: '100%', mb: 2 }}>
                         <TargetControlFigure
                             identifiers={identifiers}
                             moduleKey={'seqType'}
                             figureType={'polar'}
                             sectionLayout={sectionLayout}
+                            palmprintOnly={palmprintOnly}
                         />
                     </Box>
                     <Typography variant='h6' sx={{ mt: 4, mb: 4 }}>
                         {`BioProject`}
                     </Typography>
                     <Box sx={{ flex: 1, width: '100%' }}>
-                        <BioprojectFigure identifiers={identifiers} />
+                        <BioprojectFigure identifiers={identifiers} palmprintOnly={palmprintOnly} />
                     </Box>
                 </Box>
             );

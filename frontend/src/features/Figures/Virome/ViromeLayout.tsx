@@ -23,7 +23,7 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
     const [activeSubgraph, setActiveSubgraph] = useState('1');
     const [isSummaryTableOpen, setIsSummaryTableOpen] = useState(false);
     const [selectedNetworkItem, setSelectedNetworkItem] = useState(null);
-    const [activeModule, setActiveModule] = useState('sotu');
+    const [activeModule, setActiveModule] = useState('species');
     const [headlessCy, setHeadlessCy] = useState(
         cytoscape({
             headless: true,
@@ -175,7 +175,7 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
                     display: 'flex',
                     justifyContent: 'flex-start',
                     alignItems: 'flex-start',
-                    height: 100,
+                    height: 200,
                     width: '100%',
                 }}
             >

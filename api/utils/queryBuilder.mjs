@@ -1,5 +1,3 @@
-const SHOULD_EXCLUDE_NON_VIRUS = true;
-
 export const handleIdKeyIrregularities = (key, table) => {
     const tableToRemappedKey = {
         sra: {
@@ -90,7 +88,7 @@ export const hasNoGroupByFilters = (filters, groupBy) => {
     return !filters.filter((filter) => filter.groupByKey !== groupBy).length > 0;
 };
 
-export const getCachedCountsQuery = (groupBy, searchStringQuery) => {
+export const getCachedCountsQuery = (groupBy, searchStringQuery, palmprintOnly) => {
     const groupByToMaterializedView = {
         organism: 'ov_counts_sra_organism',
         bioproject: 'ov_counts_sra_bioproject',
@@ -104,15 +102,16 @@ export const getCachedCountsQuery = (groupBy, searchStringQuery) => {
         stat_host_order: 'ov_counts_sra_stat',
         sex: 'ov_counts_biosample_sex',
     };
+    const palmprintOnlyClause = `${searchStringQuery.length > 0 ? 'AND' : 'WHERE'} virus_only = ${palmprintOnly ? 'true' : 'false'}`;
     return `
         SELECT * FROM ${groupByToMaterializedView[groupBy]}
         ${searchStringQuery}
-        ${searchStringQuery.length > 0 ? 'AND' : 'WHERE'} virus_only = ${SHOULD_EXCLUDE_NON_VIRUS}
+        ${palmprintOnlyClause}
     `;
 };
 
 export const getSearchStringClause = (searchString, filters, groupBy) => {
-    if (searchString === undefined) {
+    if (searchString === undefined || searchString === '') {
         return '';
     }
     const searchStrings = searchString
@@ -126,8 +125,8 @@ export const getSearchStringClause = (searchString, filters, groupBy) => {
     return `WHERE (${likeStatements.join(' OR ')})`;
 };
 
-export const getGroupedCountsByFilters = ({ filters, groupBy, searchStringQuery }) => {
-    const tableJoin = getMinimalJoinSubQuery(filters, groupBy);
+export const getGroupedCountsByFilters = ({ filters, groupBy, searchStringQuery, palmprintOnly }) => {
+    const tableJoin = getMinimalJoinSubQuery(filters, palmprintOnly, groupBy);
     return `
         SELECT ${groupBy} as name, COUNT(*) as count
         FROM (${tableJoin}) as open_virome
@@ -136,7 +135,7 @@ export const getGroupedCountsByFilters = ({ filters, groupBy, searchStringQuery 
     `;
 };
 
-export const getMinimalJoinSubQuery = (filters, groupBy = undefined, excludeNonVirus = SHOULD_EXCLUDE_NON_VIRUS) => {
+export const getMinimalJoinSubQuery = (filters, palmprintOnly, groupBy = undefined) => {
     const filterTypes = filters.map((filter) => filter.groupByKey);
 
     const tableToInnerSelect = {
@@ -191,13 +190,14 @@ export const getMinimalJoinSubQuery = (filters, groupBy = undefined, excludeNonV
     // Helper to build join statements
     const buildJoinStatement = (table, index, selectStatement, whereStatement, tableJoinKey) => {
         if (index === 0) {
-            const hasVirusConditional = excludeNonVirus
+            const palmprintOnlyClause = palmprintOnly
                 ? `${whereStatement.length > 0 ? 'AND' : 'WHERE'} has_virus = true`
                 : '';
+
             return `(
                 SELECT ${selectStatement} FROM ${table}
                 ${whereStatement}
-                ${hasVirusConditional}
+                ${palmprintOnlyClause}
             ) as ${table}`;
         } else {
             return `INNER JOIN (

@@ -261,7 +261,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
     };
 
     const getRowsPerPage = () => {
-        return maxWidth > 1000 ? 10 : 5;
+        return maxWidth > 700 ? 10 : 5;
     };
 
     const onPageChange = (event: unknown, newPage: number) => {

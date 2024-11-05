@@ -13,8 +13,9 @@ import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import FormHelperText from '@mui/material/FormHelperText';
 import QuerySummaryText from './QuerySummaryText.tsx';
+import PalmprintOnlyToggle from './PalmprintOnlyToggle.tsx';
 
-const FilterTable = () => {
+const FilterTable = ({ palmprintOnly }) => {
     const dispatch = useDispatch();
     const [searchString, setSearchString] = useState('');
     const [isTypingInterval, setIsTypingInterval] = useState(0);
@@ -33,6 +34,7 @@ const FilterTable = () => {
         isFetching: identifiersFetching,
     } = useGetIdentifiersQuery({
         filters: getFilterQuery({ filters }),
+        palmprintOnly,
     });
 
     const {
@@ -48,6 +50,7 @@ const FilterTable = () => {
             pageStart: 0,
             pageEnd: 100000,
             searchString: searchString,
+            palmprintOnly,
         },
         {
             skip: isTypingInterval > 0,
@@ -139,16 +142,27 @@ const FilterTable = () => {
                     />
                 )}
             </Box>
-            <Box sx={{ mb: 2, mt: 2, ml: 2 }}>
+            <Box sx={{ mb: 2, mt: 2, ml: 2, mr: 1 }}>
                 {!identifiersData || identifiersFetching || countIsFetching ? (
                     <Skeleton variant='rounded' height={20} width={'80%'} />
                 ) : (
-                    <Box>
-                        <FormHelperText component={'span'} sx={{ textAlign: 'left' }}>
-                            {`Total rows: ${countData && countData?.length >= 100000 ? '≥' : ''}${countData ? formatNumber(countData.length) : ''}`}
-                        </FormHelperText>
+                    <>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                flexDirection: 'row',
+                                alignItems: 'flex-start',
+                                justifyContent: 'space-between',
+                                width: '100%',
+                            }}
+                        >
+                            <FormHelperText component={'span'} sx={{ textAlign: 'left' }}>
+                                {`Total rows: ${countData && countData?.length >= 100000 ? '≥' : ''}${countData ? formatNumber(countData.length) : ''}`}
+                            </FormHelperText>
+                            <PalmprintOnlyToggle />
+                        </Box>
                         <QuerySummaryText />
-                    </Box>
+                    </>
                 )}
             </Box>
         </>

@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectAllFilters } from '../Query/slice.ts';
-import { selectSectionLayoutBySection, setSectionLayout, selectSidebarOpen } from '../../app/slice.ts';
+import {
+    selectSectionLayoutBySection,
+    setSectionLayout,
+    selectSidebarOpen,
+    selectPalmprintOnly,
+} from '../../app/slice.ts';
 import { sectionConfig } from './constants.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
 import { shouldDisableFigureView } from '../../common/utils/plotHelpers.ts';
@@ -28,6 +33,7 @@ const Module = ({ sectionKey }) => {
     const filters = useSelector(selectAllFilters);
     const sectionLayout = useSelector((state) => selectSectionLayoutBySection(state, sectionKey));
     const sidebarOpen = useSelector(selectSidebarOpen);
+    const palmprintOnly = useSelector(selectPalmprintOnly);
     const [moduleDisplay, setModuleDisplay] = useState(sectionConfig[sectionKey].defaultDisplay);
 
     const isTableView = () => moduleDisplay === 'table';
@@ -40,6 +46,7 @@ const Module = ({ sectionKey }) => {
     } = useGetIdentifiersQuery(
         {
             filters: getFilterQuery({ filters }),
+            palmprintOnly,
         },
         {
             skip: sidebarOpen, // Skip fetching when sidebar is open
@@ -67,13 +74,25 @@ const Module = ({ sectionKey }) => {
             );
         }
         if (sectionKey === 'sra') {
-            return <SRARunLayout identifiers={identifiersData} sectionLayout={sectionLayout} />;
+            return (
+                <SRARunLayout
+                    identifiers={identifiersData}
+                    sectionLayout={sectionLayout}
+                    palmprintOnly={palmprintOnly}
+                />
+            );
         }
         if (sectionKey === 'palmdb') {
             return <ViromeLayout identifiers={identifiersData} sectionLayout={sectionLayout} />;
         }
         if (sectionKey === 'ecology') {
-            return <EcologyLayout identifiers={identifiersData} sectionLayout={sectionLayout} />;
+            return (
+                <EcologyLayout
+                    identifiers={identifiersData}
+                    sectionLayout={sectionLayout}
+                    palmprintOnly={palmprintOnly}
+                />
+            );
         }
         return (
             <Box sx={{ height: 500, width: 400 }}>
