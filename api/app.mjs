@@ -46,18 +46,19 @@ app.post('/counts', async (req, res) => {
         return res.status(400).json({ error: 'Invalid request!' });
     }
 
-    const idColumn = body?.idColumn || undefined;
-    const ids = body?.ids || [];
-    const idRanges = body?.idRanges || [];
+    const idColumn = body?.idColumn ?? undefined;
+    const ids = body?.ids ?? [];
+    const idRanges = body?.idRanges ?? [];
 
-    const filters = body?.filters || [];
-    const table = body?.table || 'sra';
-    const groupBy = body?.groupBy || undefined;
-    const sortByColumn = body?.sortByColumn || undefined;
-    const sortByDirection = body?.sortByDirection || undefined;
-    const pageStart = body?.pageStart || 0;
-    const pageEnd = body?.pageEnd || undefined;
-    const searchString = body?.searchString || undefined;
+    const filters = body?.filters ?? [];
+    const table = body?.table ?? 'sra';
+    const groupBy = body?.groupBy ?? undefined;
+    const sortByColumn = body?.sortByColumn ?? undefined;
+    const sortByDirection = body?.sortByDirection ?? undefined;
+    const pageStart = body?.pageStart ?? 0;
+    const pageEnd = body?.pageEnd ?? undefined;
+    const searchString = body?.searchString ?? undefined;
+    const palmprintOnly = body?.palmprintOnly ?? true;
 
     if (idColumn && filters.length > 0) {
         return res.status(400).json({ error: 'Cannot have both idColumn and filters!' });
@@ -90,7 +91,7 @@ app.post('/counts', async (req, res) => {
     } else if (useMaterializedView) {
         // Counts for filters, from materialized view if no filters applied
         const searchStringQuery = getSearchStringClause(searchString, filters, groupBy);
-        query = getCachedCountsQuery(groupBy, searchStringQuery);
+        query = getCachedCountsQuery(groupBy, searchStringQuery, palmprintOnly);
     } else {
         // Counts for filters, from main table if filters applied
         const searchStringQuery = getSearchStringClause(searchString, filters, groupBy);
@@ -98,6 +99,7 @@ app.post('/counts', async (req, res) => {
             filters,
             groupBy,
             searchStringQuery,
+            palmprintOnly,
         });
     }
 
@@ -123,12 +125,13 @@ app.post('/identifiers', async (req, res) => {
         return res.status(400).json({ error: 'Invalid request!' });
     }
 
-    const filters = body?.filters || [];
+    const filters = body?.filters ?? [];
+    const palmprintOnly = body?.palmprintOnly ?? true;
 
     if (filters.length === 0) {
         return res.json(formatIdentifiersResponse([]));
     }
-    const subquery = getMinimalJoinSubQuery(filters);
+    const subquery = getMinimalJoinSubQuery(filters, palmprintOnly);
     const query = `
         SELECT DISTINCT run_id, bioproject, biosample
         FROM (${subquery}) as open_virome
@@ -152,13 +155,13 @@ app.post('/results', async (req, res) => {
         return res.status(400).json({ error: 'Invalid request!' });
     }
 
-    const idColumn = body?.idColumn || 'run_id';
-    const ids = body?.ids || [];
-    const idRanges = body?.idRanges || [];
-    const table = body?.table || 'sra';
-    const columns = body?.columns || '*';
-    const pageStart = body?.pageStart || 0;
-    const pageEnd = body?.pageEnd || undefined;
+    const idColumn = body?.idColumn ?? 'run_id';
+    const ids = body?.ids ?? [];
+    const idRanges = body?.idRanges ?? [];
+    const table = body?.table ?? 'sra';
+    const columns = body?.columns ?? '*';
+    const pageStart = body?.pageStart ?? 0;
+    const pageEnd = body?.pageEnd ?? undefined;
 
     const clauses = getIdClauses(ids, idRanges, idColumn, table);
 

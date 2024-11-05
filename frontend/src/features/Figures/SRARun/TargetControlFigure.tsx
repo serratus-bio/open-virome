@@ -12,7 +12,7 @@ import BarPlot from '../../../common/BarPlot.tsx';
 import PolarBarPlot from '../../../common/PolarBarPlot.tsx';
 import RadioButtonsGroup from '../../../common/RadioButtonsGroup.tsx';
 
-const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout }) => {
+const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout, palmprintOnly }) => {
     const [activeCountKey, setActiveCountKey] = useState('count');
     const {
         data: targetCountData,
@@ -24,6 +24,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout
             ids: identifiers ? identifiers['run'].single : [],
             idRanges: identifiers ? identifiers['run'].range : [],
             groupBy: moduleConfig[moduleKey].groupByKey,
+            palmprintOnly,
         },
         {
             skip: shouldDisableFigureView(identifiers) || isSummaryView(identifiers),
@@ -43,6 +44,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout
             pageStart: isSummaryView(identifiers) ? 0 : undefined,
             pageEnd: isSummaryView(identifiers) ? (moduleKey === 'label' ? 10 : 4) : undefined,
             sortBy: isSummaryView(identifiers) ? activeCountKey : undefined,
+            palmprintOnly,
         },
         {
             skip: shouldDisableFigureView(identifiers),

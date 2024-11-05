@@ -10,7 +10,7 @@ export const sectionConfig = {
     },
     palmdb: {
         title: 'Virome',
-        wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Virome-Module',
+        wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Virome',
         modules: ['sotu', 'family', 'species'],
         defaultDisplay: 'figure',
     },
@@ -121,8 +121,8 @@ export const moduleConfig = {
         queryBuilderDisplay: 'table',
     },
     statHost: {
-        title: 'Host (STAT)',
-        tag: 'Host (STAT)',
+        title: 'STAT Organism',
+        tag: 'STAT Organism',
         groupByKey: 'stat_host_order',
         resultsTable: 'sra_stat',
         resultsIdColumn: 'run',

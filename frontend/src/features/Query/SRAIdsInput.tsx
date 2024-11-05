@@ -13,8 +13,9 @@ import Button from '@mui/material/Button';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import FormHelperText from '@mui/material/FormHelperText';
 import QuerySummaryText from './QuerySummaryText.tsx';
+import PalmprintOnlyToggle from './PalmprintOnlyToggle.tsx';
 
-const SRAIdsInput = () => {
+const SRAIdsInput = ({ palmprintOnly }) => {
     const dispatch = useDispatch();
     const [isTypingInterval, setIsTypingInterval] = useState(0);
     const activeQueryModule = useSelector(selectActiveQueryModule);
@@ -88,6 +89,7 @@ const SRAIdsInput = () => {
     } = useGetIdentifiersQuery(
         {
             filters: [...buildIdFilters(), ...getFilterQuery({ filters, excludeType: activeQueryModule })],
+            palmprintOnly,
         },
         {
             skip: isTypingInterval > 0,
@@ -168,7 +170,9 @@ const SRAIdsInput = () => {
                         autoFocus
                     />
                 </Box>
-
+                <Box sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                    <PalmprintOnlyToggle />
+                </Box>
                 {!identifiersFetching && isTypingInterval == 0 && getMissingIdList().length > 0 ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                         <FormHelperText sx={{ color: '#FFCCCB' }}>{getMissingIdListMessage()}</FormHelperText>

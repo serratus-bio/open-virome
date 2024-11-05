@@ -2,8 +2,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/query';
 import rootReducer from './rootReducer';
 import { middleware as apiMiddleware } from '../api/client.ts';
-import ReduxQuerySync from 'redux-query-sync';
 import { moduleConfig } from '../features/Module/constants.ts';
+import ReduxQuerySync from 'redux-query-sync';
 
 export const store = configureStore({
     reducer: rootReducer,
@@ -53,6 +53,23 @@ ReduxQuerySync({
             },
             valueToString: (value) => {
                 return JSON.stringify(value);
+            },
+        },
+        palmprintOnly: {
+            selector: (state) => {
+                return state?.app?.palmprintOnly;
+            },
+            action: (value) => {
+                if (value === undefined) {
+                    return { type: 'skip' };
+                }
+                return { type: 'app/togglePalmprintOnly' };
+            },
+            stringToValue: (string) => {
+                return string === 'true';
+            },
+            valueToString: (value) => {
+                return value ? 'true' : 'false';
             },
         },
     },

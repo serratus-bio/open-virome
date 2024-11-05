@@ -3,7 +3,7 @@ import { Provider, useSelector } from 'react-redux';
 import { store } from './store.ts';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { selectDarkMode, selectSidebarOpen } from './slice.ts';
+import { selectDarkMode, selectSidebarOpen, selectPalmprintOnly } from './slice.ts';
 import { selectAllFilters } from '../features/Query/slice.ts';
 import { useGetIdentifiersQuery } from '../api/client.ts';
 import { getFilterQuery } from '../common/utils/queryHelpers.ts';
@@ -32,6 +32,7 @@ const App = () => {
     const darkMode = useSelector(selectDarkMode);
     const filters = useSelector(selectAllFilters);
     const sidebarOpen = useSelector(selectSidebarOpen);
+    const palmprintOnly = useSelector(selectPalmprintOnly);
 
     const theme = createTheme({
         palette: {
@@ -46,6 +47,7 @@ const App = () => {
     } = useGetIdentifiersQuery(
         {
             filters: getFilterQuery({ filters }),
+            palmprintOnly,
         },
         {
             skip: sidebarOpen, // Skip fetching when sidebar is open

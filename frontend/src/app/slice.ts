@@ -13,6 +13,7 @@ type AppState = {
         host: string;
     };
     darkMode: boolean;
+    palmprintOnly: boolean;
 };
 
 const appSlice = createSlice({
@@ -27,6 +28,7 @@ const appSlice = createSlice({
             host: 'simple',
         },
         darkMode: true,
+        palmprintOnly: true,
     },
     reducers: {
         toggleSidebar: (state) => {
@@ -42,6 +44,9 @@ const appSlice = createSlice({
         setActiveQueryModule: (state, action) => {
             state.activeQueryModule = action.payload;
         },
+        togglePalmprintOnly: (state) => {
+            state.palmprintOnly = !state.palmprintOnly;
+        },
     },
 });
 
@@ -49,7 +54,8 @@ export default appSlice.reducer;
 
 /* Actions */
 
-export const { toggleSidebar, toggleDarkMode, setSectionLayout, setActiveQueryModule } = appSlice.actions;
+export const { toggleSidebar, toggleDarkMode, setSectionLayout, setActiveQueryModule, togglePalmprintOnly } =
+    appSlice.actions;
 
 /* Selectors */
 
@@ -57,6 +63,7 @@ export const selectApp = (state: RootState) => state.app;
 
 export const selectSidebarOpen = createSelector([selectApp], (app: AppState) => app.sidebarOpen);
 export const selectDarkMode = createSelector([selectApp], (app: AppState) => app.darkMode);
+export const selectPalmprintOnly = createSelector([selectApp], (app: AppState) => app.palmprintOnly);
 export const selectSectionLayouts = createSelector([selectApp], (app: AppState) => app.sectionLayouts);
 export const selectSectionLayoutBySection = createSelector(
     [selectSectionLayouts, (_: RootState, sectionKey: string) => sectionKey],
