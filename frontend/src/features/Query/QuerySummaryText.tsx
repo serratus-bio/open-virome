@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectAllFilters } from './slice.ts';
+import { selectPalmprintOnly } from '../../app/slice.ts';
 import { useGetIdentifiersQuery, useGetCountsQuery } from '../../api/client.ts';
 import { getFilterQuery, handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
 import { formatNumber } from '../../common/utils/textFormatting.ts';
@@ -13,6 +14,7 @@ import Skeleton from '@mui/material/Skeleton';
 
 const QuerySummaryText = () => {
     const filters = useSelector(selectAllFilters);
+    const palmprintOnly = useSelector(selectPalmprintOnly);
 
     const {
         data: identifiersData,
@@ -20,6 +22,7 @@ const QuerySummaryText = () => {
         isFetching: identifiersFetching,
     } = useGetIdentifiersQuery({
         filters: getFilterQuery({ filters }),
+        palmprintOnly,
     });
 
     const {
@@ -36,6 +39,7 @@ const QuerySummaryText = () => {
             idRanges: identifiersData
                 ? identifiersData[handleIdKeyIrregularities(moduleConfig['sotu'].resultsIdColumn)].range
                 : [],
+            palmprintOnly,
         },
         {
             skip: !identifiersData,
@@ -53,6 +57,7 @@ const QuerySummaryText = () => {
             sortByColumn: 'count',
             sortByDirection: 'desc',
             pageStart: 0,
+            palmprintOnly,
         },
         {
             skip: !identifiersData || isSummaryView(identifiersData),
