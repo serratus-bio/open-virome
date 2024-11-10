@@ -18,6 +18,11 @@ const getNumericToIdMap = (ids) => {
     }, {});
 };
 
+export const sanitizeQueryStrings = (filterValue) => {
+    // escape single quotes
+    return filterValue.replace(/'/g, "''");
+};
+
 const reduceConsecutiveToRange = (ids) => {
     if (ids.length === 0) {
         return [[], []];

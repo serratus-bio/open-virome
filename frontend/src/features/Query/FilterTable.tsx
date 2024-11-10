@@ -122,7 +122,7 @@ const FilterTable = ({ palmprintOnly }) => {
         <>
             <Box>
                 {(countIsFetching || !countData) && searchString.length === 0 ? (
-                    <Skeleton variant='rounded' height={'80vh'} />
+                    <Skeleton variant='rounded' height={'75vh'} />
                 ) : (
                     <VirtualizedTable
                         rows={getRows(countData, searchString, moduleFilters)}

@@ -1,35 +1,63 @@
+import { sanitizeQueryStrings } from './format.mjs';
+
+const TABLE_TO_SELECT_COLUMNS = {
+    ov_identifiers: ['run_id', 'bioproject', 'biosample', 'has_virus'],
+    sra: ['acc', 'bioproject', 'biosample', 'organism', 'assay_type'],
+    sra_stat: ['run_id', 'stat_host_order'],
+    palm_virome: ['run', 'sotu', 'tax_species', 'tax_family'],
+    biosample_tissue: ['biosample_id', 'tissue'],
+    biosample_sex: ['biosample', 'sex'],
+    biosample_geographical_location: ['accession', 'geo_attribute_value'],
+    bgl_gm4326_gp4326: ['accession', 'biome_attribute_value'],
+    biosample_disease: ['biosample', 'do_label'],
+};
+
+const TABLE_TO_JOIN_KEY = {
+    ov_identifiers: 'run_id',
+    sra: 'run_id',
+    sra_stat: 'run_id',
+    palm_virome: 'run_id',
+    biosample_tissue: 'biosample',
+    biosample_sex: 'biosample',
+    biosample_geographical_location: 'biosample',
+    bgl_gm4326_gp4326: 'biosample',
+    biosample_disease: 'biosample',
+};
+
+const TABLE_TO_UNIFIED_JOIN_KEY = {
+    sra: {
+        run: 'acc',
+    },
+    sra_stat: {
+        run_id: 'run',
+        stat_host_order: 'name',
+    },
+    biosample_tissue: {
+        biosample: 'biosample_id',
+    },
+    biosample_geographical_location: {
+        biosample: 'accession',
+        geo_attribute_value: 'attribute_value',
+    },
+    bgl_gm4326_gp4326: {
+        biosample: 'accession',
+        biome_attribute_value: 'gp4326_wwf_tew_id',
+    },
+    palm_virome: {
+        run_id: 'run',
+    },
+};
+
 export const handleIdKeyIrregularities = (key, table) => {
-    const tableToRemappedKey = {
-        sra: {
-            run: 'acc',
-        },
-        sra_stat: {
-            run_id: 'run',
-            stat_host_order: 'name',
-        },
-        biosample_tissue: {
-            biosample: 'biosample_id',
-        },
-        biosample_geographical_location: {
-            biosample: 'accession',
-            geo_attribute_value: 'attribute_value',
-        },
-        bgl_gm4326_gp4326: {
-            biosample: 'accession',
-            biome_attribute_value: 'gp4326_wwf_tew_id',
-        },
-        palm_virome: {
-            run_id: 'run',
-        },
-    };
-    if (tableToRemappedKey[table] && tableToRemappedKey[table][key]) {
-        return tableToRemappedKey[table][key];
+    if (TABLE_TO_UNIFIED_JOIN_KEY[table] && TABLE_TO_UNIFIED_JOIN_KEY[table][key]) {
+        return TABLE_TO_UNIFIED_JOIN_KEY[table][key];
     }
     return key;
 };
 
 export const getFilterClauses = (filters, table) => {
     let filterClauses = [];
+
     if (Object.keys(filters).length > 0) {
         let groupByKeys = filters.map((filter) => filter.groupByKey);
         groupByKeys = [...new Set(groupByKeys)];
@@ -40,7 +68,7 @@ export const getFilterClauses = (filters, table) => {
 
             filterClauses = [
                 ...filterClauses,
-                `${handleIdKeyIrregularities(groupByKey, table)} IN (${groupByValues.map((groupByValue) => `'${groupByValue}'`).join(', ')})`,
+                `${handleIdKeyIrregularities(groupByKey, table)} IN (${groupByValues.map((groupByValue) => `'${sanitizeQueryStrings(groupByValue)}'`).join(', ')})`,
             ];
         });
     }
@@ -101,6 +129,7 @@ export const getCachedCountsQuery = (groupBy, searchStringQuery, palmprintOnly) 
         biome_attribute_value: 'ov_counts_bgl_gm4326_gp4326',
         stat_host_order: 'ov_counts_sra_stat',
         sex: 'ov_counts_biosample_sex',
+        do_label: 'ov_counts_biosample_disease',
     };
     const palmprintOnlyClause = `${searchStringQuery.length > 0 ? 'AND' : 'WHERE'} virus_only = ${palmprintOnly ? 'true' : 'false'}`;
     return `
@@ -120,7 +149,7 @@ export const getSearchStringClause = (searchString, filters, groupBy) => {
         .filter(Boolean);
     const columnName = hasNoGroupByFilters(filters, groupBy) ? 'name' : groupBy;
     const likeStatements = searchStrings.map((searchString) => {
-        return `LOWER(${columnName}) LIKE LOWER('%${searchString}%')`;
+        return `LOWER(${columnName}) LIKE LOWER('%${sanitizeQueryStrings(searchString)}%')`;
     });
     return `WHERE (${likeStatements.join(' OR ')})`;
 };
@@ -147,34 +176,15 @@ export const getMinimalJoinSubQuery = (filters, palmprintOnly, groupBy = undefin
         biosample_sex: 'biosample, sex',
         biosample_geographical_location: 'accession as biosample, attribute_value as geo_attribute_value',
         bgl_gm4326_gp4326: 'accession as biosample, gp4326_wwf_tew_id as biome_attribute_value',
-    };
-
-    const tableToColumn = {
-        ov_identifiers: ['run_id', 'bioproject', 'biosample', 'has_virus'],
-        sra: ['acc', 'bioproject', 'biosample', 'organism', 'assay_type'],
-        sra_stat: ['run_id', 'stat_host_order'],
-        palm_virome: ['run', 'sotu', 'tax_species', 'tax_family'],
-        biosample_tissue: ['biosample_id', 'tissue'],
-        biosample_sex: ['biosample', 'sex'],
-        biosample_geographical_location: ['accession', 'geo_attribute_value'],
-        bgl_gm4326_gp4326: ['accession', 'biome_attribute_value'],
-    };
-
-    const tableToJoinKey = {
-        ov_identifiers: 'run_id',
-        sra: 'run_id',
-        sra_stat: 'run_id',
-        palm_virome: 'run_id',
-        biosample_tissue: 'biosample',
-        biosample_sex: 'biosample',
-        biosample_geographical_location: 'biosample',
-        bgl_gm4326_gp4326: 'biosample',
+        biosample_disease: 'biosample, do_label',
     };
 
     // Helper function to get tables based on filters or groupBy
     const getRelevantTables = (keys) => {
         // only return first table that contains the key
-        return keys.map((key) => Object.keys(tableToColumn).find((table) => tableToColumn[table].includes(key)));
+        return keys.map((key) =>
+            Object.keys(TABLE_TO_SELECT_COLUMNS).find((table) => TABLE_TO_SELECT_COLUMNS[table].includes(key)),
+        );
     };
 
     // Determine relevant tables from filters and groupBy
@@ -210,8 +220,8 @@ export const getMinimalJoinSubQuery = (filters, palmprintOnly, groupBy = undefin
 
     // Build join statements
     const joinStatements = tables.map((table, i) => {
-        const columns = tableToColumn[table];
-        const tableJoinKey = tableToJoinKey[table];
+        const columns = TABLE_TO_SELECT_COLUMNS[table];
+        const tableJoinKey = TABLE_TO_JOIN_KEY[table];
         let tableFilters = filters.filter((filter) => columns.includes(filter.groupByKey));
 
         // Adjust filter keys to account for irregularities
@@ -234,7 +244,7 @@ export const getMinimalJoinSubQuery = (filters, palmprintOnly, groupBy = undefin
         'ov_identifiers.run_id as run_id, ov_identifiers.biosample as biosample, ov_identifiers.bioproject as bioproject',
     ];
     if (groupBy !== undefined && !selectStatements[0].includes(groupBy)) {
-        const groupByTable = tables.find((table) => tableToColumn[table].includes(groupBy));
+        const groupByTable = tables.find((table) => TABLE_TO_SELECT_COLUMNS[table].includes(groupBy));
         selectStatements.push(`${groupByTable}.${groupBy} as ${groupBy}`);
     }
 

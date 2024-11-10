@@ -23,7 +23,7 @@ export const sectionConfig = {
     host: {
         title: 'Host',
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Host-Module',
-        modules: ['tissue', 'statHost', 'sex'],
+        modules: ['statOrganism', 'tissue', 'disease', 'sex'],
         defaultDisplay: 'table',
     },
 };
@@ -120,12 +120,20 @@ export const moduleConfig = {
         resultsIdColumn: 'biosample',
         queryBuilderDisplay: 'table',
     },
-    statHost: {
+    statOrganism: {
         title: 'STAT Organism',
         tag: 'STAT Organism',
         groupByKey: 'stat_host_order',
         resultsTable: 'sra_stat',
         resultsIdColumn: 'run',
+        queryBuilderDisplay: 'table',
+    },
+    disease: {
+        title: 'Disease',
+        tag: 'Disease',
+        groupByKey: 'do_label',
+        resultsTable: 'biosample_disease',
+        resultsIdColumn: 'biosample',
         queryBuilderDisplay: 'table',
     },
     sex: {
