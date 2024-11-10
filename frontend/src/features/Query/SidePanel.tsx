@@ -51,7 +51,7 @@ const SidePanel = () => {
             </Box>
             {Object.keys(sectionConfig).map((sectionKey) => (
                 <Box key={sectionKey}>
-                    <Typography sx={{ mt: 2, ml: 2 }} variant='body1' component='div'>
+                    <Typography sx={{ mt: 1, ml: 2 }} variant='body1' component='div'>
                         {sectionConfig[sectionKey].title}
                     </Typography>
                     <MenuList dense>
