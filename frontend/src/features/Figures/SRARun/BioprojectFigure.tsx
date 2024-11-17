@@ -70,12 +70,20 @@ const BioprojectFigure = ({ identifiers, palmprintOnly }) => {
         );
     };
 
+    const handleScatterPlotEvents = {
+        click: (e) => {
+            const bioProjectId = e.value ? e.value[2] : null;
+            if (bioProjectId) window.open(`https://www.ncbi.nlm.nih.gov/bioproject/${bioProjectId}`, '_blank');
+        },
+    };
+
     const renderSizeVsPercentagePlot = () => {
         return (
             <Box sx={{ flex: 1, width: '100%', height: '100%' }}>
                 <ScatterPlot
                     plotData={getBioprojectSizeVsPercentagePlotData(controlCountData, targetCountData)}
                     styles={{ height: 600 }}
+                    onEvents={handleScatterPlotEvents}
                 />
             </Box>
         );

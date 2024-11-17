@@ -166,7 +166,7 @@ export const getViromeGraphData = (rows = [], groupByKey = 'sotu') => {
     return plotData;
 };
 
-export const getScatterPlotData = (rows = []) => {
+export const getViromeScatterPlotData = (rows = []) => {
     const tooltipFormatter = (args) => {
         if (!rows || !rows[args.dataIndex]) {
             return '';
@@ -235,6 +235,153 @@ export const getScatterPlotData = (rows = []) => {
                 emphasis: {
                     focus: 'series',
                 },
+            },
+        ],
+    };
+};
+
+export const getMWASScatterPlotData = (data, activeMetadataType) => {
+    let filteredData = data;
+
+    if (activeMetadataType && activeMetadataType.length > 0) {
+        filteredData = data.filter((row) => {
+            if (!row) {
+                return false;
+            }
+            const stringifiedRow = JSON.stringify(row);
+            if (stringifiedRow.toLowerCase().includes(activeMetadataType.toLowerCase())) {
+                return true;
+            }
+            return false;
+        });
+    }
+
+    let plotDataRows = filteredData.map((row) => [
+        Math.log2(row.fold_change),
+        -Math.log10(row.p_value),
+        row.bioproject,
+        row.family ? row.family.split('-')[0] : 'N/A',
+        row.metadata_field,
+        row.metadata_value,
+        row.p_value ?? parseFloat(row.p_value),
+        row.fold_change ?? parseFloat(row.fold_change),
+    ]);
+
+    const tooltipFormatter = (args) => {
+        if (!args || !args.data) {
+            return '';
+        }
+        const bioprojectId = args.data[2];
+        const family = args.data[3];
+        const metadataField = truncate(args.data[4], 20);
+        const metadataValue = truncate(args.data[5], 20);
+        return `${args.marker}
+        Attribute Name: ${metadataField}  <br />
+        &ensp; &ensp; Attribute Value: ${metadataValue} <br />
+        &ensp; &ensp;  Background set: ${family} <br />
+        &ensp; &ensp;  Bioproject: ${bioprojectId} <br />
+        `;
+    };
+
+    const absMaxFoldChange =
+        Math.round(
+            Math.max(
+                Math.abs(Math.min(...plotDataRows.map((row) => row[0]))),
+                Math.abs(Math.max(...plotDataRows.map((row) => row[0]))),
+            ),
+        ) + 1;
+
+    return {
+        xAxis: {
+            name: 'log2(fold change)',
+            nameLocation: 'middle',
+            type: 'value',
+            boundaryGap: ['5%', '5%'],
+            max: absMaxFoldChange,
+            min: -absMaxFoldChange,
+            splitLine: {
+                show: false,
+            },
+            nameGap: 35,
+        },
+        yAxis: {
+            name: '-log10(p-value)',
+            nameLocation: 'middle',
+            type: 'value',
+            boundaryGap: ['5%', '5%'],
+            splitLine: {
+                show: false,
+            },
+            nameGap: 35,
+        },
+        title: {
+            text: 'Metadata-wide association study (MWAS)',
+            textStyle: {
+                color: 'white',
+                fontSize: 14,
+                fontWeight: 'normal',
+                fontStyle: 'italic',
+            },
+            left: 0,
+            top: 0,
+            show: false,
+        },
+        grid: {
+            left: '7%',
+            right: '7%',
+            bottom: '7%',
+            containLabel: true,
+            show: false,
+        },
+        dataZoom: [
+            {
+                type: 'inside',
+                xAxisIndex: [0],
+                filterMode: 'empty',
+            },
+            {
+                type: 'inside',
+                yAxisIndex: [0],
+                filterMode: 'empty',
+            },
+        ],
+        visualMap: {
+            show: false,
+            type: 'continuous',
+            min: 0,
+            max: 3,
+            dimension: 1,
+            inRange: {
+                color: ['grey', 'red'],
+            },
+        },
+        dataset: {
+            dimensions: ['fold change', 'p value'],
+            source: [...plotDataRows],
+        },
+        tooltip: {
+            trigger: 'item',
+            axisPointer: {
+                type: 'shadow',
+            },
+            formatter: tooltipFormatter,
+        },
+        legend: {
+            show: false,
+        },
+        series: [
+            {
+                name: `BioProjects size (n runs)`,
+                type: 'scatter',
+                label: {
+                    show: false,
+                    color: 'white',
+                },
+                emphasis: {
+                    focus: 'series',
+                },
+                color: 'gray',
+                symbolSize: 7,
             },
         ],
     };

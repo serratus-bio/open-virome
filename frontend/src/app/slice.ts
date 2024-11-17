@@ -23,7 +23,7 @@ const appSlice = createSlice({
         activeQueryModule: 'label',
         sectionLayouts: {
             sra: 'simple',
-            palmdb: 'advanced',
+            palmdb: 'simple',
             ecology: 'simple',
             host: 'simple',
         },

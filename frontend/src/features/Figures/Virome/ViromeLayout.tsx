@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { isSummaryView, isSimpleLayout } from '../../../common/utils/plotHelpers.ts';
-import { getViromeGraphData, getScatterPlotData } from './plotHelpers.ts';
+import { getViromeGraphData, getViromeScatterPlotData } from './plotHelpers.ts';
 import { useGetResultQuery } from '../../../api/client.ts';
 import { moduleConfig } from '../../Module/constants.ts';
 import { handleIdKeyIrregularities } from '../../../common/utils/queryHelpers.ts';
@@ -16,6 +16,7 @@ import DropDownSelect from '../../../common/DropdownSelect.tsx';
 import ScatterPlot from '../../../common/ScatterPlot.tsx';
 import ViromeSummaryTable from './ViromeSummaryTable.tsx';
 import RadioButtonsGroup from '../../../common/RadioButtonsGroup.tsx';
+import ViromeMWAS from './ViromeMWAS.tsx';
 
 const ViromeLayout = ({ identifiers, sectionLayout }) => {
     const allFilters = useSelector(selectAllFilters);
@@ -254,13 +255,22 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
             return [nodes.length, edges.length, index];
         });
 
-        const plotData = getScatterPlotData(rows);
+        const plotData = getViromeScatterPlotData(rows);
 
         return <ScatterPlot plotData={plotData} styles={{ height: '70vh' }} onEvents={onScatterPlotEvents} />;
     };
 
     const shouldRenderPlaceholder = (isError, isFetching, data) => {
         return isError || isFetching || !data || data.length === 0;
+    };
+
+    const getVirusFamilies = () => {
+        const filteredResultData = getFilteredResultData();
+        if (!filteredResultData) {
+            return [];
+        }
+        const allTaxFamilies = filteredResultData.map((row) => row['tax_family']);
+        return [...new Set(allTaxFamilies)];
     };
 
     return (
@@ -283,28 +293,29 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
                         flexDirection: 'row',
                     }}
                 >
-                    <Box sx={{ flex: 1, width: isSimpleLayout(sectionLayout) ? '100%' : '50%' }}>
-                        {renderNetworkFigure()}
-                    </Box>
-                    {isSimpleLayout(sectionLayout) ? null : (
-                        <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                {renderDropdown()}
-                                {renderLabelRadioButtons()}
-                            </Box>
-                            {isSummaryTableOpen ? (
-                                <ViromeSummaryTable
-                                    selectedItem={selectedNetworkItem}
-                                    onClose={() => setIsSummaryTableOpen(false)}
-                                    rows={resultData}
-                                    activeModule={activeModule}
-                                    maxWidth={containerRef.current.clientWidth}
-                                />
-                            ) : (
-                                renderScatterPlot()
-                            )}
+                    <Box sx={{ flex: 1, width: '50%' }}>{renderNetworkFigure()}</Box>
+                    <Box sx={{ flex: 1, display: 'flex', justifyContent: 'center', flexDirection: 'column' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            {renderDropdown()}
+                            {renderLabelRadioButtons()}
                         </Box>
-                    )}
+                        {isSummaryTableOpen ? (
+                            <ViromeSummaryTable
+                                selectedItem={selectedNetworkItem}
+                                onClose={() => setIsSummaryTableOpen(false)}
+                                rows={resultData}
+                                activeModule={activeModule}
+                                maxWidth={containerRef.current.clientWidth}
+                            />
+                        ) : (
+                            renderScatterPlot()
+                        )}
+                    </Box>
+                </Box>
+            )}
+            {isSimpleLayout(sectionLayout) ? null : (
+                <Box sx={{ mt: 2, height: '70vh' }}>
+                    <ViromeMWAS identifiers={identifiers} virusFamilies={getVirusFamilies()} />
                 </Box>
             )}
         </Box>
