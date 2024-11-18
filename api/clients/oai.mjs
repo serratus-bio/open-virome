@@ -17,6 +17,7 @@ const OPENAI_MODEL_CONFIGS = {
 
 const getOpenAIClient = (configName) => {
     const config = OPENAI_MODEL_CONFIGS[configName];
+    console.log(config);
     return new AzureOpenAI(config);
 };
 

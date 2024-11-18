@@ -2,30 +2,36 @@ import { runLLMCompletion } from '../clients/oai.mjs';
 import { runCypherQuery } from '../clients/neo4j.mjs';
 
 export const getBioprojectsSummarization = async (bioprojects) => {
-    const serializeBioProjectRecord = (record) => {
-        if (!record || !record?.n) {
-            return {};
-        }
-        const node = record.n;
-        return JSON.stringify({
-            id: node.properties.bioProject,
-            name: node.properties.name,
-            title: node.properties.title,
-            description: node.properties.description,
-        });
-    };
     const bioprojectRecords = await runCypherQuery(
         `MATCH (n:BioProject)
         WHERE n.bioProject IN [${bioprojects.map((id) => `'${id}'`).join(', ')}]
+        AND size(n.description) < 1000
         RETURN n
         ORDER BY size(n.description) DESC
-        LIMIT 10
+        LIMIT 20
         `,
     );
-    const serializedBioprojects = bioprojectRecords.map(serializeBioProjectRecord);
+
+    const serializeBioProjectRecord = (record) => {
+        if (!record?.n) {
+            return {};
+        }
+        const { bioProject: id, name, title, description } = record.n.properties;
+        return JSON.stringify({ id, name, title, description });
+    };
+    const maxTotalLength = 10000;
+    const serializedBioprojects = [];
+    let totalLength = 0;
+    for (const serialized of bioprojectRecords.map(serializeBioProjectRecord)) {
+        if (totalLength + serialized.length > maxTotalLength) {
+            break;
+        }
+        serializedBioprojects.push(serialized);
+        totalLength += serialized.length;
+    }
 
     const context = `
-    You are a bioinformatician working on a project to capture and summarize bioprojects to be displayed on the page based on a set of filters.
+    You are a bioinformatician working on a project to capture and summarize bioprojects to be displayed on a wikipedia-like page.
     You will follow the below pipeline in order to summarize projects:
     1. The user will be give you a list of bioproject objects including their title, description and ID.
     2. You will need to read through the projects and gain a comprehensive understanding of all the projects through the title and project description.

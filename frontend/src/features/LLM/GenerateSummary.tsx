@@ -6,13 +6,14 @@ import BlurOnIcon from '@mui/icons-material/BlurOn';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
 
 const GenerateSummary = ({ identifiers }) => {
     const [getSummaryText, { data: summaryData, isLoading: isLoadingSummary, error: errorSummary }] =
         useLazyGetSummaryTextQuery();
 
     const onButtonClick = () => {
-        getSummaryText({ ids: identifiers ? identifiers['bioproject'].single : [] });
+        getSummaryText({ ids: identifiers ? identifiers['bioproject'].single : [] }, true);
     };
 
     const renderPlaceholder = () => {
@@ -25,7 +26,30 @@ const GenerateSummary = ({ identifiers }) => {
     const summaryTextIsNonEmpty = () => summaryData && summaryData?.text?.length > 0;
 
     const processSummaryText = (text) => {
-        // support newlines in the summary text by replacing \n with <br>
+        // const bioProjectRegex = /PRJNA\d+/g;
+        // bioproject can be of form PRJNA or PRJEB or PRJDB, just check for starting with PRJ
+        const bioProjectRegex = /PRJ\w+/g;
+        const bioProjectMatches = text.match(bioProjectRegex);
+        if (bioProjectMatches) {
+            const components = text.split(bioProjectRegex);
+            const finalComponents = [];
+            for (let i = 0; i < components.length; i++) {
+                finalComponents.push(components[i]);
+                if (i < bioProjectMatches.length) {
+                    finalComponents.push(
+                        <Link
+                            key={i}
+                            href={`https://www.ncbi.nlm.nih.gov/bioproject/${bioProjectMatches[i]}`}
+                            target='_blank'
+                        >
+                            {bioProjectMatches[i]}
+                        </Link>,
+                    );
+                }
+            }
+            return finalComponents;
+        }
+
         return text;
     };
 
@@ -47,13 +71,6 @@ const GenerateSummary = ({ identifiers }) => {
                     'minWidth': '90%',
                     'maxHeight': 300,
                     'overflow': 'auto',
-                    // hide scrollbar
-                    // '&::-webkit-scrollbar': {
-                    //     display: 'none'
-                    // },
-                    // '-ms-overflow-style': 'none',
-                    // scrollbarWidth: 'none',
-                    // color-scheme: dark;
                     'color-scheme': 'dark',
                 }}
             >
