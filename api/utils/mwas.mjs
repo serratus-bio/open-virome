@@ -231,7 +231,7 @@ export const getMWASResults = async (bioprojects, targetVirusFamilies, pageStart
         WHERE n.bioProject IN [${bioprojects.map((bioproject) => `'${bioproject}'`).join(', ')}]
         with n.bioProject as bioProject, s.taxFamily as virusFamily, collect(DISTINCT r.bioSample) as bioSamples, collect(DISTINCT s.sotu) as sotus, collect(DISTINCT s.taxSpecies) as taxSpecies
         RETURN bioProject, virusFamily, bioSamples, sotus, taxSpecies
-        LIMIT 10000
+        LIMIT 5000
     `;
 
     const records = await runCypherQuery(query);
