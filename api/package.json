@@ -5,7 +5,7 @@
     "description": "open-virome API served on AWS Lambda",
     "main": "app.mjs",
     "scripts": {
-        "start": "node index.mjs",
+        "start": "IS_LOCAL=true node index.mjs",
         "prettify": "prettier --write ."
     },
     "dependencies": {

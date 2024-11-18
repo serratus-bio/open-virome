@@ -23,7 +23,7 @@ const SRARunLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
         } else {
             return (
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                    <Typography variant='h6' sx={{ mt: 4, mb: 4 }}>
+                    <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
                         {`Run Label`}
                     </Typography>
                     <Box sx={{ flex: 1, width: '100%', mb: 2 }}>
@@ -35,7 +35,7 @@ const SRARunLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                             palmprintOnly={palmprintOnly}
                         />
                     </Box>
-                    <Typography variant='h6' sx={{ mt: 4, mb: 4 }}>
+                    <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
                         {`Run Technology`}
                     </Typography>
                     <Box sx={{ flex: 1, width: '100%', mb: 2 }}>
@@ -47,7 +47,7 @@ const SRARunLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                             palmprintOnly={palmprintOnly}
                         />
                     </Box>
-                    <Typography variant='h6' sx={{ mt: 4, mb: 4 }}>
+                    <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
                         {`BioProject`}
                     </Typography>
                     <Box sx={{ flex: 1, width: '100%' }}>

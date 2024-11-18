@@ -2,7 +2,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import compression from 'compression';
-import * as db from './db/index.mjs';
+
+import { runPSQLQuery } from './clients/psql.mjs';
 import {
     getIdClauses,
     getMinimalJoinSubQuery,
@@ -13,6 +14,7 @@ import {
     getCachedCountsQuery,
     getSearchStringClause,
 } from './utils/queryBuilder.mjs';
+import { getMWASResults } from './utils/mwas.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware.js';
 
@@ -29,15 +31,6 @@ app.use(
     }),
 );
 app.use(compression());
-
-const runQuery = async (query) => {
-    try {
-        const result = await db.query(query);
-        return result.rows;
-    } catch (e) {
-        return { error: JSON.stringify(e) };
-    }
-};
 
 app.post('/counts', async (req, res) => {
     const body = getRequestBody(req);
@@ -109,7 +102,7 @@ app.post('/counts', async (req, res) => {
         ${pageEnd !== undefined ? `LIMIT ${pageEnd - pageStart} OFFSET ${pageStart}` : ''}
     `;
 
-    const result = await runQuery(query);
+    const result = await runPSQLQuery(query);
     if (result.error) {
         console.error(result.error);
         console.error(query);
@@ -137,7 +130,7 @@ app.post('/identifiers', async (req, res) => {
         FROM (${subquery}) as open_virome
     `;
 
-    let result = await runQuery(query);
+    let result = await runPSQLQuery(query);
 
     if (result.error) {
         console.error(result.error);
@@ -171,10 +164,27 @@ app.post('/results', async (req, res) => {
         ${clauses.length > 0 ? `WHERE ${clauses.join(' OR ')}` : ''}
         ${pageEnd !== undefined ? `LIMIT ${pageEnd - pageStart} OFFSET ${pageStart}` : 'LIMIT 20000'}
     `;
-    const result = await runQuery(query);
+    const result = await runPSQLQuery(query);
     if (result.error) {
         console.error(result.error);
         console.error(query);
+        return res.status(500).json({ error: result.error });
+    }
+    return res.json(result);
+});
+
+app.post('/mwas', async (req, res) => {
+    const body = getRequestBody(req);
+    if (body === undefined) {
+        return res.status(400).json({ error: 'Invalid request!' });
+    }
+    const ids = body?.ids ?? [];
+    const virusFamilies = body?.virusFamilies ?? [];
+    const pageStart = body?.pageStart ?? 0;
+    const pageEnd = body?.pageEnd ?? undefined;
+    const result = await getMWASResults(ids, virusFamilies, pageStart, pageEnd);
+    if (result.error) {
+        console.error(result.error);
         return res.status(500).json({ error: result.error });
     }
     return res.json(result);

@@ -49,8 +49,15 @@ export const apiSlice = createApi({
             }),
             providesTags: ['Results'],
         }),
+        getMWAS: build.query({
+            query: (args) => ({
+                url: 'mwas',
+                method: 'POST',
+                body: args,
+            }),
+        }),
     }),
 });
 
-export const { useGetCountsQuery, useGetIdentifiersQuery, useGetResultQuery } = apiSlice;
+export const { useGetCountsQuery, useGetIdentifiersQuery, useGetResultQuery, useGetMWASQuery } = apiSlice;
 export const { endpoints, reducerPath, reducer, middleware } = apiSlice;
