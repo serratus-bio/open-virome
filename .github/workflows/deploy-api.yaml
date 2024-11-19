@@ -34,6 +34,9 @@ jobs:
           echo NEO4J_URI=${{ secrets.NEO4J_URI }} >> .env
           echo NEO4J_USERNAME=${{ secrets.NEO4J_USERNAME }} >> .env
           echo NEO4J_PASSWORD=${{ secrets.NEO4J_PASSWORD }} >> .env
+          echo OPENAI_TOKEN=${{ secrets.OPENAI_TOKEN }} >> .env
+          echo OPENAI_ENDPOINT_gpt4o=${{ secrets.OPENAI_ENDPOINT_GPT4O }} >> .env
+          echo OPENAI_ENDPOINT_o1=${{ secrets.OPENAI_ENDPOINT_O1 }} >> .env
 
       - name: Build
         run: |
