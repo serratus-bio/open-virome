@@ -5,7 +5,6 @@ export const getBioprojectsSummarization = async (bioprojects) => {
     const bioprojectRecords = await runCypherQuery(
         `MATCH (n:BioProject)
         WHERE n.bioProject IN [${bioprojects.map((id) => `'${id}'`).join(', ')}]
-        AND size(n.description) < 1000
         RETURN n
         ORDER BY size(n.description) DESC
         LIMIT 20
@@ -44,7 +43,7 @@ export const getBioprojectsSummarization = async (bioprojects) => {
     9. You may be asked to re-evaluate your answer and given hints or tips to alter your previous answer.
     10. You should use the delimiter | to surround/highlight important topics or keywords in the bioprojects, DO NOT ADD THEM TO BIOPROJECT IDs.
     11. Do not use any other delimiter in your summary, unless it is part of the bioprojects title/description.
-    12. You should loosely follow the provided template as a baseline for your summary where data is applicable, however you should prioritize maintaining a coherent paragraph. DO NOT EXPLICITLY STATE THE TEMPLATE IN YOUR RESPONSE: 
+    12. You should loosely follow the provided template as a baseline for your summary where data is applicable, however you should prioritize maintaining a coherent paragraph. DO NOT EXPLICITLY STATE THE TEMPLATE IN YOUR RESPONSE:
     Key Focus Areas:
     [A summary of the primary research topics or objectives represented across the bioprojects. For example, "Most bioprojects focus on genetic diversity in avian species, pathogen-host interactions, and vaccine development for parasitic diseases like Eimeria."]
 
@@ -66,7 +65,6 @@ export const getBioprojectsSummarization = async (bioprojects) => {
     Conclusion:
     [Provide a high-level insight into what the bioprojects collectively reveal about the overarching research domain. For example, "The bioprojects collectively emphasize the urgent need for sustainable solutions to tackle parasitic infections in livestock, with a strong focus on leveraging genomic data for targeted interventions."]
     `;
-
     let model, role;
     model = 'gpt4o';
     if (model === 'gpt4o') {
