@@ -137,7 +137,6 @@ const cleanMWASData = (rows) => {
         .sort((a, b) => a.p_value - b.p_value);
 };
 
-
 const availableFamilyDirs = [
     'Alphaflexiviridae',
     'Alphatetraviridae',
@@ -278,7 +277,10 @@ export const getMWASResults = async (bioprojects, targetVirusFamilies, pageStart
 
     let output = '';
     for (const chunk of chunkedCommands) {
-        const catMWASData = spawn('sh', ['-c', `echo '${chunk.join('\n')}' | ${s5cmdPath} --numworkers 10 --no-sign-request run`]);
+        const catMWASData = spawn('sh', [
+            '-c',
+            `echo '${chunk.join('\n')}' | ${s5cmdPath} --numworkers 10 --no-sign-request run`,
+        ]);
         for await (const line of createInterface({
             input: catMWASData.stdout,
             terminal: false,
@@ -346,9 +348,8 @@ export const getMWASResults = async (bioprojects, targetVirusFamilies, pageStart
             taxSpecies,
         });
     }
-    const mwasDataClean = cleanMWASData(mwasData)
+    const mwasDataClean = cleanMWASData(mwasData);
     const pagedData = mwasDataClean.slice(pageStart, pageEnd);
     console.log(`MWAS done fetching data. Total: ${mwasDataClean.length}, paged: ${pagedData.length}`);
     return pagedData;
 };
-

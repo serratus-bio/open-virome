@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLazyGetSummaryTextQuery } from '../../api/client.ts';
+import { load } from '@fingerprintjs/botd';
 
 import IconButton from '@mui/material/IconButton';
 import BlurOnIcon from '@mui/icons-material/BlurOn';
@@ -7,13 +8,23 @@ import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
+import Tooltip from '@mui/material/Tooltip';
 
 const GenerateSummary = ({ identifiers }) => {
     const [getSummaryText, { data: summaryData, isLoading: isLoadingSummary, error: errorSummary }] =
         useLazyGetSummaryTextQuery();
 
-    const onButtonClick = () => {
-        getSummaryText({ ids: identifiers ? identifiers['bioproject'].single : [] }, true);
+    const onButtonClick = async () => {
+        try {
+            const botd = await load();
+            const detect = await botd.detect();
+            if (!detect || detect.bot === true) {
+                throw new Error('Bot detected');
+            }
+            getSummaryText({ ids: identifiers ? identifiers['bioproject'].single : [] }, true);
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     const renderPlaceholder = () => {
@@ -26,29 +37,16 @@ const GenerateSummary = ({ identifiers }) => {
     const summaryTextIsNonEmpty = () => summaryData && summaryData?.text?.length > 0;
 
     const processSummaryText = (text) => {
-        console.log(text);
-        // const bioProjectRegex = /PRJNA\d+/g;
-        // const boldRegex = /\|([^|]+)\|/g;
-        // bioproject can be of form PRJNA or PRJEB or PRJDB, just check for starting with PRJ
         const combinedRegex = /PRJ\w+|\|([^|]+)\|/g;
-
-        // Find all matches for the combined regex
         const combinedMatches = text.match(combinedRegex);
-        console.log(combinedMatches);
-    
         if (combinedMatches) {
             const finalComponents: (string | JSX.Element)[] = [];
             let lastIndex = 0;
-    
             combinedMatches.forEach((match, index) => {
                 const matchIndex = text.indexOf(match, lastIndex);
-    
-                // Add the text segment before the match
                 if (matchIndex > lastIndex) {
                     finalComponents.push(text.substring(lastIndex, matchIndex));
                 }
-    
-                // Process the match
                 if (/PRJ\w+/.test(match)) {
                     finalComponents.push(
                         <Link
@@ -57,28 +55,20 @@ const GenerateSummary = ({ identifiers }) => {
                             target='_blank'
                         >
                             {match}
-                        </Link>
+                        </Link>,
                     );
                 } else if (/\|([^|]+)\|/.test(match)) {
                     finalComponents.push(
-                        <span
-                        key={`bold-${index}`}
-                        style={{ fontWeight: "bold" }}
-                    >
-                        {match.slice(1, -1)}
-                    </span>
+                        <span key={`bold-${index}`} style={{ fontWeight: 'bold' }}>
+                            {match.slice(1, -1)}
+                        </span>,
                     );
                 }
-    
                 lastIndex = matchIndex + match.length;
             });
-    
-            // Add the remaining text segment after the last match
             if (lastIndex < text.length) {
                 finalComponents.push(text.substring(lastIndex));
             }
-    
-            console.log(finalComponents);
             return finalComponents;
         }
         return text;
@@ -107,7 +97,7 @@ const GenerateSummary = ({ identifiers }) => {
             >
                 {renderPlaceholder()}
                 {summaryTextIsNonEmpty() ? (
-                    <Typography variant='body2' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
+                    <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
                         {processSummaryText(summaryData.text)}
                     </Typography>
                 ) : null}
@@ -122,14 +112,16 @@ const GenerateSummary = ({ identifiers }) => {
                     mr: summaryTextIsNonEmpty() ? 0 : '-10%',
                 }}
             >
-                <IconButton style={{ backgroundColor: 'rgba(86, 86, 86, 0.4)' }} onClick={onButtonClick}>
-                    <BlurOnIcon
-                        style={{
-                            color: '#9be3ef',
-                            fontSize: 30,
-                        }}
-                    />
-                </IconButton>
+                <Tooltip title='LLM research assistant' placement='bottom'>
+                    <IconButton style={{ backgroundColor: 'rgba(86, 86, 86, 0.4)' }} onClick={onButtonClick}>
+                        <BlurOnIcon
+                            style={{
+                                color: '#9be3ef',
+                                fontSize: 30,
+                            }}
+                        />
+                    </IconButton>
+                </Tooltip>
             </Box>
         </Box>
     );

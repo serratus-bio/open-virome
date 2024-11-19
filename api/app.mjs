@@ -175,11 +175,16 @@ app.post('/results', async (req, res) => {
 });
 
 app.post('/mwas', async (req, res) => {
+    const body = getRequestBody(req);
+    if (body === undefined) {
+        return res.status(400).json({ error: 'Invalid request!' });
+    }
+    const ids = body?.ids ?? [];
     const virusFamilies = body?.virusFamilies ?? [];
     const pageStart = body?.pageStart ?? 0;
     const pageEnd = body?.pageEnd ?? undefined;
     const result = await getMWASResults(ids, virusFamilies, pageStart, pageEnd);
-    if (result?.error) {
+    if (result.error) {
         console.error(result.error);
         return res.status(500).json({ error: result.error });
     }

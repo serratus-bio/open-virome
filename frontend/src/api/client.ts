@@ -66,5 +66,11 @@ export const apiSlice = createApi({
     }),
 });
 
-export const { useGetCountsQuery, useGetIdentifiersQuery, useGetResultQuery, useGetMWASQuery, useLazyGetSummaryTextQuery } = apiSlice;
+export const {
+    useGetCountsQuery,
+    useGetIdentifiersQuery,
+    useGetResultQuery,
+    useGetMWASQuery,
+    useLazyGetSummaryTextQuery,
+} = apiSlice;
 export const { endpoints, reducerPath, reducer, middleware } = apiSlice;
