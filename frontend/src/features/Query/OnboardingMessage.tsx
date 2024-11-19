@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { toggleSidebar } from '../../app/slice.ts';
 import { addManyFilters } from './slice.ts';
@@ -14,6 +14,10 @@ import Logo from '../../common/assets/ov_hex_dark.png';
 
 const OnbaordingMessage = () => {
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     const exampleFilters = {
         Eimeria: [

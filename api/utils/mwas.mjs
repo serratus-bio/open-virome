@@ -278,7 +278,7 @@ export const getMWASResults = async (bioprojects, targetVirusFamilies, pageStart
 
     let output = '';
     for (const chunk of chunkedCommands) {
-        const catMWASData = spawn('sh', ['-c', `echo '${chunk.join('\n')}' | ${s5cmdPath} --no-sign-request run`]);
+        const catMWASData = spawn('sh', ['-c', `echo '${chunk.join('\n')}' | ${s5cmdPath} --numworkers 10 --no-sign-request run`]);
         for await (const line of createInterface({
             input: catMWASData.stdout,
             terminal: false,
