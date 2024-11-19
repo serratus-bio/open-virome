@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TargetControlFigure from './TargetControlFigure.tsx';
 import BioprojectFigure from './BioprojectFigure.tsx';
+import GenerateSummary from '../../LLM/GenerateSummary.tsx';
 
 const SRARunLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
     const getFigures = () => {
@@ -58,7 +59,12 @@ const SRARunLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
         }
     };
 
-    return <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>{getFigures()}</Box>;
+    return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <GenerateSummary identifiers={identifiers} />
+            {getFigures()}
+        </Box>
+    );
 };
 
 export default React.memo(SRARunLayout);

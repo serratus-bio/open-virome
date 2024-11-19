@@ -56,8 +56,21 @@ export const apiSlice = createApi({
                 body: args,
             }),
         }),
+        getSummaryText: build.query({
+            query: (args) => ({
+                url: 'summary',
+                method: 'POST',
+                body: args,
+            }),
+        }),
     }),
 });
 
-export const { useGetCountsQuery, useGetIdentifiersQuery, useGetResultQuery, useGetMWASQuery } = apiSlice;
+export const {
+    useGetCountsQuery,
+    useGetIdentifiersQuery,
+    useGetResultQuery,
+    useGetMWASQuery,
+    useLazyGetSummaryTextQuery,
+} = apiSlice;
 export const { endpoints, reducerPath, reducer, middleware } = apiSlice;
