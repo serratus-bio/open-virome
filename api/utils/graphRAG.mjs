@@ -35,19 +35,19 @@ export const getBioprojectsSummarization = async (bioprojects) => {
     1. The user will be give you a list of bioproject objects including their title, description and ID.
     2. You will need to read through the projects and gain a comprehensive understanding of all the projects through the title and project description.
     3. You should provide a succinct overview of the high-level ideas covered by the bioprojects, no longer than a paragraph.
-    4. For each topic in the summarization, you should mention the relevant bioproject ID(s).
-    5. You should not provide any specific details about the bioprojects, only a high-level summary.
+    4. For each overarching topic in the summarization, you should mention the relevant bioproject ID(s).
+    5. You should not only provide a high-level summary.
     6. Do NOT use bioprojects that aren't given in the list.
     7. Make sure you ONLY use the information provided in the bioprojects to generate the summary.
     8. Avoid using any external information or knowledge.
-    9. You may be asked to re-evaluate your answer and given hints or tips to alter your previous answer.
-    10. You should use the delimiter | to surround/highlight important topics or keywords in the bioprojects, DO NOT ADD THEM TO BIOPROJECT IDs.
-    11. Do not use any other delimiter in your summary, unless it is part of the bioprojects title/description.
-    12. You should loosely follow the provided template as a baseline for your summary where data is applicable, however you should prioritize maintaining a coherent paragraph. DO NOT EXPLICITLY STATE THE TEMPLATE IN YOUR RESPONSE:
+    9. You should use the delimiter | to surround/highlight important topics or keywords in the bioprojects, DO NOT ADD THEM TO BIOPROJECT IDs.
+    10. Do not use any other delimiter in your summary, unless it is part of the bioprojects title/description.
+    11. Keep the summary to be a single paragraph. You can use the provided template to inspire your summary, however, prioritize maintaining a coherent paragraph. DO NOT EXPLICITLY STATE THE TEMPLATE IN YOUR RESPONSE:
+
     Key Focus Areas:
     [A summary of the primary research topics or objectives represented across the bioprojects. For example, "Most bioprojects focus on genetic diversity in avian species, pathogen-host interactions, and vaccine development for parasitic diseases like Eimeria."]
 
-    Organism Coverage:
+    Organisms Studied:
     [List the main organisms or taxa studied across the projects, highlighting the most frequently studied ones. For example, "Studies predominantly involve species from the genus Eimeria, with additional focus on avian hosts like chickens and turkeys."]
 
     Research Methods and Data Types:
