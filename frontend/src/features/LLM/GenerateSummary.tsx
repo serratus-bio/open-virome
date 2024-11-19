@@ -26,30 +26,61 @@ const GenerateSummary = ({ identifiers }) => {
     const summaryTextIsNonEmpty = () => summaryData && summaryData?.text?.length > 0;
 
     const processSummaryText = (text) => {
+        console.log(text);
         // const bioProjectRegex = /PRJNA\d+/g;
+        // const boldRegex = /\|([^|]+)\|/g;
         // bioproject can be of form PRJNA or PRJEB or PRJDB, just check for starting with PRJ
-        const bioProjectRegex = /PRJ\w+/g;
-        const bioProjectMatches = text.match(bioProjectRegex);
-        if (bioProjectMatches) {
-            const components = text.split(bioProjectRegex);
-            const finalComponents = [];
-            for (let i = 0; i < components.length; i++) {
-                finalComponents.push(components[i]);
-                if (i < bioProjectMatches.length) {
+        const combinedRegex = /PRJ\w+|\|([^|]+)\|/g;
+
+        // Find all matches for the combined regex
+        const combinedMatches = text.match(combinedRegex);
+        console.log(combinedMatches);
+    
+        if (combinedMatches) {
+            const finalComponents: (string | JSX.Element)[] = [];
+            let lastIndex = 0;
+    
+            combinedMatches.forEach((match, index) => {
+                const matchIndex = text.indexOf(match, lastIndex);
+    
+                // Add the text segment before the match
+                if (matchIndex > lastIndex) {
+                    finalComponents.push(text.substring(lastIndex, matchIndex));
+                }
+    
+                // Process the match
+                if (/PRJ\w+/.test(match)) {
                     finalComponents.push(
                         <Link
-                            key={i}
-                            href={`https://www.ncbi.nlm.nih.gov/bioproject/${bioProjectMatches[i]}`}
+                            key={`link-${index}`}
+                            href={`https://www.ncbi.nlm.nih.gov/bioproject/${match}`}
                             target='_blank'
                         >
-                            {bioProjectMatches[i]}
-                        </Link>,
+                            {match}
+                        </Link>
+                    );
+                } else if (/\|([^|]+)\|/.test(match)) {
+                    finalComponents.push(
+                        <span
+                        key={`bold-${index}`}
+                        style={{ fontWeight: "bold" }}
+                    >
+                        {match.slice(1, -1)}
+                    </span>
                     );
                 }
+    
+                lastIndex = matchIndex + match.length;
+            });
+    
+            // Add the remaining text segment after the last match
+            if (lastIndex < text.length) {
+                finalComponents.push(text.substring(lastIndex));
             }
+    
+            console.log(finalComponents);
             return finalComponents;
         }
-
         return text;
     };
 
