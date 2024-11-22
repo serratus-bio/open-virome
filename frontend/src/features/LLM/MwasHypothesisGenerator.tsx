@@ -1,5 +1,6 @@
 import React from 'react';
-import { useLazyGetSummaryTextQuery } from '../../api/client.ts';
+
+import { useLazyGetHypothesisQuery } from '../../api/client.ts';
 import { load } from '@fingerprintjs/botd';
 
 import IconButton from '@mui/material/IconButton';
@@ -10,9 +11,9 @@ import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Tooltip from '@mui/material/Tooltip';
 
-const MwasHypothesisGenerator = () => {
-    const [getSummaryText, { data: summaryData, isLoading: isLoadingSummary, error: errorSummary }] =
-        useLazyGetSummaryTextQuery();
+const MwasHypothesisGenerator = ({ identifiers, virusFamilies }) => {
+    const [getHypothesisText, { data: hypothesisData, isLoading: isLoadingHypothesis, error: errorHypothesis }] =
+        useLazyGetHypothesisQuery();
 
     const onButtonClick = async () => {
         try {
@@ -21,22 +22,29 @@ const MwasHypothesisGenerator = () => {
             if (!detect || detect.bot === true) {
                 throw new Error('Bot detected');
             }
-            getSummaryText({ ids: identifiers ? identifiers['bioproject'].single : [] }, true);
+            getHypothesisText({
+                idColumn: 'bioproject',
+                ids: identifiers ? identifiers['bioproject'].single : [],
+                idRanges: identifiers ? identifiers['bioproject'].range : [],
+                virusFamilies: virusFamilies ? virusFamilies : [],
+                pageStart: 0,
+                pageEnd: 1000,
+                identifiers: identifiers,
+            });
         } catch (error) {
             console.error(error);
         }
     };
-
+    console.log(hypothesisData);
     const renderPlaceholder = () => {
-        if (isLoadingSummary) {
+        if (isLoadingHypothesis) {
             return <Skeleton variant='text' width={'100%'} height={60} />;
         }
         return null;
     };
+    const hypothesisTextIsNonEmpty = () => hypothesisData && hypothesisData?.text?.length > 0;
 
-    const summaryTextIsNonEmpty = () => summaryData && summaryData?.text?.length > 0;
-
-    const processSummaryText = (text) => {
+    const processHypothesisText = (text) => {
         const combinedRegex = /PRJ\w+|\|([^|]+)\|/g;
         const combinedMatches = text.match(combinedRegex);
         if (combinedMatches) {
@@ -81,8 +89,8 @@ const MwasHypothesisGenerator = () => {
                 width: '100%',
                 justifyContent: 'space-between',
                 justifyItems: 'flex-start',
-                height: summaryTextIsNonEmpty() || isLoadingSummary ? '100%' : 0,
-                mb: summaryTextIsNonEmpty() || isLoadingSummary ? 4 : 0,
+                height: hypothesisTextIsNonEmpty() || isLoadingHypothesis ? '100%' : 0,
+                mb: hypothesisTextIsNonEmpty() || isLoadingHypothesis ? 4 : 0,
             }}
         >
             {}
@@ -96,10 +104,9 @@ const MwasHypothesisGenerator = () => {
                 }}
             >
                 {renderPlaceholder()}
-                {summaryTextIsNonEmpty() ? (
+                {hypothesisTextIsNonEmpty() ? (
                     <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
-                        {/* {processSummaryText(summaryData.text)} */}
-                        {summaryData.text}
+                        {processHypothesisText(hypothesisData.text)}
                     </Typography>
                 ) : null}
             </Box>
@@ -110,7 +117,7 @@ const MwasHypothesisGenerator = () => {
                     display: 'flex',
                     justifyContent: 'flex-end',
                     height: 45,
-                    mr: summaryTextIsNonEmpty() ? 0 : '-10%',
+                    mr: hypothesisTextIsNonEmpty() ? 0 : '-10%',
                 }}
             >
                 <Tooltip title='Generate MWAS Hypotheses' placement='bottom'>
