@@ -9,6 +9,7 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import MdOpenInNew from '@mui/icons-material/OpenInNew';
 import SearchBar from '../../../common/SearchBar.tsx';
+import MwasHypothesisGenerator from '../../LLM/MwasHypothesisGenerator.tsx';
 
 const ViromeMWAS = ({ identifiers, virusFamilies }) => {
     const [selectedMetadata, setSelectedMetadata] = useState(null);
@@ -83,6 +84,7 @@ const ViromeMWAS = ({ identifiers, virusFamilies }) => {
                 <Typography variant='h6' component={'div'} sx={{ flex: 1.2 }}>
                     {`Metadata-wide association study (MWAS) `}
                 </Typography>
+                <MwasHypothesisGenerator/>
                 {identifiers && identifiers['bioproject'].single.length > 100 ? (
                     <Typography variant='h7' component={'div'} sx={{ mt: 2, flex: 1 }}>
                         {`Dataset is too large. Displaying partial results.`}
