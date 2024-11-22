@@ -19,6 +19,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Footer from './Footer.tsx';
 import OnboardingMessage from '../features/Query/OnboardingMessage.tsx';
 import NoResultsMessage from '../features/Query/NoResultsMessage.tsx';
+import Chat from '../features/LLM/Chat.tsx';
 
 const AppWrapper = () => {
     return (
@@ -83,6 +84,7 @@ const App = () => {
                 <CssBaseline />
                 <AppToolbar />
                 <SidePanel />
+                <Chat/>
                 <Box sx={getContainerStyles()}>
                     <Box
                         sx={{
