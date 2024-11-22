@@ -105,7 +105,7 @@ export const getGroupedCountsByIdentifiers = ({ ids, idRanges, idColumn, groupBy
     let remappedGroupBy = handleIdKeyIrregularities(groupBy, table);
     clauses = `${clauses.length > 0 ? `WHERE ${clauses.join(' OR ')}` : ''}`;
     return `
-        SELECT ${remappedGroupBy} as name, COUNT(*) as count, SUM(mbases)/POWER(10,3) as gbp
+        SELECT ${remappedGroupBy} as name, COUNT(*) as count ${table === 'sra' ? ', SUM(mbases)/POWER(10,3) as gbp' : ''}
         FROM ${table}
         ${clauses}
         GROUP BY ${remappedGroupBy}

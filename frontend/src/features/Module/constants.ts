@@ -24,7 +24,7 @@ export const sectionConfig = {
         title: 'Host',
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Host-Module',
         modules: ['statOrganism', 'tissue', 'disease', 'sex'],
-        defaultDisplay: 'table',
+        defaultDisplay: 'figure',
     },
 };
 
