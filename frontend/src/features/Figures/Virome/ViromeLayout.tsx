@@ -314,7 +314,7 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
                 </Box>
             )}
             {isSimpleLayout(sectionLayout) ? null : (
-                <Box sx={{ mt: 2, height: '70vh', mb: 4 }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 15}}>
                     <ViromeMWAS identifiers={identifiers} virusFamilies={getVirusFamilies()} />
                 </Box>
             )}
