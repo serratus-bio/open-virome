@@ -83,17 +83,28 @@ const MwasHypothesisGenerator = ({ identifiers, virusFamilies }) => {
     };
 
     return (
-        <Box
-            sx={{
-                display: 'flex',
-                width: '100%',
-                justifyContent: 'space-between',
-                justifyItems: 'flex-start',
-                height: hypothesisTextIsNonEmpty() || isLoadingHypothesis ? '100%' : 0,
-                mb: hypothesisTextIsNonEmpty() || isLoadingHypothesis ? 4 : 0,
-            }}
-        >
-            {}
+        <Box>
+            <Box
+                sx={{
+                    zIndex: 10,
+                    flex: 1,
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    height: 45,
+                    mr: hypothesisTextIsNonEmpty() ? 0 : '2%',
+                }}
+            >
+                <Tooltip title='Generate MWAS Hypotheses' placement='bottom'>
+                    <IconButton style={{ backgroundColor: 'rgba(86, 86, 86, 0.4)' }} onClick={onButtonClick}>
+                        <BlurOnIcon
+                            style={{
+                                color: '#9be3ef',
+                                fontSize: 30,
+                            }}
+                        />
+                    </IconButton>
+                </Tooltip>
+            </Box>
             <Box
                 sx={{
                     'flex': 1,
@@ -110,27 +121,7 @@ const MwasHypothesisGenerator = ({ identifiers, virusFamilies }) => {
                     </Typography>
                 ) : null}
             </Box>
-            <Box
-                sx={{
-                    zIndex: 10,
-                    flex: 1,
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    height: 45,
-                    mr: hypothesisTextIsNonEmpty() ? 0 : '-10%',
-                }}
-            >
-                <Tooltip title='Generate MWAS Hypotheses' placement='bottom'>
-                    <IconButton style={{ backgroundColor: 'rgba(86, 86, 86, 0.4)' }} onClick={onButtonClick}>
-                        <BlurOnIcon
-                            style={{
-                                color: '#9be3ef',
-                                fontSize: 30,
-                            }}
-                        />
-                    </IconButton>
-                </Tooltip>
-            </Box>
+
         </Box>
     );
 };
