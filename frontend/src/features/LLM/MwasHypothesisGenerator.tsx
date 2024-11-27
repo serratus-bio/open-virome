@@ -95,7 +95,7 @@ const MwasHypothesisGenerator = ({ identifiers, virusFamilies }) => {
         >
             {}
             <Box
-                sx={{
+                sx={{   
                     'flex': 1,
                     'minWidth': '90%',
                     'maxHeight': 300,
