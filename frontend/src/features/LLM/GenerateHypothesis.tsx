@@ -49,18 +49,27 @@ const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
         >
             <Box
                 sx={{
-                    'flex': 1,
-                    'minWidth': '90%',
-                    'maxHeight': 300,
-                    'overflow': 'auto',
-                    'color-scheme': 'dark',
+                    flex: 1,
+                    minWidth: '90%',
+                    maxHeight: 300,
                 }}
             >
                 {renderPlaceholder()}
                 {hypothesisTextIsNonEmpty() ? (
-                    <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
-                        {formatLLMGeneratedText(hypothesisData.text, hypothesisData.conversation)}
-                    </Typography>
+                    <Box
+                        sx={{
+                            backgroundColor: '#484848',
+                            p: 2,
+                            borderRadius: 2,
+                            overflow: 'auto',
+                            colorScheme: 'dark',
+                            maxHeight: 300,
+                        }}
+                    >
+                        <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
+                            {formatLLMGeneratedText(hypothesisData.text, hypothesisData.conversation)}
+                        </Typography>
+                    </Box>
                 ) : null}
             </Box>
             <Box
