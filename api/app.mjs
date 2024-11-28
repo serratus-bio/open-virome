@@ -213,7 +213,6 @@ app.post('/hypothesis', async (req, res) => {
     }
     const ids = body?.ids ?? [];
     const filters = body?.filters ?? [];
-    console.log(filters);
     const virusFamilies = body?.virusFamilies ?? [];
     const identifiers = body?.identifiers ?? [];
     const selectedMetadata = body?.selectedMetadata ?? [];
