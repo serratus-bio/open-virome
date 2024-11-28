@@ -9,27 +9,48 @@ const getBioprojectContext = async (bioprojects) => {
         WHERE n.bioProject IN [${bioprojects.map((id) => `'${id}'`).join(', ')}]
         RETURN n
         ORDER BY size(n.description) DESC
-        LIMIT 20
+        LIMIT 5000
         `,
     );
 
-    const serializeBioProjectRecord = (record) => {
+    // Try serializing full bioproject details first
+    // fallback to only including titles if the total length exceeds the limit
+    const serializeBioprojectRecord = (record, includeFullDetails) => {
         if (!record?.n) {
             return {};
         }
         const { bioProject: id, name, title, description } = record.n.properties;
-        return JSON.stringify({ id, name, title, description });
-    };
-    const serializedBioprojects = [];
-    let totalLength = 0;
-    for (const serialized of bioprojectRecords.map(serializeBioProjectRecord)) {
-        if (totalLength + serialized.length > maxTotalLength) {
-            break;
+        if (includeFullDetails) {
+            return JSON.stringify({ id, name, title, description });
         }
-        serializedBioprojects.push(serialized);
-        totalLength += serialized.length;
+        return JSON.stringify({ id, title });
+    };
+
+    const serializeAllBioprojects = (bioprojectRecords, includeFullDetails) => {
+        let totalLength = 0;
+        const serializedBioprojects = [];
+        const serializedIterator = bioprojectRecords.map((record) =>
+            serializeBioprojectRecord(record, includeFullDetails),
+        );
+        for (const serialized of serializedIterator) {
+            const isExceedingMax = totalLength + serialized.length > maxTotalLength;
+            if (isExceedingMax && includeFullDetails) {
+                return undefined;
+            }
+            if (isExceedingMax) {
+                break;
+            }
+            totalLength += serialized.length;
+            serializedBioprojects.push(serialized);
+        }
+        return serializedBioprojects.join('\n');
+    };
+
+    let serializedBioprojects = serializeAllBioprojects(bioprojectRecords, false);
+    if (serializedBioprojects === undefined) {
+        serializedBioprojects = serializeAllBioprojects(bioprojectRecords, true);
     }
-    return serializedBioprojects.join('\n');
+    return serializedBioprojects;
 };
 
 const getFilterQueryContext = (filters) => {

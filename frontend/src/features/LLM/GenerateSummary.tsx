@@ -12,7 +12,7 @@ const GenerateSummary = ({ identifiers }) => {
         useLazyGetSummaryTextQuery();
 
     const onButtonClick = async () => {
-        getSummaryText(
+        await getSummaryText(
             {
                 idColumn: 'bioproject',
                 ids: identifiers ? identifiers['bioproject'].single : [],
@@ -49,7 +49,7 @@ const GenerateSummary = ({ identifiers }) => {
                 }}
             >
                 {renderPlaceholder()}
-                {summaryTextIsNonEmpty() ? (
+                {!isLoadingSummary && summaryTextIsNonEmpty() ? (
                     <Box
                         sx={{
                             backgroundColor: '#484848',

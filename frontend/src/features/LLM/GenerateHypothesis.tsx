@@ -17,7 +17,7 @@ const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
         useLazyGetHypothesisQuery();
 
     const onButtonClick = async () => {
-        getHypothesisText({
+        await getHypothesisText({
             idColumn: 'bioproject',
             ids: identifiers ? identifiers['bioproject'].single : [],
             idRanges: identifiers ? identifiers['bioproject'].range : [],
@@ -55,7 +55,7 @@ const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
                 }}
             >
                 {renderPlaceholder()}
-                {hypothesisTextIsNonEmpty() ? (
+                {!isLoadingHypothesis && hypothesisTextIsNonEmpty() ? (
                     <Box
                         sx={{
                             backgroundColor: '#484848',
