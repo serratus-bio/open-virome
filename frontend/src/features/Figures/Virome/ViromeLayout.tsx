@@ -291,6 +291,7 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
                         justifyContent: 'space-between',
                         alignItems: 'flex-start',
                         flexDirection: 'row',
+                        height: '100%',
                     }}
                 >
                     <Box sx={{ flex: 1, width: '50%' }}>{renderNetworkFigure()}</Box>
@@ -314,7 +315,7 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
                 </Box>
             )}
             {isSimpleLayout(sectionLayout) ? null : (
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 15}}>
+                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' }}>
                     <ViromeMWAS identifiers={identifiers} virusFamilies={getVirusFamilies()} />
                 </Box>
             )}

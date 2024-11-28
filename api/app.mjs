@@ -2,6 +2,7 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import compression from 'compression';
+import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware.js';
 
 import { runPSQLQuery } from './clients/psql.mjs';
 import {
@@ -15,10 +16,8 @@ import {
     getSearchStringClause,
 } from './utils/queryBuilder.mjs';
 import { getMWASResults } from './utils/mwas.mjs';
-import { getBioprojectsSummarization } from './utils/graphRAG.mjs';
-import { getMwasHypothesis } from './utils/mwasHypothesisGenerator.mjs';
+import { getBioprojectsSummarization, getMwasHypothesis } from './utils/LLMTextGeneration.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
-import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware.js';
 
 const app = express();
 const port = 8000;
@@ -213,10 +212,8 @@ app.post('/hypothesis', async (req, res) => {
     }
     const ids = body?.ids ?? [];
     const filters = body?.filters ?? [];
-    const virusFamilies = body?.virusFamilies ?? [];
-    const identifiers = body?.identifiers ?? [];
     const selectedMetadata = body?.selectedMetadata ?? [];
-    const result = await getMwasHypothesis(ids, virusFamilies, identifiers, filters, selectedMetadata);
+    const result = await getMwasHypothesis(ids, filters, selectedMetadata);
     if (result.error) {
         console.error(result.error);
         return res.status(500).json({ error: result.error });

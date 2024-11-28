@@ -1,8 +1,45 @@
 import React from 'react';
 import Link from '@mui/material/Link';
+import MdCopyAll from '@mui/icons-material/CopyAll';
 
-export const processGeneratedText = (text) => {
-    const combinedRegex = /PRJ\w+|\|([^|]+)\|/g;
+const copyFullConversationButton = (fullConversation) => {
+    const copyFullConversation = () => {
+        navigator.clipboard.writeText(JSON.stringify(fullConversation));
+    };
+
+    return (
+        <Link
+            onClick={copyFullConversation}
+            sx={{
+                'display': 'flex',
+                'alignItems': 'center',
+                'cursor': 'pointer',
+                'color': 'text.secondary',
+                '&:hover': {
+                    color: 'text.primary',
+                },
+                'mt': 4,
+            }}
+        >
+            <MdCopyAll sx={{ mr: 1 }} />
+            Copy full conversation
+        </Link>
+    );
+};
+
+export const formatLLMGeneratedText = (text, conversation) => {
+    const regexPatterns = {
+        'Bioproject': /PRJ\w+/,
+        'Markdown bold': /\*{2}(.*?)\*{2}/,
+        'Markdown italic 1': /_([^|]+)_/,
+        'Markdown italic 2': /\*([^|]+)\*/,
+    };
+    const combinedRegex = new RegExp(
+        Object.values(regexPatterns)
+            .map((regex) => `(${regex.source})`)
+            .join('|'),
+        'g',
+    );
     const combinedMatches = text.match(combinedRegex);
     if (combinedMatches) {
         const finalComponents: (string | JSX.Element)[] = [];
@@ -12,7 +49,16 @@ export const processGeneratedText = (text) => {
             if (matchIndex > lastIndex) {
                 finalComponents.push(text.substring(lastIndex, matchIndex));
             }
-            if (/PRJ\w+/.test(match)) {
+            // Markdown bold
+            if (regexPatterns['Markdown bold'].test(match)) {
+                finalComponents.push(
+                    <span key={`bold-${index}`} style={{ fontWeight: 'bold' }}>
+                        {match.slice(2, -2)}
+                    </span>,
+                );
+            }
+            // Bioproject link
+            else if (regexPatterns['Bioproject'].test(match)) {
                 finalComponents.push(
                     <Link
                         key={`link-${index}`}
@@ -22,9 +68,11 @@ export const processGeneratedText = (text) => {
                         {match}
                     </Link>,
                 );
-            } else if (/\|([^|]+)\|/.test(match)) {
+            }
+            // Markdown italic
+            else if (regexPatterns['Markdown italic 1'].test(match) || regexPatterns['Markdown italic 2'].test(match)) {
                 finalComponents.push(
-                    <span key={`bold-${index}`} style={{ fontWeight: 'bold' }}>
+                    <span key={`italic-${index}`} style={{ fontStyle: 'italic' }}>
                         {match.slice(1, -1)}
                     </span>,
                 );
@@ -33,6 +81,10 @@ export const processGeneratedText = (text) => {
         });
         if (lastIndex < text.length) {
             finalComponents.push(text.substring(lastIndex));
+
+            if (conversation) {
+                finalComponents.push(copyFullConversationButton(conversation));
+            }
         }
         return finalComponents;
     }
