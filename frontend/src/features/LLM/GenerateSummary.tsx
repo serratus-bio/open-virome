@@ -1,14 +1,11 @@
 import React from 'react';
 import { useLazyGetSummaryTextQuery } from '../../api/client.ts';
 import { load } from '@fingerprintjs/botd';
-
-import IconButton from '@mui/material/IconButton';
-import BlurOnIcon from '@mui/icons-material/BlurOn';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
-import Tooltip from '@mui/material/Tooltip';
+import { processGeneratedText } from './textFormatting.tsx';
+import { GenerateButton } from './GenerateButton.tsx';
 
 const GenerateSummary = ({ identifiers }) => {
     const [getSummaryText, { data: summaryData, isLoading: isLoadingSummary, error: errorSummary }] =
@@ -36,44 +33,6 @@ const GenerateSummary = ({ identifiers }) => {
 
     const summaryTextIsNonEmpty = () => summaryData && summaryData?.text?.length > 0;
 
-    const processSummaryText = (text) => {
-        const combinedRegex = /PRJ\w+|\|([^|]+)\|/g;
-        const combinedMatches = text.match(combinedRegex);
-        if (combinedMatches) {
-            const finalComponents: (string | JSX.Element)[] = [];
-            let lastIndex = 0;
-            combinedMatches.forEach((match, index) => {
-                const matchIndex = text.indexOf(match, lastIndex);
-                if (matchIndex > lastIndex) {
-                    finalComponents.push(text.substring(lastIndex, matchIndex));
-                }
-                if (/PRJ\w+/.test(match)) {
-                    finalComponents.push(
-                        <Link
-                            key={`link-${index}`}
-                            href={`https://www.ncbi.nlm.nih.gov/bioproject/${match}`}
-                            target='_blank'
-                        >
-                            {match}
-                        </Link>,
-                    );
-                } else if (/\|([^|]+)\|/.test(match)) {
-                    finalComponents.push(
-                        <span key={`bold-${index}`} style={{ fontWeight: 'bold' }}>
-                            {match.slice(1, -1)}
-                        </span>,
-                    );
-                }
-                lastIndex = matchIndex + match.length;
-            });
-            if (lastIndex < text.length) {
-                finalComponents.push(text.substring(lastIndex));
-            }
-            return finalComponents;
-        }
-        return text;
-    };
-
     return (
         <Box
             sx={{
@@ -98,7 +57,7 @@ const GenerateSummary = ({ identifiers }) => {
                 {renderPlaceholder()}
                 {summaryTextIsNonEmpty() ? (
                     <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
-                        {processSummaryText(summaryData.text)}
+                        {processGeneratedText(summaryData.text)}
                     </Typography>
                 ) : null}
             </Box>
@@ -112,16 +71,7 @@ const GenerateSummary = ({ identifiers }) => {
                     mr: summaryTextIsNonEmpty() ? 0 : '-10%',
                 }}
             >
-                <Tooltip title='LLM research assistant' placement='bottom'>
-                    <IconButton style={{ backgroundColor: 'rgba(86, 86, 86, 0.4)' }} onClick={onButtonClick}>
-                        <BlurOnIcon
-                            style={{
-                                color: '#9be3ef',
-                                fontSize: 30,
-                            }}
-                        />
-                    </IconButton>
-                </Tooltip>
+                {GenerateButton({ onButtonClick, title: 'Generate Summary' })}
             </Box>
         </Box>
     );
