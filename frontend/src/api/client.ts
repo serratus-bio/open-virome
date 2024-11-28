@@ -63,6 +63,13 @@ export const apiSlice = createApi({
                 body: args,
             }),
         }),
+        getHypothesis: build.query({
+            query: (args) => ({
+                url: 'hypothesis',
+                method: 'POST',
+                body: args,
+            }),
+        }),
     }),
 });
 
@@ -72,5 +79,6 @@ export const {
     useGetResultQuery,
     useGetMWASQuery,
     useLazyGetSummaryTextQuery,
+    useLazyGetHypothesisQuery,
 } = apiSlice;
 export const { endpoints, reducerPath, reducer, middleware } = apiSlice;

@@ -9,6 +9,7 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import MdOpenInNew from '@mui/icons-material/OpenInNew';
 import SearchBar from '../../../common/SearchBar.tsx';
+import GenerateHypothesis from '../../LLM/GenerateHypothesis.tsx';
 
 const ViromeMWAS = ({ identifiers, virusFamilies }) => {
     const [selectedMetadata, setSelectedMetadata] = useState(null);
@@ -89,6 +90,10 @@ const ViromeMWAS = ({ identifiers, virusFamilies }) => {
                     </Typography>
                 ) : null}
             </Box>
+            {selectedMetadata ? (
+                <GenerateHypothesis identifiers={identifiers} selectedMetadata={selectedMetadata} />
+            ) : null}
+
             <Box
                 sx={{
                     display: 'flex',
@@ -96,7 +101,7 @@ const ViromeMWAS = ({ identifiers, virusFamilies }) => {
                     flexDirection: 'row',
                     flex: 1,
                     width: '100%',
-                    height: 500,
+                    height: '100%',
                     mt: 2,
                 }}
             >
