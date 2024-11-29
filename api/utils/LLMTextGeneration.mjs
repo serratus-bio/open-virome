@@ -127,13 +127,18 @@ export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) 
     const backgroundBioprojectContext = await getBioprojectContext(contextBioprojects);
     const targetBioprojectContext = await getBioprojectContext([selectedMetadata['bioproject']]);
 
-    const change_in_viral_load = selectedMetadata['mean_rpm_true'] - selectedMetadata['mean_rpm_false'];
+    const taxSpecies = Array.from(new Set(selectedMetadata['taxSpecies'])).join(', ');
+    const changeInViralLoad = selectedMetadata['mean_rpm_true'] - selectedMetadata['mean_rpm_false'];
+
     const target_mwas_prompt = `
         - Query: ${filterQueryContext}
         - Virus Family: ${selectedMetadata['family']}
+        - Virus Species: ${taxSpecies}
         - Significant metadata term: ${selectedMetadata['metadata_field']}
         - Significant metadata value: ${selectedMetadata['metadata_value']}
-        - Mean change in viral reads per million (RPM) between positive and negative samples: ${change_in_viral_load}
+        - Mean change in viral reads per million (RPM) between positive and negative samples: ${changeInViralLoad}
+        - P-value: ${selectedMetadata['p_value']}
+        - Fold change: ${selectedMetadata['fold_change']}
     `;
 
     const prompt_1 = `
