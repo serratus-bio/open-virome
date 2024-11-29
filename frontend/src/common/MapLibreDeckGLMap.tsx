@@ -12,8 +12,9 @@ import {
     MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE,
     REGION_COUNTRIES,
 } from '../features/Figures/Ecology/constants.ts';
-
+import GenerateSummary from '../features/LLM/GenerateSummary.tsx';
 import Flag from 'react-world-flags';
+import { Box } from '@mui/material';
 
 // SEND TO UTIL FUNCTIONS
 const aggregateArray128 = (a) => {
@@ -603,17 +604,22 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
         <div style={style}>
             <div style={{ alignItems: 'flex-end', display: 'flex', padding: '0 6px 0 6px' }}>
                 <div style={{ flex: '1 0' }}>
-                    <div style={{ color: '#EEE', fontSize: '16px', fontWeight: 700 }}>
-                        {'Showing ' +
-                            siteCount.toLocaleString() +
-                            ' contigs, representing ' +
-                            sOTUCount.toLocaleString() +
-                            ' unique species (sOTUs) from ' +
-                            hitCount.toLocaleString() +
-                            ' runs, across ' +
-                            locationCount.toLocaleString() +
-                            ' unique geographic locations.'}
-                    </div>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', width: '80vw', maxWidth: 2000 }}>
+                        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', width: '100%', height: '100%', mb: 4 }}>
+                                <GenerateSummary identifiers={identifiers} />   
+                        </Box>
+                        <div style={{ color: '#EEE', fontSize: '16px', fontWeight: 700 }}>
+                            {'Showing ' +
+                                siteCount.toLocaleString() +
+                                ' contigs, representing ' +
+                                sOTUCount.toLocaleString() +
+                                ' unique species (sOTUs) from ' +
+                                hitCount.toLocaleString() +
+                                ' runs, across ' +
+                                locationCount.toLocaleString() +
+                                ' unique geographic locations.'}
+                        </div>
+                    </Box>
                     {siteCount >= 1024 * 64 && (
                         <div style={{ color: '#FA0', flex: '1 0', fontSize: '14px', fontWeight: 700 }}>
                             The number of sites displayed is limited to 65.536. Download the dataset to get the whole

@@ -17,6 +17,7 @@ import ScatterPlot from '../../../common/ScatterPlot.tsx';
 import ViromeSummaryTable from './ViromeSummaryTable.tsx';
 import RadioButtonsGroup from '../../../common/RadioButtonsGroup.tsx';
 import ViromeMWAS from './ViromeMWAS.tsx';
+import GenerateSummary from '../../LLM/GenerateSummary.tsx';
 
 const ViromeLayout = ({ identifiers, sectionLayout }) => {
     const allFilters = useSelector(selectAllFilters);
@@ -275,6 +276,11 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
 
     return (
         <Box sx={{ width: '100%', height: '100%' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', width: '80vw', maxWidth: 1500 }}>
+                <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', width: '100%', height: '100%', mb: 5 }}>
+                    <GenerateSummary identifiers={identifiers} />   
+                </Box>
+            </Box>
             {resultData && resultData.length > 1000 ? (
                 <Box
                     sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', height: '100%', mb: 2 }}

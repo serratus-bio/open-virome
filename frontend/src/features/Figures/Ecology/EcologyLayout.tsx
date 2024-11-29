@@ -2,6 +2,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import MapPlot from '../../../common/MapLibreDeckGLMap.tsx';
 
+
 const EcologyLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
     return (
         <Box

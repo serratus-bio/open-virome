@@ -9,6 +9,7 @@ import Typography from '@mui/material/Typography';
 import BarPlot from '../../../common/BarPlot.tsx';
 import PolarBarPlot from '../../../common/PolarBarPlot.tsx';
 import Skeleton from '@mui/material/Skeleton';
+import GenerateSummary from '../../LLM/GenerateSummary.tsx';
 
 const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
     const {
@@ -140,6 +141,9 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', width: '80vw', maxWidth: 1500 }}>
+            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', width: '100%', height: '100%' }}>
+                <GenerateSummary identifiers={identifiers} />   
+            </Box>
             <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
                     <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
@@ -154,6 +158,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                     {getDiseasePlot()}
                 </Box>
             </Box>
+
             {isSimpleLayout(sectionLayout) ? null : (
                 <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
