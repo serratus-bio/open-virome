@@ -61,7 +61,7 @@ const SRARunLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <GenerateSummary identifiers={identifiers} />
+            <GenerateSummary dataObj={identifiers} dataType={"bioproject"} />
             {getFigures()}
         </Box>
     );

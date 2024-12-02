@@ -7,15 +7,15 @@ import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import GenerateButton from './GenerateButton.tsx';
 
-const GenerateSummary = ({ identifiers }) => {
+const GenerateSummary = ({ dataObj, dataType}) => {
     const [getSummaryText, { data: summaryData, isLoading: isLoadingSummary, error: errorSummary }] =
         useLazyGetSummaryTextQuery();
 
     const onButtonClick = async () => {
         getSummaryText(
             {
-                idColumn: 'bioproject',
-                ids: identifiers ? identifiers['bioproject'].single : [],
+                dataType: dataType,
+                dataObj: dataType === 'bioproject' ? dataObj['bioproject'].single : dataObj,
             },
             true,
         );

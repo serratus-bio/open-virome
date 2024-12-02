@@ -606,7 +606,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                 <div style={{ flex: '1 0' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', width: '80vw', maxWidth: 2000 }}>
                         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', width: '100%', height: '100%', mb: 4 }}>
-                                <GenerateSummary identifiers={identifiers} />   
+                                <GenerateSummary dataObj={identifiers} dataType={"ecology"} />   
                         </Box>
                         <div style={{ color: '#EEE', fontSize: '16px', fontWeight: 700 }}>
                             {'Showing ' +

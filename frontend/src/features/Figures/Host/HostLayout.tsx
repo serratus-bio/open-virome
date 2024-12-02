@@ -142,7 +142,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', width: '80vw', maxWidth: 1500 }}>
             <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', width: '100%', height: '100%' }}>
-                <GenerateSummary identifiers={identifiers} />   
+                <GenerateSummary dataType={"host"} dataObj={{tissueCountData, diseaseCountData, organismCountData, sexCountData}} />   
             </Box>
             <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>

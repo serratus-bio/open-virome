@@ -278,7 +278,7 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
         <Box sx={{ width: '100%', height: '100%' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', width: '80vw', maxWidth: 1500 }}>
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', width: '100%', height: '100%', mb: 5 }}>
-                    <GenerateSummary identifiers={identifiers} />   
+                    <GenerateSummary dataObj={resultData} dataType={"virome"}/>   
                 </Box>
             </Box>
             {resultData && resultData.length > 1000 ? (

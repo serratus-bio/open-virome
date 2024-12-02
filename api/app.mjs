@@ -16,7 +16,7 @@ import {
     getSearchStringClause,
 } from './utils/queryBuilder.mjs';
 import { getMWASResults } from './utils/mwas.mjs';
-import { getBioprojectsSummarization, getMwasHypothesis } from './utils/LLMTextGeneration.mjs';
+import { getBioprojectsSummarization, getMwasHypothesis, getFigureSummarization } from './utils/LLMTextGeneration.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 
 const app = express();
@@ -196,8 +196,16 @@ app.post('/summary', async (req, res) => {
     if (body === undefined) {
         return res.status(400).json({ error: 'Invalid request!' });
     }
-    const ids = body?.ids ?? [];
-    const result = await getBioprojectsSummarization(ids);
+    const dataObj = body?.dataObj ?? [];
+    const dataType = body?.dataType ?? '';
+    const model = body?.model ?? 'gpt4o';
+    let result = {};
+    if (dataType === 'bioproject') {
+        result = await getBioprojectsSummarization(dataObj, model);
+    }
+    else{
+        result = await getFigureSummarization(dataObj, dataType, model);
+    }
     if (result?.error) {
         console.error(result.error);
         return res.status(500).json({ error: result.error });
@@ -213,7 +221,8 @@ app.post('/hypothesis', async (req, res) => {
     const ids = body?.ids ?? [];
     const filters = body?.filters ?? [];
     const selectedMetadata = body?.selectedMetadata ?? [];
-    const result = await getMwasHypothesis(ids, filters, selectedMetadata);
+    const model = body?.model ?? 'gpt4o';
+    const result = await getMwasHypothesis(ids, filters, selectedMetadata, model);
     if (result.error) {
         console.error(result.error);
         return res.status(500).json({ error: result.error });

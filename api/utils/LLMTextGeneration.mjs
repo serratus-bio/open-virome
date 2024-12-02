@@ -40,7 +40,19 @@ const getFilterQueryContext = (filters) => {
     return filterContext.join('\n');
 };
 
-export const getBioprojectsSummarization = async (bioprojects) => {
+const changeGPTRole = (model) => {
+    let role;
+    model = 'gpt4o';
+    if (model === 'gpt4o') {
+        role = 'system';
+    } else {
+        role = 'assistant'; // o1
+    }
+    return role;
+}
+
+export const getBioprojectsSummarization = async (bioprojects, model) => {
+    role = changeGPTRole(model);
     const bioprojectContext = await getBioprojectContext(bioprojects);
 
     const context = `
@@ -69,13 +81,6 @@ export const getBioprojectsSummarization = async (bioprojects) => {
 
     {{Conclusion}}
     `;
-    let model, role;
-    model = 'gpt4o';
-    if (model === 'gpt4o') {
-        role = 'system';
-    } else {
-        role = 'assistant'; // o1
-    }
 
     const conversation = [
         {
@@ -91,15 +96,8 @@ export const getBioprojectsSummarization = async (bioprojects) => {
     return { text: result.text, conversation: conversation };
 };
 
-export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) => {
-    let model, role;
-    model = 'gpt4o';
-    if (model === 'gpt4o') {
-        role = 'system';
-    } else {
-        role = 'assistant'; // o1
-    }
-
+export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata, model) => {
+    const role = changeGPTRole(model);
     const filterQueryContext = getFilterQueryContext(filters);
 
     const contextBioprojects = bioprojects.filter((bioproject) => bioproject !== selectedMetadata['bioproject']);
@@ -155,3 +153,33 @@ export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) 
 
     return { text: result.text, conversation: conversation };
 };
+
+export const getFigureSummarization = async (dataObj, dataType, model) => {
+    const role = changeGPTRole(model);
+
+    const data = [];
+    Object.values(dataObj).forEach(value => {
+        data.push(value);
+    });
+
+    // Maybe let the model generate a plot to observe trends to enhance response?
+    const context = {
+        'ecology': '',
+        'host': 'You are a data visualization assistant. Using the following data representing tissue samples and their counts, generate a concise summary of the data points, highlighting key observations, such as the tissue with the highest count, the lowest count, and any patterns or clusters observed.',
+        'virome': '',
+    }
+
+    const conversation = [
+        {
+            role: role,
+            content: context[dataType],
+        },
+        {
+            role: 'user',
+            content: `Please provide a brief summary of the following datapoints: \n ${JSON.stringify(data, null)}`,
+        },
+    ];
+
+    const result = await runLLMCompletion(conversation, model);
+    return { text: result.text, conversation: conversation };
+}
