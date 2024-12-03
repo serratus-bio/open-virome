@@ -18,6 +18,7 @@ import Typography from '@mui/material/Typography';
 import SRARunLayout from '../Figures/SRARun/SRARunLayout.tsx';
 import EcologyLayout from '../Figures/Ecology/EcologyLayout.tsx';
 import ViromeLayout from '../Figures/Virome/ViromeLayout.tsx';
+import HostLayout from '../Figures/Host/HostLayout.tsx';
 import IconButton from '@mui/material/IconButton';
 import TableIcon from '@mui/icons-material/TableRows';
 import PlotIcon from '@mui/icons-material/InsertChart';
@@ -92,6 +93,11 @@ const Module = ({ sectionKey }) => {
                     sectionLayout={sectionLayout}
                     palmprintOnly={palmprintOnly}
                 />
+            );
+        }
+        if (sectionKey === 'host') {
+            return (
+                <HostLayout identifiers={identifiersData} sectionLayout={sectionLayout} palmprintOnly={palmprintOnly} />
             );
         }
         return (
