@@ -10,6 +10,7 @@ const TABLE_TO_SELECT_COLUMNS = {
     biosample_geographical_location: ['accession', 'geo_attribute_value'],
     bgl_gm4326_gp4326: ['accession', 'biome_attribute_value'],
     biosample_disease: ['biosample', 'do_label'],
+    virome_community: ['run', 'community_id'],
 };
 
 const TABLE_TO_JOIN_KEY = {
@@ -22,6 +23,7 @@ const TABLE_TO_JOIN_KEY = {
     biosample_geographical_location: 'biosample',
     bgl_gm4326_gp4326: 'biosample',
     biosample_disease: 'biosample',
+    virome_community: 'run_id',
 };
 
 const TABLE_TO_UNIFIED_JOIN_KEY = {
@@ -44,6 +46,9 @@ const TABLE_TO_UNIFIED_JOIN_KEY = {
         biome_attribute_value: 'gp4326_wwf_tew_id',
     },
     palm_virome: {
+        run_id: 'run',
+    },
+    virome_community: {
         run_id: 'run',
     },
 };
@@ -179,6 +184,7 @@ export const getMinimalJoinSubQuery = (filters, palmprintOnly, groupBy = undefin
         biosample_geographical_location: 'accession as biosample, attribute_value as geo_attribute_value',
         bgl_gm4326_gp4326: 'accession as biosample, gp4326_wwf_tew_id as biome_attribute_value',
         biosample_disease: 'biosample, do_label',
+        virome_community: 'run as run_id, community_id',
     };
 
     // Helper function to get tables based on filters or groupBy

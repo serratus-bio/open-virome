@@ -70,6 +70,13 @@ export const apiSlice = createApi({
                 body: args,
             }),
         }),
+        getGlobalChat: build.query({
+            query: (args) => ({
+                url: 'globalChat',
+                method: 'POST',
+                body: args,
+            }),
+        }),
     }),
 });
 
@@ -80,5 +87,6 @@ export const {
     useGetMWASQuery,
     useLazyGetSummaryTextQuery,
     useLazyGetHypothesisQuery,
+    useLazyGetGlobalChatQuery,
 } = apiSlice;
 export const { endpoints, reducerPath, reducer, middleware } = apiSlice;

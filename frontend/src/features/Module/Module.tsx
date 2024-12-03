@@ -179,7 +179,6 @@ const Module = ({ sectionKey }) => {
                 </Box>
 
                 <Box>
-                    View:
                     <Tooltip
                         placement='top'
                         title={

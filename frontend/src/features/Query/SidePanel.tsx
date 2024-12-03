@@ -32,6 +32,7 @@ const SidePanel = () => {
             open={sidebarOpen}
             anchor={'left'}
             variant='persistent'
+            onClose={handleDrawerClose}
             sx={{
                 'zIndex': sidebarOpen ? 1400 : -1,
                 'width': drawerWidth,
@@ -41,6 +42,7 @@ const SidePanel = () => {
                     boxSizing: 'border-box',
                     backgroundColor: 'rgb(40, 40, 40)',
                     border: 'none',
+                    overflow: 'hidden',
                 },
             }}
         >
