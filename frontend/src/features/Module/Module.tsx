@@ -84,7 +84,7 @@ const Module = ({ sectionKey }) => {
             );
         }
         if (sectionKey === 'palmdb') {
-            return <ViromeLayout identifiers={identifiersData} sectionLayout={sectionLayout} />;
+            return <ViromeLayout identifiers={identifiersData} sectionLayout={sectionLayout} palmprintOnly={palmprintOnly} />;
         }
         if (sectionKey === 'ecology') {
             return (

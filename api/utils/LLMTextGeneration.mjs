@@ -52,7 +52,7 @@ const changeGPTRole = (model) => {
 }
 
 export const getBioprojectsSummarization = async (bioprojects, model) => {
-    role = changeGPTRole(model);
+    const role = changeGPTRole(model);
     const bioprojectContext = await getBioprojectContext(bioprojects);
 
     const context = `
@@ -165,8 +165,8 @@ export const getFigureSummarization = async (dataObj, dataType, model) => {
     // Maybe let the model generate a plot to observe trends to enhance response?
     const context = {
         'ecology': '',
-        'host': 'You are a data visualization assistant. Using the following data representing tissue samples and their counts, generate a concise summary of the data points, highlighting key observations, such as the tissue with the highest count, the lowest count, and any patterns or clusters observed.',
-        'virome': '',
+        'host': 'You are a data inference assistant. Using the following data representing tissue samples and their counts, generate a concise summary of the data points, highlighting key observations, such as the tissue with the highest count, the lowest count, and discuss any patterns or clusters observed.',
+        'virome': 'You are a data inference assistant. Using the following data representing viruses and their counts, generate a concise summary of the data points, highlighting key observations, such as the virus with the highest count, the lowest count, and discuss any patterns or clusters observed.',
     }
 
     const conversation = [

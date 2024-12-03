@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSelector } from 'react-redux';
-import { isSummaryView, isSimpleLayout } from '../../../common/utils/plotHelpers.ts';
+import { isSummaryView, isSimpleLayout, shouldDisableFigureView } from '../../../common/utils/plotHelpers.ts';
 import { getViromeGraphData, getViromeScatterPlotData } from './plotHelpers.ts';
-import { useGetResultQuery } from '../../../api/client.ts';
+import { useGetResultQuery, useGetCountsQuery } from '../../../api/client.ts';
 import { moduleConfig } from '../../Module/constants.ts';
 import { handleIdKeyIrregularities } from '../../../common/utils/queryHelpers.ts';
 import { selectAllFilters } from '../../Query/slice.ts';
@@ -19,7 +19,7 @@ import RadioButtonsGroup from '../../../common/RadioButtonsGroup.tsx';
 import ViromeMWAS from './ViromeMWAS.tsx';
 import GenerateSummary from '../../LLM/GenerateSummary.tsx';
 
-const ViromeLayout = ({ identifiers, sectionLayout }) => {
+const ViromeLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
     const allFilters = useSelector(selectAllFilters);
     const [randomized, setRandomized] = useState(0);
     const [activeSubgraph, setActiveSubgraph] = useState('1');
@@ -33,6 +33,24 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
         }),
     );
     const containerRef = React.useRef(null);
+
+    const {
+        data: viromeCountData,
+        error: viromeCountError,
+        isFetching: viromeCountIsFetching,
+    } = useGetCountsQuery(
+        {
+            idColumn: moduleConfig[activeModule].resultsIdColumn,
+            ids: identifiers ? identifiers[moduleConfig[activeModule].resultsIdColumn].single : [],
+            idRanges: identifiers ? identifiers[moduleConfig[activeModule].resultsIdColumn].range : [],
+            groupBy: moduleConfig[activeModule].groupByKey,
+            table: moduleConfig[activeModule].resultsTable,
+            palmprintOnly,
+        },
+        {
+            skip: shouldDisableFigureView(identifiers),
+        },
+    );
 
     const {
         data: resultData,
@@ -278,7 +296,7 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
         <Box sx={{ width: '100%', height: '100%' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', width: '80vw', maxWidth: 1500 }}>
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'row', width: '100%', height: '100%', mb: 5 }}>
-                    <GenerateSummary dataObj={resultData} dataType={"virome"}/>   
+                    <GenerateSummary dataObj={viromeCountData} dataType={"virome"}/>   
                 </Box>
             </Box>
             {resultData && resultData.length > 1000 ? (
