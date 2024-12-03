@@ -17,16 +17,16 @@ import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 import InputAdornment from '@mui/material/InputAdornment';
 import DeleteIcon from '@mui/icons-material/Delete';
+import ChatOutlinedIcon from '@mui/icons-material/ChatOutlined';
 
 
 export const Chat = () => {
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-    const [messages, setMessages] = useState(["How can I help you today?"]);
+    const [messages, setMessages] = useState([{message: "How can I help you today?", user: false}]);
     const [inputValue, setInputValue] = useState('');
 
     const onButtonClick = () => {
         setIsDrawerOpen(!isDrawerOpen);
-        console.log('Chat button clicked');
     };
 
     const handleDrawerClose = () => {
@@ -35,14 +35,14 @@ export const Chat = () => {
     
     const handleSendMessage = () => {
         if (inputValue.trim() !== '') {
-            setMessages([...messages, inputValue]);
+            setMessages([...messages, {message: inputValue, user: true}]);
             setInputValue('');
         }
     };
 
     // clc
     const handleClearMessages = () => {
-        setMessages(["How can I help you today?"]);
+        setMessages([{message: "How can I help you today?", user: false}]);
     }
 
     // sends msg when user presses enter
@@ -53,42 +53,40 @@ export const Chat = () => {
         }
     };
 
-    const presetChips = ['Generate Summary', 'Generate MWAS Hypothesis', 'Option 3'];
+    const chatBubble = (messageObj) => {
+        return (
+            messageObj.user 
+            ? 
+            (<Box component="section" sx={{ bgcolor: '#C2C2C2', p: 1, border: 'rounded', borderRadius: '16px 16px 0 16px', ml: 'auto'}}>
+            {messageObj.message}
+            </Box>) 
+            :
+            (<Box component="section" sx={{ bgcolor: '#218AFF', p: 1, border: 'rounded', borderRadius: '16px 16px 16px 0'}}>
+            {messageObj.message}
+            </Box>)
+        );
+    }
 
+    const presetChips = ['Generate Bioproject Summary', 'Generate MWAS Hypothesis', 'Option 3'];
     // preset chip actions
     const handleChipClick = (e) => {
         const chipLabel = e.target.innerText;
         switch (chipLabel) {
-            case 'Generate Summary':
-                setMessages([...messages, 'Bioproject Summary generated']);
+            case 'Generate Bioproject Summary':
+
+                setMessages([...messages, {message: 'Bioproject Summary generated', user: false}]);
                 break;
             case 'Generate MWAS Hypothesis':
-                setMessages([...messages, 'MWAS Hypothesis generated']);
+                setMessages([...messages, {message: 'MWAS Hypothesis generated', user: false}]);
                 break;
             case 'Option 3':
-                setMessages([...messages, 'Option 3 selected']);
+                setMessages([...messages, {message: 'Option 3 selected', user: false}]);
                 break;
             default:
                 break;
         }
     };
 
-    // Bioproject Summary - annoying to implement rn
-    // const [getSummaryText, { data: summaryData, isLoading: isLoadingSummary, error: errorSummary }] =
-    // useLazyGetSummaryTextQuery();
-
-    // const getSummary = async () => {
-    //     try {
-    //         const botd = await load();
-    //         const detect = await botd.detect();
-    //         if (!detect || detect.bot === true) {
-    //             throw new Error('Bot detected');
-    //         }
-    //         getSummaryText({ ids: identifiers ? identifiers['bioproject'].single : [] }, true);
-    //     } catch (error) {
-    //         console.error(error);
-    //     }
-    // };
 
     return (
         <>
@@ -101,14 +99,14 @@ export const Chat = () => {
                 }}
             >
                 <Tooltip title='LLM research assistant' placement='bottom'>
-                    <IconButton style={{ backgroundColor: 'rgba(86, 86, 86, 0.4)' }} onClick={onButtonClick}>
+                    <ChatOutlinedIcon style={{ backgroundColor: 'rgba(86, 86, 86, 0.4)' }} onClick={onButtonClick}>
                         <BlurOnIcon
                             style={{
                                 color: '#9be3ef',
                                 fontSize: 30,
                             }}
                         />
-                    </IconButton>
+                    </ChatOutlinedIcon>
                 </Tooltip>
             </Box>
             <Drawer
@@ -135,7 +133,8 @@ export const Chat = () => {
                     <List>
                         {messages.map((message, index) => (
                             <ListItem key={index}>
-                                <ListItemText primary={message} />
+                                {/* <ListItemText primary={message.message} /> */}
+                                {chatBubble(message)}
                             </ListItem>
                         ))}
                     </List>
