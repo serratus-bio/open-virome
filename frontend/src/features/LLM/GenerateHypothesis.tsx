@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectAllFilters } from '../Query/slice.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
@@ -11,12 +11,24 @@ import Typography from '@mui/material/Typography';
 import GenerateButton from './GenerateButton.tsx';
 
 const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
+    const [displayMessage, setDisplayMessage] = useState('');
     const filters = useSelector(selectAllFilters);
 
     const [getHypothesisText, { data: hypothesisData, isLoading: isLoadingHypothesis, error: errorHypothesis }] =
         useLazyGetHypothesisQuery();
 
+    useEffect(() => {
+        if (hypothesisData && hypothesisData.text) {
+            setDisplayMessage(hypothesisData.text);
+        } else if (isLoadingHypothesis) {
+            setDisplayMessage('');
+        }
+    }, [hypothesisData, isLoadingHypothesis]);
+
     const onButtonClick = async () => {
+        if (isLoadingHypothesis) {
+            return;
+        }
         await getHypothesisText({
             idColumn: 'bioproject',
             ids: identifiers ? identifiers['bioproject'].single : [],
@@ -33,7 +45,7 @@ const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
         return null;
     };
 
-    const hypothesisTextIsNonEmpty = () => hypothesisData && hypothesisData?.text?.length > 0;
+    const hypothesisTextIsNonEmpty = () => displayMessage && displayMessage?.length > 0;
 
     return (
         <Box
@@ -67,7 +79,7 @@ const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
                         }}
                     >
                         <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
-                            {formatLLMGeneratedText(hypothesisData.text, hypothesisData.conversation)}
+                            {formatLLMGeneratedText(displayMessage)}
                         </Typography>
                     </Box>
                 ) : null}

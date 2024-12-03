@@ -93,7 +93,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
 
     const getTissuePlot = () => {
         if (tissueCountIsFetching) {
-            return <Skeleton variant='rectangular' height={400} />;
+            return <Skeleton variant='rectangular' height={400} width={'80%'} />;
         }
         if (tissueCountData && tissueCountData.length > 0) {
             const maxRows = isSimpleLayout(sectionLayout) ? 9 : undefined;
@@ -104,7 +104,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
 
     const getDiseasePlot = () => {
         if (diseaseCountIsFetching) {
-            return <Skeleton variant='rectangular' height={400} />;
+            return <Skeleton variant='rectangular' height={400} width={'80%'} />;
         }
 
         if (diseaseCountData && diseaseCountData.length > 0) {
@@ -116,7 +116,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
 
     const getOrganismPlot = () => {
         if (organismCountIsFetching) {
-            return <Skeleton variant='rectangular' height={400} />;
+            return <Skeleton variant='rectangular' height={400} width={'80%'} />;
         }
 
         if (organismCountData && organismCountData.length > 0) {
@@ -128,7 +128,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
 
     const getSexPlot = () => {
         if (sexCountIsFetching) {
-            return <Skeleton variant='rectangular' height={400} />;
+            return <Skeleton variant='rectangular' height={400} width={'80%'} />;
         }
 
         if (sexCountData && sexCountData.length > 0) {
