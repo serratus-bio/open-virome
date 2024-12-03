@@ -35,6 +35,7 @@ const FilterTable = ({ palmprintOnly }) => {
     } = useGetIdentifiersQuery({
         filters: getFilterQuery({ filters }),
         palmprintOnly,
+        maxRetries: 3,
     });
 
     const {

@@ -48,6 +48,22 @@ const TABLE_TO_UNIFIED_JOIN_KEY = {
     },
 };
 
+const GROUP_BY_KEY_TO_COUNTS_MATERIALIZED_VIEW = {
+    organism: 'ov_counts_sra_organism',
+    bioproject: 'ov_counts_sra_bioproject',
+    assay_type: 'ov_counts_sra_assay_type',
+    tax_species: 'ov_counts_palm_virome_tax_species',
+    tax_family: 'ov_counts_palm_virome_tax_family',
+    sotu: 'ov_counts_palm_virome_sotu',
+    tissue: 'ov_counts_biosample_tissue',
+    geo_attribute_value: 'ov_counts_biosample_geographical_location',
+    biome_attribute_value: 'ov_counts_bgl_gm4326_gp4326',
+    stat_host_order: 'ov_counts_sra_stat',
+    sex: 'ov_counts_biosample_sex',
+    do_label: 'ov_counts_biosample_disease',
+    community_id: 'ov_counts_virome_community',
+};
+
 export const handleIdKeyIrregularities = (key, table) => {
     if (TABLE_TO_UNIFIED_JOIN_KEY[table] && TABLE_TO_UNIFIED_JOIN_KEY[table][key]) {
         return TABLE_TO_UNIFIED_JOIN_KEY[table][key];
@@ -117,23 +133,9 @@ export const hasNoGroupByFilters = (filters, groupBy) => {
 };
 
 export const getCachedCountsQuery = (groupBy, searchStringQuery, palmprintOnly) => {
-    const groupByToMaterializedView = {
-        organism: 'ov_counts_sra_organism',
-        bioproject: 'ov_counts_sra_bioproject',
-        assay_type: 'ov_counts_sra_assay_type',
-        tax_species: 'ov_counts_palm_virome_tax_species',
-        tax_family: 'ov_counts_palm_virome_tax_family',
-        sotu: 'ov_counts_palm_virome_sotu',
-        tissue: 'ov_counts_biosample_tissue',
-        geo_attribute_value: 'ov_counts_biosample_geographical_location',
-        biome_attribute_value: 'ov_counts_bgl_gm4326_gp4326',
-        stat_host_order: 'ov_counts_sra_stat',
-        sex: 'ov_counts_biosample_sex',
-        do_label: 'ov_counts_biosample_disease',
-    };
     const palmprintOnlyClause = `${searchStringQuery.length > 0 ? 'AND' : 'WHERE'} virus_only = ${palmprintOnly ? 'true' : 'false'}`;
     return `
-        SELECT * FROM ${groupByToMaterializedView[groupBy]}
+        SELECT * FROM ${GROUP_BY_KEY_TO_COUNTS_MATERIALIZED_VIEW[groupBy]}
         ${searchStringQuery}
         ${palmprintOnlyClause}
     `;

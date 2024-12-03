@@ -1,20 +1,15 @@
 import React from 'react';
+import { isBotDetected } from '../../common/utils/botDetection.ts';
+
 import IconButton from '@mui/material/IconButton';
 import BlurOnIcon from '@mui/icons-material/BlurOn';
 import Tooltip from '@mui/material/Tooltip';
-import { load } from '@fingerprintjs/botd';
 
 const GenerateButton = ({ onButtonClick, title }) => {
     const onClick = async () => {
-        try {
-            const botd = await load();
-            const detect = await botd.detect();
-            if (!detect || detect.bot === true) {
-                throw new Error('Bot detected');
-            }
+        const isBot = await isBotDetected();
+        if (!isBot) {
             onButtonClick();
-        } catch (error) {
-            console.error(error);
         }
     };
 

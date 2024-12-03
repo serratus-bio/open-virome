@@ -1,4 +1,5 @@
 import React from 'react';
+
 import Link from '@mui/material/Link';
 import MdCopyAll from '@mui/icons-material/CopyAll';
 
@@ -27,12 +28,14 @@ const copyFullConversationButton = (fullConversation) => {
     );
 };
 
-export const formatLLMGeneratedText = (text, conversation) => {
+export const formatLLMGeneratedText = (text, conversation = []) => {
+    if (!text) {
+        return null;
+    }
     const regexPatterns = {
         'Bioproject': /PRJ\w+/,
-        'Markdown bold': /\*{2}(.*?)\*{2}/,
-        'Markdown italic 1': /_([^|]+)_/,
-        'Markdown italic 2': /\*([^|]+)\*/,
+        'Markdown bold 1': /\*{2}(?!PRJ)(.*?)\*{2}/,
+        'Markdown bold 2': /_{2}(?!PRJ)(.*?)_{2}/,
     };
     const combinedRegex = new RegExp(
         Object.values(regexPatterns)
@@ -49,34 +52,29 @@ export const formatLLMGeneratedText = (text, conversation) => {
             if (matchIndex > lastIndex) {
                 finalComponents.push(text.substring(lastIndex, matchIndex));
             }
-            // Markdown bold
-            if (regexPatterns['Markdown bold'].test(match)) {
-                finalComponents.push(
-                    <span key={`bold-${index}`} style={{ fontWeight: 'bold' }}>
-                        {match.slice(2, -2)}
-                    </span>,
-                );
-            }
-            // Bioproject link
-            else if (regexPatterns['Bioproject'].test(match)) {
+            // NCBI links
+            if (regexPatterns['Bioproject'].test(match)) {
+                let cleanMatch = match.match(regexPatterns['Bioproject'])[0];
                 finalComponents.push(
                     <Link
-                        key={`link-${index}`}
-                        href={`https://www.ncbi.nlm.nih.gov/bioproject/${match}`}
+                        key={`link-${index}-${cleanMatch}`}
+                        href={`https://www.ncbi.nlm.nih.gov/bioproject/${cleanMatch}`}
                         target='_blank'
                     >
                         {match}
                     </Link>,
                 );
             }
-            // Markdown italic
-            else if (regexPatterns['Markdown italic 1'].test(match) || regexPatterns['Markdown italic 2'].test(match)) {
+            // Markdown formatting
+            else if (regexPatterns['Markdown bold 1'].test(match) || regexPatterns['Markdown bold 2'].test(match)) {
+                const cleanText = match.slice(2, -2);
                 finalComponents.push(
-                    <span key={`italic-${index}`} style={{ fontStyle: 'italic' }}>
-                        {match.slice(1, -1)}
+                    <span key={`bold-${index}`} style={{ fontWeight: 'bold' }}>
+                        {cleanText}
                     </span>,
                 );
             }
+
             lastIndex = matchIndex + match.length;
         });
         if (lastIndex < text.length) {

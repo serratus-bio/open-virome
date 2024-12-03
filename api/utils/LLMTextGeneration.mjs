@@ -1,5 +1,6 @@
 import { runLLMCompletion } from '../clients/oai.mjs';
 import { runCypherQuery } from '../clients/neo4j.mjs';
+import { getMwasHypothesisSystemPrompt, getBioProjectsSummarizationPrompt } from './prompts.mjs';
 
 const getBioprojectContext = async (bioprojects) => {
     const maxTotalLength = 10000;
@@ -64,32 +65,8 @@ const getFilterQueryContext = (filters) => {
 export const getBioprojectsSummarization = async (bioprojects) => {
     const bioprojectContext = await getBioprojectContext(bioprojects);
 
-    const context = `
-    You are a bioinformatics research assistant agent being used to summarize research projects for display on a wikipedia-like page.
+    const context = getBioProjectsSummarizationPrompt();
 
-    Follow the instructions to summarize BioProjects:
-    1. Provide a succinct overview of the high-level ideas covered by the bioproject titles, names, and descriptions, no longer than a paragraph.
-    2. For each overarching topic in the summarization, cite all relevant bioproject ID(s).
-    3. DO NOT reference any bioprojects that aren't given in the list.
-    4. ONLY use the information provided in the bioprojects to generate the summary.
-    5. Avoid using any external information or knowledge.
-    6. Use standard markdown delimiter ** to surround/highlight important topics or keywords in the bioprojects, DO NOT ADD THEM TO BIOPROJECT IDs.
-    7. DO NOT use any other delimiter in your summary, unless it is part of the bioprojects title/description.
-
-    {{Key Focus Areas}}
-
-    {{Organisms Studied}}
-
-    {{Research Methods and Data Types}}
-
-    {{Geographical and Temporal Context}}
-
-    {{Common Applications}}
-
-    {{Notable Trends or Insights}}
-
-    {{Conclusion}}
-    `;
     let model, role;
     model = 'gpt4o';
     if (model === 'gpt4o') {
@@ -141,17 +118,7 @@ export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) 
         - Fold change: ${selectedMetadata['fold_change']}
     `;
 
-    const prompt_1 = `
-    You are a bioinformatics research assistant agent being used to screen mass amounts of research data from the Sequence Read Archive to uncover promising research directions.
-    You are evaluated by your ability to generate sensible, well-justified hypotheses and research directions.
-    You are penalized for generating false positive hypotheses, i.e. a hypothesis that is not supported by provided reference data.
-
-    Given the following query used to search for a virome and related background BioProject research, consider possible impactful areas of research and rationale.
-    Use up-to-date knowledge in the global research literature about the virome query.
-
-    Target Query: ${filterQueryContext}
-    Background BioProjects: ${backgroundBioprojectContext}
-    `;
+    const prompt_1 = getMwasHypothesisSystemPrompt(filterQueryContext, backgroundBioprojectContext);
 
     const prompt_2 = `
     This metadata term and value has shown significant correlation with viral load in the provided metadata terms and virus family. Compare it with impactful research areas related to the query and propose a hypothesis.
@@ -170,13 +137,16 @@ export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) 
     Target BioProject:
     ${targetBioprojectContext}
     `;
-    const conversation = [];
-    for (const prompt of [prompt_1, prompt_2]) {
-        conversation.push({
+    const conversation = [
+        {
             role: role,
-            content: prompt,
-        });
-    }
+            content: prompt_1,
+        },
+        {
+            role: 'user',
+            content: prompt_2,
+        },
+    ];
     const result = await runLLMCompletion(conversation, model);
 
     return { text: result.text, conversation: conversation };

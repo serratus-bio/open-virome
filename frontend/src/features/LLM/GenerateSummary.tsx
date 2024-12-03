@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLazyGetSummaryTextQuery } from '../../api/client.ts';
 import { formatLLMGeneratedText } from './textFormatting.tsx';
 
@@ -8,10 +8,22 @@ import Typography from '@mui/material/Typography';
 import GenerateButton from './GenerateButton.tsx';
 
 const GenerateSummary = ({ identifiers }) => {
+    const [displayMessage, setDisplayMessage] = useState('');
     const [getSummaryText, { data: summaryData, isLoading: isLoadingSummary, error: errorSummary }] =
         useLazyGetSummaryTextQuery();
 
+    useEffect(() => {
+        if (summaryData && summaryData.text) {
+            setDisplayMessage(summaryData.text);
+        } else if (isLoadingSummary) {
+            setDisplayMessage('');
+        }
+    }, [summaryData, isLoadingSummary]);
+
     const onButtonClick = async () => {
+        if (isLoadingSummary) {
+            return;
+        }
         await getSummaryText(
             {
                 idColumn: 'bioproject',
@@ -28,7 +40,7 @@ const GenerateSummary = ({ identifiers }) => {
         return null;
     };
 
-    const summaryTextIsNonEmpty = () => summaryData && summaryData?.text?.length > 0;
+    const summaryTextIsNonEmpty = () => displayMessage && displayMessage?.length > 0;
 
     return (
         <Box
@@ -61,7 +73,7 @@ const GenerateSummary = ({ identifiers }) => {
                         }}
                     >
                         <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
-                            {formatLLMGeneratedText(summaryData.text, summaryData.conversation)}
+                            {formatLLMGeneratedText(displayMessage)}
                         </Typography>
                     </Box>
                 ) : null}
