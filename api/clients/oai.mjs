@@ -13,6 +13,11 @@ const OPENAI_MODEL_CONFIGS = {
         apiKey: process.env.OPENAI_TOKEN,
         apiVersion: '2024-09-01-preview',
     },
+    gpt4oMini: {
+        endpoint: process.env.OPENAI_ENDPOINT_gpt4o_mini,
+        apiKey: process.env.OPENAI_TOKEN,
+        apiVersion: '2024-09-01-preview',
+    },
 };
 
 const getOpenAIClient = (configName) => {

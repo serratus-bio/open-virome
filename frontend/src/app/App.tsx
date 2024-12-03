@@ -10,6 +10,7 @@ import { getFilterQuery } from '../common/utils/queryHelpers.ts';
 import { isSummaryView } from '../common/utils/plotHelpers.ts';
 
 import SidePanel from '../features/Query/SidePanel.tsx';
+import Chat from '../features/LLM/Chat.tsx';
 import AppToolbar from './Toolbar.tsx';
 import Box from '@mui/material/Box';
 import QuerySummaryText from '../features/Query/QuerySummaryText.tsx';
@@ -83,6 +84,7 @@ const App = () => {
                 <CssBaseline />
                 <AppToolbar />
                 <SidePanel />
+                <Chat />
                 <Box sx={getContainerStyles()}>
                     <Box
                         sx={{

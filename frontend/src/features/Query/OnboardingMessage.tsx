@@ -1,7 +1,8 @@
-import React, { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import React, { useEffect, useMemo } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { toggleSidebar } from '../../app/slice.ts';
 import { addManyFilters } from './slice.ts';
+import { selectChatMessages } from '../LLM/slice.ts';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
@@ -11,9 +12,11 @@ import LabelIcon from '@mui/icons-material/Description';
 import BrainIcon from '@mui/icons-material/Diversity2';
 import GeoIcon from '@mui/icons-material/TravelExplore';
 import Logo from '../../common/assets/ov_hex_dark.png';
+import OnboardingChat from '../LLM/OnboardingChat.tsx';
 
 const OnbaordingMessage = () => {
     const dispatch = useDispatch();
+    const chatMessages = useSelector(selectChatMessages);
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -102,17 +105,25 @@ const OnbaordingMessage = () => {
         dispatch(addManyFilters(filters));
     };
 
+    const onlyShowGlobalChat = () => {
+        if (chatMessages.length === 0) {
+            return false;
+        }
+        const lastMessage = chatMessages[chatMessages.length - 1];
+        return lastMessage.mode === 'global' && lastMessage.role === 'assistant';
+    };
+
     const getExampleFilter = (name) => {
         const iconMap = {
-            Eimeria: <LabelIcon fontSize='medium' sx={{ mb: 2 }} />,
-            Neuronal: <BrainIcon fontSize='medium' sx={{ mb: 2 }} />,
-            Tundra: <GeoIcon fontSize='medium' sx={{ mb: 2, mt: 0 }} />,
+            Eimeria: <LabelIcon fontSize='medium' />,
+            Neuronal: <BrainIcon fontSize='medium' />,
+            Tundra: <GeoIcon fontSize='medium' />,
         };
 
         const filterTypeMap = {
-            Eimeria: 'run label',
-            Neuronal: 'tissue metadata',
-            Tundra: 'geography metadata',
+            Eimeria: 'organism',
+            Neuronal: 'tissue',
+            Tundra: 'biome',
         };
 
         return (
@@ -130,24 +141,26 @@ const OnbaordingMessage = () => {
                         padding: 2,
                         display: 'flex',
                         flex: 1,
-                        flexDirection: 'column',
+                        flexDirection: 'row',
                         justifyContent: 'center',
-                        alignItems: 'flex-start',
+                        alignItems: 'center',
+                        alignContent: 'center',
                         borderWidth: 1,
                         borderColor: 'rgba(255, 255, 255, 0.48)',
                         borderRadius: 8,
                         borderStyle: 'solid',
-                        height: 150,
-                        width: 225,
+                        height: 80,
+                        width: 200,
+                        gap: 1,
                     }}
                 >
                     {iconMap[name]}
-                    <Typography variant='body1'>
+                    <Typography variant='body' sx={{ textAlign: 'left' }}>
                         {`Query the `}
-                        <Typography component='span' fontStyle='italic'>
+                        <Typography variant='body' component='span' fontStyle='italic'>
                             {name}
                         </Typography>
-                        {` virome by ${filterTypeMap[name]}`}
+                        {` ${filterTypeMap[name]} virome`}
                     </Typography>
                 </CardActionArea>
             </Card>
@@ -165,46 +178,71 @@ const OnbaordingMessage = () => {
                 alignItems: 'center',
             }}
         >
-            <Box
-                alt='Open virome logo'
-                component='img'
-                sx={{
-                    height: 150,
-                    width: 150,
-                    cursor: 'pointer',
-                    mt: -20,
-                }}
-                src={Logo}
-                onClick={onClickFilterText}
-            />
-            <Typography variant='h6'>{`Welcome to Open Virome.`}</Typography>
-            <Typography variant='h6'>
-                <Typography
-                    onClick={onClickFilterText}
-                    paragraph
-                    variant='h6'
-                    component='span'
-                    color='primary'
-                    style={{ cursor: 'pointer' }}
+            {
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        width: '100%',
+                        height: '100%',
+                        mt: 4,
+                    }}
                 >
-                    {`Add filters`}
-                </Typography>
-                {` or click an example below.`}
-            </Typography>
-            <Box
-                sx={{
-                    backgroundColor: 'transparent',
-                    display: 'flex',
-                    flexDirection: 'row',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    mt: 8,
-                }}
-            >
-                {getExampleFilter('Eimeria')}
-                {getExampleFilter('Neuronal')}
-                {getExampleFilter('Tundra')}
-            </Box>
+                    {!onlyShowGlobalChat() ? (
+                        <>
+                            <Box
+                                alt='Open virome logo'
+                                component='img'
+                                sx={{
+                                    height: 150,
+                                    width: 150,
+                                    cursor: 'pointer',
+                                    mt: -10,
+                                }}
+                                src={Logo}
+                                onClick={onClickFilterText}
+                            />
+                            <Typography
+                                variant='h6'
+                                onClick={onClickFilterText}
+                                sx={{ cursor: 'pointer' }}
+                            >{`Welcome to Open Virome`}</Typography>
+                        </>
+                    ) : null}
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            width: '100%',
+                            height: onlyShowGlobalChat() ? '100%' : 100,
+                            mt: 4,
+                        }}
+                    >
+                        <OnboardingChat />
+                    </Box>
+
+                    {!onlyShowGlobalChat() ? (
+                        <Box
+                            sx={{
+                                backgroundColor: 'transparent',
+                                display: 'flex',
+                                flexDirection: 'row',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                mt: 6,
+                            }}
+                        >
+                            {getExampleFilter('Eimeria')}
+                            {getExampleFilter('Neuronal')}
+                            {getExampleFilter('Tundra')}
+                        </Box>
+                    ) : null}
+                </Box>
+            }
         </Box>
     );
 };

@@ -1,6 +1,15 @@
 import { runLLMCompletion } from '../clients/oai.mjs';
 import { runCypherQuery } from '../clients/neo4j.mjs';
-import { getMwasHypothesisSystemPrompt, getBioProjectsSummarizationPrompt } from './prompts.mjs';
+import {
+    getMwasHypothesisSystemPrompt,
+    getBioProjectsSummarizationPrompt,
+    getGraphRAGMapSystemPrompt,
+    getGraphRAGReduceSystemPrompt,
+    allowGeneralKnowledgeSystemPrompt,
+    noDataFoundMessage,
+} from './prompts.mjs';
+
+const INCLUDE_MWAS_IN_GRAPH_RAG = true;
 
 const getBioprojectContext = async (bioprojects) => {
     const maxTotalLength = 10000;
@@ -64,9 +73,7 @@ const getFilterQueryContext = (filters) => {
 
 export const getBioprojectsSummarization = async (bioprojects) => {
     const bioprojectContext = await getBioprojectContext(bioprojects);
-
     const context = getBioProjectsSummarizationPrompt();
-
     let model, role;
     model = 'gpt4o';
     if (model === 'gpt4o') {
@@ -75,7 +82,7 @@ export const getBioprojectsSummarization = async (bioprojects) => {
         role = 'assistant'; // o1
     }
 
-    const conversation = [
+    let conversation = [
         {
             role: role,
             content: context,
@@ -86,6 +93,12 @@ export const getBioprojectsSummarization = async (bioprojects) => {
         },
     ];
     const result = await runLLMCompletion(conversation, model);
+
+    conversation.push({
+        role: role,
+        content: result.text,
+    });
+
     return { text: result.text, conversation: conversation };
 };
 
@@ -118,36 +131,131 @@ export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) 
         - Fold change: ${selectedMetadata['fold_change']}
     `;
 
-    const prompt_1 = getMwasHypothesisSystemPrompt(filterQueryContext, backgroundBioprojectContext);
+    const instructionsPrompt = `
+    ${getMwasHypothesisSystemPrompt(filterQueryContext, backgroundBioprojectContext)}
 
-    const prompt_2 = `
-    This metadata term and value has shown significant correlation with viral load in the provided metadata terms and virus family. Compare it with impactful research areas related to the query and propose a hypothesis.
+    ${allowGeneralKnowledgeSystemPrompt()}
+    `;
 
-    Provide a final hypothesis that explains the correlation between a significant metadata term and viral load in the provided organism and virus family.
-
-    Include a rationale with strong supporting evidence and possible mechanisms.
-
-    Cite any references to BioProjects that support the hypothesis.
-
-    Provide flaws in the hypothesis if there are any and attempt to correct them if possible. Provide possible alternative hypotheses if necessary.
-
+    const documentsPrompt = `
+    <documents>
     Target Metadata Association:
     ${target_mwas_prompt}
 
     Target BioProject:
     ${targetBioprojectContext}
+    </documents>
     `;
-    const conversation = [
+    let conversation = [
         {
             role: role,
-            content: prompt_1,
+            content: instructionsPrompt,
         },
         {
             role: 'user',
-            content: prompt_2,
+            content: documentsPrompt,
         },
     ];
     const result = await runLLMCompletion(conversation, model);
 
+    conversation.push({
+        role: role,
+        content: result.text,
+    });
+
     return { text: result.text, conversation: conversation };
+};
+
+export const getGraphRAGResults = async (message, conversation = []) => {
+    let communitySummaries;
+    try {
+        communitySummaries = await import('./virome_community_summaries.json', {
+            assert: { type: 'json' },
+        });
+        communitySummaries = communitySummaries.default;
+    } catch (e) {
+        console.error(e);
+        return { text: noDataFoundMessage, conversation: conversation };
+    }
+
+    const mapModel = 'gpt4oMini';
+    const reduceModel = 'gpt4o';
+    const role = 'system';
+    const promises = [];
+    const maxTokenLimit = 128000;
+
+    let index = 0;
+    for (const community of communitySummaries) {
+        if (!INCLUDE_MWAS_IN_GRAPH_RAG) {
+            delete community.mwas;
+        }
+
+        const communityPrompt = getGraphRAGMapSystemPrompt(JSON.stringify(community));
+        const communityConversation = [
+            ...conversation,
+            {
+                role: role,
+                content: communityPrompt,
+            },
+            {
+                role: 'user',
+                content: message,
+            },
+        ];
+        const result = runLLMCompletion(communityConversation, mapModel);
+        promises.push(result);
+        index++;
+    }
+
+    const results = await Promise.all(promises);
+
+    let parsedResults = results.map((result) => {
+        try {
+            return JSON.parse(result.text);
+        } catch (e) {
+            return {};
+        }
+    });
+
+    parsedResults = parsedResults.filter((result) => result.points && result.points.length > 0);
+    parsedResults = parsedResults.map((result) => {
+        result.points = result.points.filter((point) => point.description && point.score && point.score >= 0);
+        return result;
+    });
+    parsedResults = parsedResults.filter((result) => result.points && result.points.length > 0);
+    parsedResults = parsedResults.sort((a, b) => b.score - a.score);
+
+    if (parsedResults.length === 0) {
+        return { text: noDataFoundMessage, conversation: conversation };
+    }
+
+    let content = JSON.stringify(parsedResults);
+    if (content.length > maxTokenLimit) {
+        console.log(`GraphRAG content length exceeds ${maxTokenLimit} characters. ${content.length}`);
+        parsedResults = parsedResults.slice(0, 100);
+        content = JSON.stringify(parsedResults);
+        console.log(`GraphRAG content length after truncation: ${content.length}`);
+    }
+
+    const reducerConversation = [
+        ...conversation,
+        {
+            role: role,
+            content: getGraphRAGReduceSystemPrompt(JSON.stringify(parsedResults)),
+        },
+    ];
+    const reducerResult = await runLLMCompletion(reducerConversation, reduceModel);
+
+    const displayedConversation = [
+        {
+            role: 'user',
+            content: message,
+        },
+        ...reducerConversation,
+        {
+            role: role,
+            content: reducerResult.text,
+        },
+    ];
+    return { text: reducerResult.text, conversation: displayedConversation };
 };

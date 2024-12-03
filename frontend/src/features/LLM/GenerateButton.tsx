@@ -8,9 +8,10 @@ import Tooltip from '@mui/material/Tooltip';
 const GenerateButton = ({ onButtonClick, title }) => {
     const onClick = async () => {
         const isBot = await isBotDetected();
-        if (!isBot) {
-            onButtonClick();
+        if (isBot) {
+            return;
         }
+        onButtonClick();
     };
 
     return (

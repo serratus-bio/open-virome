@@ -37,6 +37,7 @@ jobs:
           echo OPENAI_TOKEN=${{ secrets.OPENAI_TOKEN }} >> .env
           echo OPENAI_ENDPOINT_gpt4o=${{ secrets.OPENAI_ENDPOINT_GPT4O }} >> .env
           echo OPENAI_ENDPOINT_o1=${{ secrets.OPENAI_ENDPOINT_O1 }} >> .env
+          echo OPENAI_ENDPOINT_gpt4o_mini=${{ secrets.OPENAI_ENDPOINT_GPT4O_MINI }} >> .env
 
       - name: Build
         run: |
