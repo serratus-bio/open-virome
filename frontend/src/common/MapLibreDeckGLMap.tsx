@@ -225,6 +225,7 @@ const DeckGLRenderScatterplot: any = ({
     setBiomeID,
     setBiosampleID,
     setCountryID,
+    setElevation,
     setHitCount,
     setLatLon,
     setLocationCount,
@@ -265,8 +266,8 @@ const DeckGLRenderScatterplot: any = ({
 
             const selectBGLJSON = await (async () => {
                 const SELECT: any = {
-                    text: `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, gm4326_id, gp4326_wwf_tew_id
-                    FROM bgl_gm4326_gp4326
+                    text: `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, elevation, gm4326_id, gp4326_wwf_tew_id
+                    FROM bgl_gm4326_gp4326_e
                     ${getWhereClause(palmprintOnly, identifiers)}
                     LIMIT 65536;`,
                 };
@@ -296,6 +297,7 @@ const DeckGLRenderScatterplot: any = ({
                         'attribute_value',
                         'lat',
                         'lon',
+                        'elevation',
                         'gm4326_id',
                         'gp4326_wwf_tew_id',
                     ]);
@@ -311,7 +313,7 @@ const DeckGLRenderScatterplot: any = ({
                     text: `run, bio_sample, palm_id, sotu
                     FROM (SELECT DISTINCT(accession)
                         FROM (SELECT accession
-                            FROM bgl_gm4326_gp4326
+                            FROM bgl_gm4326_gp4326_e
                             ${getWhereClause(palmprintOnly, identifiers)}
                             LIMIT 65536)) AS t
                     JOIN palm_virome ON t.accession = palm_virome.bio_sample;`,
@@ -385,7 +387,9 @@ const DeckGLRenderScatterplot: any = ({
 
                                 setCountryID(info.object.gm4326_id);
 
-                                setLatLon([info.object.lat, info.object.lon].join(','));
+                                setLatLon([info.object.lat, info.object.lon].join(', '));
+
+                                setElevation(info.object.elevation);
 
                                 if (mapMode === 'CONTIGS') {
                                     setRunID(info.object.run);
@@ -467,6 +471,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
     const [biosampleTitle, setBiosampleTitle] = useState('');
     const [countryID, setCountryID] = useState('');
     const [countryRegionID, setCountryRegionID] = useState('');
+    const [elevation, setElevation] = useState('');
     const [hitCount, setHitCount] = useState(0);
     const [latLon, setLatLon] = useState('');
     const [locationCount, setLocationCount] = useState(0);
@@ -520,6 +525,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                     setBioprojectID,
                     setBiosampleID,
                     setCountryID,
+                    setElevation,
                     setHitCount,
                     setLatLon,
                     setLocationCount,
@@ -794,27 +800,41 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                                     {truncate(attributeName + ': ' + attributeValue, 40)}
                                 </div>
                                 <div style={{ height: '8px' }}></div>
-                                <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                                    <span>LAT / LON</span>
-                                    <div
-                                        style={{
-                                            alignItems: 'flex-end',
-                                            display: 'inline-flex',
-                                            gap: '8px',
-                                            margin: '0 0 0 8px',
-                                            position: 'relative',
-                                            top: '2px',
-                                        }}
-                                    >
-                                        <MapLibreDeckGLMapCopyButton
-                                            onClick={() => navigator.clipboard.writeText(latLon)}
-                                        />
-                                        <MapLibreDeckGLMapURLButton
-                                            href={'https://www.google.com/maps/search/?api=1&query=' + latLon}
-                                        />
-                                    </div>
+                                <div>
                                 </div>
-                                <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{latLon}</div>
+                                <div style={{ alignItems:'baseline', display: 'flex' }}>
+                                    <div style={{ flex: '1 0' }}>
+                                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                                            <span>LAT / LON</span>
+                                            <div
+                                                style={{
+                                                    alignItems: 'flex-end',
+                                                    display: 'inline-flex',
+                                                    gap: '8px',
+                                                    margin: '0 0 0 8px',
+                                                    position: 'relative',
+                                                    top: '2px',
+                                                }}
+                                            >
+                                                <MapLibreDeckGLMapCopyButton
+                                                    onClick={() => navigator.clipboard.writeText(latLon)}
+                                                />
+                                                <MapLibreDeckGLMapURLButton
+                                                    href={'https://www.google.com/maps/search/?api=1&query=' + latLon}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{latLon}</div>
+                                    </div>
+                                    {elevation && <div style={{ flex: '1 0' }}>
+                                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                                            <span>ELEVATION</span>
+                                        </div>
+                                        <div style={{ margin: '0 0 0 0' }}>
+                                            <span style={{ fontSize: '14px' }}>{elevation}</span>
+                                        </div>
+                                    </div>}
+                                </div>
                                 <div style={{ height: '8px' }}></div>
                                 <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                                     <span style={{ verticalAlign: 'middle' }}>BIOME</span>
@@ -835,7 +855,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                                 </div>
                                 <div style={{ height: '8px' }}></div>
                                 <div style={{ display: 'flex' }}>
-                                    <div style={{ flex: '1 0' }}>
+                                    {countryID && <div style={{ flex: '1 0' }}>
                                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                                             <span>COUNTRY</span>
                                         </div>
@@ -851,7 +871,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                                                 {countryID}
                                             </span>
                                         </div>
-                                    </div>
+                                    </div>}
                                     <div style={{ flex: '1 0' }}>
                                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                                             <span>REGION</span>
