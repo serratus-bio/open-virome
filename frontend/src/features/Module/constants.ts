@@ -11,7 +11,7 @@ export const sectionConfig = {
     palmdb: {
         title: 'Virome',
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Virome',
-        modules: ['sotu', 'family', 'species'],
+        modules: ['sotu', 'family', 'species', 'community'],
         defaultDisplay: 'figure',
     },
     ecology: {
@@ -93,6 +93,14 @@ export const moduleConfig = {
         tag: 'Virus Family',
         groupByKey: 'tax_family',
         resultsTable: 'palm_virome',
+        resultsIdColumn: 'run',
+        queryBuilderDisplay: 'table',
+    },
+    community: {
+        title: 'Community',
+        tag: 'Community',
+        groupByKey: 'community_id',
+        resultsTable: 'virome_community',
         resultsIdColumn: 'run',
         queryBuilderDisplay: 'table',
     },

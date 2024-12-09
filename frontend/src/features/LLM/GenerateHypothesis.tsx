@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useSelector } from 'react-redux';
 import { selectAllFilters } from '../Query/slice.ts';
 import { getFilterQuery } from '../../common/utils/queryHelpers.ts';
@@ -11,22 +11,13 @@ import Typography from '@mui/material/Typography';
 import GenerateButton from './GenerateButton.tsx';
 
 const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
-    const [displayMessage, setDisplayMessage] = useState('');
     const filters = useSelector(selectAllFilters);
 
-    const [getHypothesisText, { data: hypothesisData, isLoading: isLoadingHypothesis, error: errorHypothesis }] =
+    const [getHypothesisText, { data: hypothesisData, isFetching: isFetchingHypothesis, error: errorHypothesis }] =
         useLazyGetHypothesisQuery();
 
-    useEffect(() => {
-        if (hypothesisData && hypothesisData.text) {
-            setDisplayMessage(hypothesisData.text);
-        } else if (isLoadingHypothesis) {
-            setDisplayMessage('');
-        }
-    }, [hypothesisData, isLoadingHypothesis]);
-
     const onButtonClick = async () => {
-        if (isLoadingHypothesis) {
+        if (isFetchingHypothesis) {
             return;
         }
         await getHypothesisText({
@@ -39,13 +30,13 @@ const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
     };
 
     const renderPlaceholder = () => {
-        if (isLoadingHypothesis) {
+        if (isFetchingHypothesis) {
             return <Skeleton variant='text' width={'100%'} height={60} />;
         }
         return null;
     };
 
-    const hypothesisTextIsNonEmpty = () => displayMessage && displayMessage?.length > 0;
+    const hypothesisTextIsNonEmpty = () => hypothesisData && hypothesisData?.text?.length > 0;
 
     return (
         <Box
@@ -54,7 +45,7 @@ const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
                 width: '100%',
                 justifyContent: 'space-between',
                 justifyItems: 'flex-start',
-                height: hypothesisTextIsNonEmpty() || isLoadingHypothesis ? '100%' : 0,
+                height: hypothesisTextIsNonEmpty() || isFetchingHypothesis ? '100%' : 0,
                 mt: 4,
                 mb: 6,
             }}
@@ -67,7 +58,7 @@ const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
                 }}
             >
                 {renderPlaceholder()}
-                {!isLoadingHypothesis && hypothesisTextIsNonEmpty() ? (
+                {!isFetchingHypothesis && hypothesisTextIsNonEmpty() ? (
                     <Box
                         sx={{
                             backgroundColor: '#484848',
@@ -79,7 +70,7 @@ const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
                         }}
                     >
                         <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
-                            {formatLLMGeneratedText(displayMessage)}
+                            {formatLLMGeneratedText(hypothesisData?.text, hypothesisData?.conversation)}
                         </Typography>
                     </Box>
                 ) : null}

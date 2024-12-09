@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useLazyGetSummaryTextQuery } from '../../api/client.ts';
 import { formatLLMGeneratedText } from './textFormatting.tsx';
 
@@ -8,20 +8,11 @@ import Typography from '@mui/material/Typography';
 import GenerateButton from './GenerateButton.tsx';
 
 const GenerateSummary = ({ identifiers }) => {
-    const [displayMessage, setDisplayMessage] = useState('');
-    const [getSummaryText, { data: summaryData, isLoading: isLoadingSummary, error: errorSummary }] =
+    const [getSummaryText, { data: summaryData, isFetching: isFetchingSummary, error: errorSummary }] =
         useLazyGetSummaryTextQuery();
 
-    useEffect(() => {
-        if (summaryData && summaryData.text) {
-            setDisplayMessage(summaryData.text);
-        } else if (isLoadingSummary) {
-            setDisplayMessage('');
-        }
-    }, [summaryData, isLoadingSummary]);
-
     const onButtonClick = async () => {
-        if (isLoadingSummary) {
+        if (isFetchingSummary) {
             return;
         }
         await getSummaryText(
@@ -34,13 +25,13 @@ const GenerateSummary = ({ identifiers }) => {
     };
 
     const renderPlaceholder = () => {
-        if (isLoadingSummary) {
+        if (isFetchingSummary) {
             return <Skeleton variant='text' width={'100%'} height={60} />;
         }
         return null;
     };
 
-    const summaryTextIsNonEmpty = () => displayMessage && displayMessage?.length > 0;
+    const summaryTextIsNonEmpty = () => summaryData && summaryData?.text?.length > 0;
 
     return (
         <Box
@@ -49,8 +40,8 @@ const GenerateSummary = ({ identifiers }) => {
                 width: '100%',
                 justifyContent: 'space-between',
                 justifyItems: 'flex-start',
-                height: summaryTextIsNonEmpty() || isLoadingSummary ? '100%' : 0,
-                mb: summaryTextIsNonEmpty() || isLoadingSummary ? 4 : 0,
+                height: summaryTextIsNonEmpty() || isFetchingSummary ? '100%' : 0,
+                mb: summaryTextIsNonEmpty() || isFetchingSummary ? 4 : 0,
             }}
         >
             <Box
@@ -61,7 +52,7 @@ const GenerateSummary = ({ identifiers }) => {
                 }}
             >
                 {renderPlaceholder()}
-                {!isLoadingSummary && summaryTextIsNonEmpty() ? (
+                {!isFetchingSummary && summaryTextIsNonEmpty() ? (
                     <Box
                         sx={{
                             backgroundColor: '#484848',
@@ -73,7 +64,7 @@ const GenerateSummary = ({ identifiers }) => {
                         }}
                     >
                         <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
-                            {formatLLMGeneratedText(displayMessage)}
+                            {formatLLMGeneratedText(summaryData?.text, summaryData?.conversation)}
                         </Typography>
                     </Box>
                 ) : null}

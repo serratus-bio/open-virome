@@ -16,7 +16,7 @@ import {
     getSearchStringClause,
 } from './utils/queryBuilder.mjs';
 import { getMWASResults } from './utils/mwas.mjs';
-import { getBioprojectsSummarization, getMwasHypothesis } from './utils/LLMTextGeneration.mjs';
+import { getBioprojectsSummarization, getMwasHypothesis, getGraphRAGResults } from './utils/LLMTextGeneration.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 
 const app = express();
@@ -214,6 +214,21 @@ app.post('/hypothesis', async (req, res) => {
     const filters = body?.filters ?? [];
     const selectedMetadata = body?.selectedMetadata ?? [];
     const result = await getMwasHypothesis(ids, filters, selectedMetadata);
+    if (result.error) {
+        console.error(result.error);
+        return res.status(500).json({ error: result.error });
+    }
+    return res.json(result);
+});
+
+app.post('/globalChat', async (req, res) => {
+    const body = getRequestBody(req);
+    if (body === undefined) {
+        return res.status(400).json({ error: 'Invalid request!' });
+    }
+    const conversation = body?.conversation ?? [];
+    const message = body?.message ?? '';
+    const result = await getGraphRAGResults(message, conversation);
     if (result.error) {
         console.error(result.error);
         return res.status(500).json({ error: result.error });

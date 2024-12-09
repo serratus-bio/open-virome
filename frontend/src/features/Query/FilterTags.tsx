@@ -44,7 +44,7 @@ const FilterTags = () => {
                     justifyContent: 'left',
                     flexWrap: 'nowrap',
                     overflow: 'auto',
-                    maxWidth: '60vw',
+                    maxWidth: '50vw',
                     borderRadius: 2,
                 }}
             >

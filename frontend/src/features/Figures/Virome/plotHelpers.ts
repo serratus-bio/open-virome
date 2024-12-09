@@ -371,7 +371,7 @@ export const getMWASScatterPlotData = (data, activeMetadataType) => {
         },
         series: [
             {
-                name: `BioProjects size (n runs)`,
+                name: `MWAS results`,
                 type: 'scatter',
                 label: {
                     show: false,
@@ -381,7 +381,7 @@ export const getMWASScatterPlotData = (data, activeMetadataType) => {
                     focus: 'series',
                 },
                 color: 'gray',
-                symbolSize: 7,
+                symbolSize: 9,
             },
         ],
     };
