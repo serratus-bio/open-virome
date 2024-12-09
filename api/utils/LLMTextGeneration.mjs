@@ -206,12 +206,11 @@ export const getGraphRAGResults = async (message, conversation = []) => {
         promises.push(result);
         index++;
     }
-
-    const results = await Promise.all(promises);
+    const results = await Promise.allSettled(promises);
 
     let parsedResults = results.map((result) => {
         try {
-            return JSON.parse(result.text);
+            return JSON.parse(result?.value?.text);
         } catch (e) {
             return {};
         }
