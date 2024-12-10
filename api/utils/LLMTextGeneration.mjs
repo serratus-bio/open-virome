@@ -17,6 +17,7 @@ const getBioprojectContext = async (bioprojects) => {
     const bioprojectRecords = await runCypherQuery(
         `MATCH (n:BioProject)
         WHERE n.bioProject IN [${bioprojects.map((id) => `'${id}'`).join(', ')}]
+        AND n:OpenVirome
         RETURN n
         ORDER BY size(n.description) DESC
         LIMIT 5000

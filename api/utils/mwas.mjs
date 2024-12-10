@@ -228,6 +228,7 @@ export const getMWASResults = async (bioprojects, targetVirusFamilies, pageStart
     const query = `
         MATCH (n:BioProject)<-[:HAS_BIOPROJECT]-(r:SRA)-[:HAS_SOTU]->(s:SOTU)
         WHERE n.bioProject IN [${bioprojects.map((bioproject) => `'${bioproject}'`).join(', ')}]
+        AND n:OpenVirome AND s:OpenVirome AND r:OpenVirome
         with n.bioProject as bioProject, s.taxFamily as virusFamily, collect(DISTINCT r.bioSample) as bioSamples, collect(DISTINCT s.sotu) as sotus, collect(DISTINCT s.taxSpecies) as taxSpecies
         RETURN bioProject, virusFamily, bioSamples, sotus, taxSpecies
         LIMIT 5000

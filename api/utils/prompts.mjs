@@ -84,7 +84,7 @@ Generate a response consisting of a list of key points that responds to the user
 
 You should use the data provided in the data tables below as the primary context for generating the response.
 
-MWAS (Metadata-wide association study) results contain significant correlations between metadata terms and viral expression in the dataset. MWAS data can be used in a seperate paragraph to proprose hypotheses to answer a question and must provide reference to a BioProject ID.
+MWAS (Metadata-wide association study) results contain significant correlations between metadata terms and viral expression in the dataset. If possible, MWAS data can be used in a seperate key point to proprose a hypothetical answer but must indicate the point is an 'MWAS derived hypothesis' and provide reference to the BioProject ID.
 
 If you don't know the answer or if the input data tables do not contain sufficient information to provide an answer, just say so. Do not make anything up.
 
@@ -129,7 +129,7 @@ Generate a response consisting of a list of key points that responds to the user
 
 You should use the data provided in the data tables below as the primary context for generating the response.
 
-MWAS (Metadata-wide association study) results contain significant correlations between metadata terms and viral expression in the dataset. MWAS data can be used in a seperate paragraph to proprose hypotheses to answer a question and must provide reference to a BioProject ID.
+MWAS (Metadata-wide association study) results contain significant correlations between metadata terms and viral expression in the dataset. If possible, MWAS data can be used in a seperate paragraph to proprose a hypothetical answer but must indicate the paragraph is an 'MWAS derived hypothesis' and provide reference to the BioProject ID.
 
 If you don't know the answer or if the input data tables do not contain sufficient information to provide an answer, just say so. Do not make anything up.
 
