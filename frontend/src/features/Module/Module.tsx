@@ -28,6 +28,8 @@ import Select from '@mui/material/Select';
 import Tooltip from '@mui/material/Tooltip';
 import Skeleton from '@mui/material/Skeleton';
 import QuestionMarkIcon from '@mui/icons-material/HelpCenter';
+import Button from '@mui/material/Button';
+import ArrowRightIcon from '@mui/icons-material/ChevronRight';
 
 const Module = ({ sectionKey }) => {
     const dispatch = useDispatch();
@@ -36,6 +38,7 @@ const Module = ({ sectionKey }) => {
     const sidebarOpen = useSelector(selectSidebarOpen);
     const palmprintOnly = useSelector(selectPalmprintOnly);
     const [moduleDisplay, setModuleDisplay] = useState(sectionConfig[sectionKey].defaultDisplay);
+    const [customDropDownOpen, setCustomDropDownOpen] = useState(false);
 
     const isTableView = () => moduleDisplay === 'table';
     const isFigureView = () => moduleDisplay === 'figure';
@@ -118,7 +121,14 @@ const Module = ({ sectionKey }) => {
     };
 
     const getSectionLayoutDisplayName = (sectionLayoutType) => {
-        return `${sectionConfig[sectionKey]?.title} (${capitalize(sectionLayoutType)})`;
+        return `${sectionConfig[sectionKey]?.title} (${sectionLayoutType == 'advanced' ? capitalize(sectionLayoutType) : 'Summary'})`;
+    };
+
+    // This custom handler is to keep MUI styles on select component while behaving like a button
+    const handleDropdownClick = () => {
+        setCustomDropDownOpen(false);
+        const newSectionLayout = sectionLayout === 'simple' ? 'advanced' : 'simple';
+        onLayoutChange({ target: { value: newSectionLayout } });
     };
 
     return (
@@ -145,36 +155,63 @@ const Module = ({ sectionKey }) => {
                     <Box sx={{ mb: 0 }}>
                         {' '}
                         {/* Pull-down Menu Module Select */}
-                        <Select
+                        <Button
+                            disableRipple
+                            color='inherit'
+                            onClick={() => {
+                                handleDropdownClick();
+                            }}
                             sx={{
+                                'color': 'inherit',
+                                'backgroundColor': 'transparent',
+                                'padding': 0,
+                                'textTransform': 'none',
                                 'fontSize': 30,
-                                '.MuiOutlinedInput-notchedOutline': {
-                                    borderColor: '#40a9ff',
-                                },
-                                '&:hover .MuiOutlinedInput-notchedOutline': {
-                                    borderColor: '#40a9ff',
-                                    borderWidth: '0.15rem',
-                                },
-                                'borderColor': '#40a9ff',
-                                '&:before': {
-                                    borderColor: '#40a9ff',
-                                },
-                                '&:after': {
-                                    borderColor: '#40a9ff',
+                                'fontWeight': 500,
+                                'borderRadius': 0,
+                                'cursor': 'pointer',
+                                '&:hover': {
+                                    backgroundColor: 'transparent',
                                 },
                             }}
-                            value={sectionLayout}
-                            onChange={onLayoutChange}
-                            variant='standard'
                         >
-                            {['simple', 'advanced'].map((sectionLayout) => {
-                                return (
-                                    <MenuItem key={sectionLayout} value={sectionLayout} sx={{ pr: 10 }}>
-                                        {getSectionLayoutDisplayName(sectionLayout)}
-                                    </MenuItem>
-                                );
-                            })}
-                        </Select>
+                            <Select
+                                sx={{
+                                    'fontSize': 30,
+                                    '.MuiOutlinedInput-notchedOutline': {
+                                        borderColor: '#40a9ff',
+                                    },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: '#40a9ff',
+                                        borderWidth: '0.15rem',
+                                    },
+                                    'borderColor': '#40a9ff',
+                                    '&:before': {
+                                        borderColor: '#40a9ff',
+                                    },
+                                    '&:after': {
+                                        borderColor: '#40a9ff',
+                                    },
+                                    'paddingRight': 0,
+                                }}
+                                value={sectionLayout}
+                                onChange={onLayoutChange}
+                                onClick={() => handleDropdownClick()}
+                                variant='standard'
+                                open={customDropDownOpen}
+                                IconComponent={() => (
+                                    <ArrowRightIcon sx={{ ml: -3, cursor: 'pointer', fontSize: 24 }} />
+                                )}
+                            >
+                                {['simple', 'advanced'].map((sectionLayout) => {
+                                    return (
+                                        <MenuItem key={sectionLayout} value={sectionLayout} sx={{ pr: 10 }}>
+                                            {getSectionLayoutDisplayName(sectionLayout)}
+                                        </MenuItem>
+                                    );
+                                })}
+                            </Select>
+                        </Button>
                     </Box>
                 </Box>
 

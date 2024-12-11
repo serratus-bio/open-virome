@@ -3,7 +3,7 @@
  */
 export const sectionConfig = {
     sra: {
-        title: 'SRA Run',
+        title: 'SRA',
         wikiUrl: 'https://github.com/serratus-bio/open-virome/wiki/Run-Module',
         modules: ['label', 'seqType', 'runId', 'biosample', 'bioproject'],
         defaultDisplay: 'figure',
