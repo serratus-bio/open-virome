@@ -18,6 +18,12 @@ const OPENAI_MODEL_CONFIGS = {
         apiKey: process.env.OPENAI_TOKEN,
         apiVersion: '2024-09-01-preview',
     },
+    // This model has a content filter policy with higher sensitivity used for high risk biosafety levels
+    gpt4oMini2: {
+        endpoint: process.env.OPENAI_ENDPOINT_gpt4o_mini2,
+        apiKey: process.env.OPENAI_TOKEN,
+        apiVersion: '2024-09-01-preview',
+    },
 };
 
 const getOpenAIClient = (configName) => {
