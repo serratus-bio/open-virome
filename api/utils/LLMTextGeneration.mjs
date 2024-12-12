@@ -179,7 +179,7 @@ export const getGraphRAGResults = async (message, conversation = []) => {
         return { text: noDataFoundMessage, conversation: conversation };
     }
 
-    const mapModel = 'gpt4oMini';
+    let mapModel = 'gpt4oMini';
     const reduceModel = 'gpt4o';
     const role = 'system';
     const promises = [];
@@ -203,6 +203,14 @@ export const getGraphRAGResults = async (message, conversation = []) => {
                 content: message,
             },
         ];
+
+        const maxBioSafetyLevel = community.max_biosafety;
+        if (maxBioSafetyLevel === 'RG4') {
+            mapModel = 'gpt4oMini2';
+        } else {
+            mapModel = 'gpt4oMini';
+        }
+
         const result = runLLMCompletion(communityConversation, mapModel);
         promises.push(result);
         index++;
