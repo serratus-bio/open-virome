@@ -31,7 +31,7 @@ const getOpenAIClient = (configName) => {
     return new AzureOpenAI(config);
 };
 
-export const runLLMCompletion = async (messages, modelName = DEFAULT_MODEL) => {
+export const runLLMCompletion = async (messages, modelName = DEFAULT_MODEL, temperature=0.8) => {
     if (!messages) {
         return { error: 'No messages provided!' };
     }
@@ -39,6 +39,7 @@ export const runLLMCompletion = async (messages, modelName = DEFAULT_MODEL) => {
         const openai = getOpenAIClient(modelName);
         const result = await openai.chat.completions.create({
             messages,
+            temperature,
         });
         return {
             text: result.choices[0].message.content,
