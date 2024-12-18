@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { useLazyGetGlobalChatQuery } from '../../api/client.ts';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useLazyGetGlobalChatQuery } from '../../api/client.ts';
 import { addFilter } from '../Query/slice.ts';
 import { isBotDetected } from '../../common/utils/botDetection.ts';
 import { formatLLMGeneratedText } from './textFormatting.tsx';
@@ -24,6 +24,21 @@ const GlobalChat = () => {
         { data: globalChatData, error: globalChatError, isFetching: isFetchingGlobalChat },
         lastRequestInfo,
     ] = useLazyGetGlobalChatQuery();
+
+    useEffect(() => {
+        if (chatMessages.length > 0) {
+            let lastUserMessage = null;
+            for (let i = chatMessages.length - 1; i >= 0; i--) {
+                if (chatMessages[i].role === 'user' && chatMessages[i].mode === 'global') {
+                    lastUserMessage = chatMessages[i].message;
+                    break;
+                }
+            }
+            if (lastUserMessage) {
+                setQuery(lastUserMessage);
+            }
+        }
+    }, [chatMessages]);
 
     const handleQuery = async () => {
         if (!query) {

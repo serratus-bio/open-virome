@@ -68,9 +68,10 @@ export const Chat = () => {
         dispatch(toggleChat());
     };
 
-    const renderChatBubble = (messageObj) => {
+    const renderChatBubble = (messageObj, index) => {
         return messageObj.role === 'user' ? (
             <Box
+                key={index}
                 sx={{
                     bgcolor: 'cornflowerblue',
                     p: 1,
@@ -83,7 +84,7 @@ export const Chat = () => {
                 <Typography variant='body'>{messageObj.text}</Typography>
             </Box>
         ) : (
-            <Box sx={{ p: 1, border: 'rounded', borderRadius: '16px 16px 16px 0', mb: 2 }}>
+            <Box sx={{ p: 1, border: 'rounded', borderRadius: '16px 16px 16px 0', mb: 2 }} key={index}>
                 <Typography sx={{ display: 'block', fontSize: '0.8em' }}>
                     {formatLLMGeneratedText(messageObj.text, messageObj.conversation, onFilterTextClick)}
                 </Typography>
@@ -126,7 +127,7 @@ export const Chat = () => {
                 <Box sx={{ flexGrow: 1 }}>
                     <List>
                         {chatMessages.map((message, index) => (
-                            <ListItem key={index}>{renderChatBubble(message)}</ListItem>
+                            <ListItem key={index}>{renderChatBubble(message, index)}</ListItem>
                         ))}
                     </List>
                 </Box>
