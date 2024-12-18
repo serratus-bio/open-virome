@@ -1,29 +1,64 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { toggleSidebar } from '../../app/slice.ts';
 import { addManyFilters } from './slice.ts';
-import { selectChatMessages } from '../LLM/slice.ts';
+import { selectChatMessages, addChatMessage, clearChatMessages } from '../LLM/slice.ts';
 
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardActionArea from '@mui/material/CardActionArea';
 import Typography from '@mui/material/Typography';
 import LabelIcon from '@mui/icons-material/Description';
-import BrainIcon from '@mui/icons-material/Diversity2';
 import GeoIcon from '@mui/icons-material/TravelExplore';
+import BlurOnIcon from '@mui/icons-material/BlurOn';
 import Logo from '../../common/assets/ov_hex_dark.png';
 import OnboardingChat from '../LLM/OnboardingChat.tsx';
 
 const OnbaordingMessage = () => {
     const dispatch = useDispatch();
     const chatMessages = useSelector(selectChatMessages);
+    const [promptList, setPromptList] = useState([]);
+    const [currentPromptIndex, setCurrentPromptIndex] = useState(0);
 
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
+    const getRandomizedPromptList = () => {
+        const randomPrompts = [
+            'What human tissue show the most viral diversity?',
+            'What are the most unusual reservoirs for human-infecting viruses?',
+            'what is the most unexpected virus-human relationship?',
+            'Which virus has the largest economic impact on global agriculture?',
+            'Are there viruses that exist in both terrestrial and aquatic ecosystems?',
+            'What viruses are common in marine biological samples as well as in humans?',
+            "Are there any indications that viruses play a role in cancer that aren't already known?",
+            'Are the any potential gaps in the current virus research data?',
+            'Could viruses be influencing autoimmune diseases in ways not yet explored?',
+            'What are the least-studied viruses in metagenomic datasets?',
+            'Are there any viruses that appear to consistently co-occur with specific bacterial pathogens?',
+            'What are the most significant gaps in understanding virus-host specificity?',
+            'What virus families are underrepresented in environmental sampling efforts?',
+            'Could there be viruses linked to rare diseases that are currently classified as idiopathic?',
+            'Are there viruses with unique adaptations to extreme environments, such as hydrothermal vents?',
+            'What human tissues are least explored for the presence of viruses?',
+            'Are there viruses that exhibit potential as vectors for therapeutic applications but remain unexamined?',
+            'Which viruses could be acting as environmental sentinels for ecosystem health?',
+        ];
+
+        return randomPrompts
+            .map((prompt) => ({ value: prompt, sort: Math.random() }))
+            .sort((a, b) => a.sort - b.sort)
+            .map((item) => item.value);
+    };
+
+    useEffect(() => {
+        const randomPrompts = getRandomizedPromptList();
+        setPromptList(randomPrompts);
+    }, []);
+
     const exampleFilters = {
-        Eimeria: [
+        'Eimeria': [
             {
                 filterId: 'label-Eimeria stiedai',
                 filterType: 'label',
@@ -50,48 +85,11 @@ const OnbaordingMessage = () => {
                 filterValue: 'Eimeria falciformis',
             },
         ],
-        Neuronal: [
+        'Coniferous Forests': [
             {
-                filterId: 'tissue-neuronal',
-                filterType: 'tissue',
-                filterValue: 'neuronal',
-            },
-            {
-                filterId: 'tissue-neuronal stem cell',
-                filterType: 'tissue',
-                filterValue: 'neuronal stem cell',
-            },
-            {
-                filterId: 'tissue-neuronal cell',
-                filterType: 'tissue',
-                filterValue: 'neuronal cell',
-            },
-            {
-                filterId: 'tissue-neuronal precursor',
-                filterType: 'tissue',
-                filterValue: 'neuronal precursor',
-            },
-            {
-                filterId: 'tissue-neuronal cell line',
-                filterType: 'tissue',
-                filterValue: 'neuronal cell line',
-            },
-            {
-                filterId: 'tissue-neuronal stem',
-                filterType: 'tissue',
-                filterValue: 'neuronal stem',
-            },
-            {
-                filterId: 'tissue-neuronal precursor cell',
-                filterType: 'tissue',
-                filterValue: 'neuronal precursor cell',
-            },
-        ],
-        Tundra: [
-            {
-                filterId: 'biome-WWF_TEW_BIOME_11',
+                filterId: 'biome-WWF_TEW_BIOME_03',
                 filterType: 'biome',
-                filterValue: 'WWF_TEW_BIOME_11',
+                filterValue: 'WWF_TEW_BIOME_03',
             },
         ],
     };
@@ -105,6 +103,14 @@ const OnbaordingMessage = () => {
         dispatch(addManyFilters(filters));
     };
 
+    const handleRandomPrompt = () => {
+        const prompt = promptList[currentPromptIndex];
+        setCurrentPromptIndex((currentPromptIndex + 1) % promptList.length);
+        dispatch(clearChatMessages());
+        dispatch(addChatMessage({ message: prompt, role: 'user', mode: 'global' }));
+        return prompt;
+    };
+
     const onlyShowGlobalChat = () => {
         if (chatMessages.length === 0) {
             return false;
@@ -113,17 +119,24 @@ const OnbaordingMessage = () => {
         return lastMessage.mode === 'global' && lastMessage.role === 'assistant';
     };
 
-    const getExampleFilter = (name) => {
+    const getExampleQuery = (name) => {
         const iconMap = {
-            Eimeria: <LabelIcon fontSize='medium' />,
-            Neuronal: <BrainIcon fontSize='medium' />,
-            Tundra: <GeoIcon fontSize='medium' />,
+            'Eimeria': <LabelIcon fontSize='medium' />,
+            'Coniferous Forests': <GeoIcon fontSize='medium' />,
+            'Prompt': <BlurOnIcon fontSize='medium' />,
         };
 
         const filterTypeMap = {
-            Eimeria: 'organism',
-            Neuronal: 'tissue',
-            Tundra: 'biome',
+            'Eimeria': 'organism',
+            'Coniferous Forests': '',
+            'Prompt': 'database',
+        };
+        const onClickHandler = () => {
+            if (name === 'Prompt') {
+                handleRandomPrompt();
+            } else {
+                onClickExampleFilter(name);
+            }
         };
 
         return (
@@ -136,7 +149,7 @@ const OnbaordingMessage = () => {
                 }}
             >
                 <CardActionArea
-                    onClick={() => onClickExampleFilter(name)}
+                    onClick={() => onClickHandler()}
                     sx={{
                         padding: 2,
                         display: 'flex',
@@ -145,23 +158,29 @@ const OnbaordingMessage = () => {
                         justifyContent: 'center',
                         alignItems: 'center',
                         alignContent: 'center',
-                        borderWidth: 1,
+                        borderWidth: 2,
                         borderColor: 'rgba(255, 255, 255, 0.48)',
                         borderRadius: 8,
                         borderStyle: 'solid',
                         height: 80,
-                        width: 200,
+                        width: 210,
                         gap: 1,
                     }}
                 >
                     {iconMap[name]}
-                    <Typography variant='body' sx={{ textAlign: 'left' }}>
-                        {`Query the `}
-                        <Typography variant='body' component='span' fontStyle='italic'>
-                            {name}
+                    {name === 'Prompt' ? (
+                        <Typography variant='body' sx={{ textAlign: 'left' }}>
+                            {`Query the global virome with a prompt`}
                         </Typography>
-                        {` ${filterTypeMap[name]} virome`}
-                    </Typography>
+                    ) : (
+                        <Typography variant='body' sx={{ textAlign: 'left' }}>
+                            {`Query the `}
+                            <Typography variant='body' component='span' fontStyle='italic'>
+                                {name}
+                            </Typography>
+                            {` ${filterTypeMap[name]} virome`}
+                        </Typography>
+                    )}
                 </CardActionArea>
             </Card>
         );
@@ -236,9 +255,9 @@ const OnbaordingMessage = () => {
                                 mt: 6,
                             }}
                         >
-                            {getExampleFilter('Eimeria')}
-                            {getExampleFilter('Neuronal')}
-                            {getExampleFilter('Tundra')}
+                            {getExampleQuery('Eimeria')}
+                            {getExampleQuery('Coniferous Forests')}
+                            {getExampleQuery('Prompt')}
                         </Box>
                     ) : null}
                 </Box>
