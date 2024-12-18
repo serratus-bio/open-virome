@@ -86,8 +86,6 @@ Generate a response consisting of a list of key points that responds to the user
 
 You should use the data provided in the data tables below as the primary context for generating the response.
 
-MWAS (Metadata-wide association study) results contain significant correlations between metadata terms and viral expression in the dataset. If possible, MWAS data can be used in a seperate key point to proprose a hypothetical answer but must indicate the point is an 'MWAS derived hypothesis' and provide reference to the BioProject ID.
-
 If you don't know the answer or if the input data tables do not contain sufficient information to provide an answer, just say so. Do not make anything up.
 
 Each key point in the response should have the following element:
@@ -130,8 +128,6 @@ ${contextData}
 Generate a response consisting of a list of key points that responds to the user's question, summarizing all relevant information in the input data tables.
 
 You should use the data provided in the data tables below as the primary context for generating the response.
-
-MWAS (Metadata-wide association study) results contain significant correlations between metadata terms and viral expression in the dataset. If possible, MWAS data can be used in a seperate paragraph to proprose a hypothetical answer but must indicate the paragraph is an 'MWAS derived hypothesis' and provide reference to the BioProject ID.
 
 If you don't know the answer or if the input data tables do not contain sufficient information to provide an answer, just say so. Do not make anything up.
 
@@ -238,6 +234,32 @@ Do not include information where the supporting evidence for it is not provided.
 
 Add sections and commentary to the response as appropriate for the length and format. Style the response in markdown.
 
+Avoid including verbose introductions or conclusions in the response.
+
 ---
 
+`;
+
+export const getGraphRAGMwasSystemPrompt = () => `
+---Role---
+
+You are a helpful bioinformatics research assistant responding to questions about a dataset by synthesizing perspectives from multiple analysts.
+
+---Goal---
+
+Generate a response of the target length and format that responds or ellucidates insights to the user's question, only using the provided MWAS (Metadata-wide association study) results.
+MWAS results contain significant correlations between metadata terms and viral expression in the dataset.
+If possible, MWAS data can be used to propose a hypothesis to explain and support an answer or idea, but you must provide reference to the BioProject ID.
+When generating a hypothesis, include a rationale with strong supporting evidence and possible mechanisms.
+**Be specific, you must include the provided "metadata_field" and "metadata_value" in the hypothesis.**
+
+BioProject IDs should be referenced in the response similarly to the following example:
+"This is an example sentence supported by MWAS data references [Filters: {{bioproject: <bioproject_id>}}]"
+
+---Target response length and format---
+
+1 Paragraph
+
+**If the MWAS results do not contain sufficient information to provide a clear hypothesis, return '###'. Do not make anything up.**
+---
 `;

@@ -31,7 +31,7 @@ const getOpenAIClient = (configName) => {
     return new AzureOpenAI(config);
 };
 
-export const runLLMCompletion = async (messages, modelName = DEFAULT_MODEL, temperature=0.8) => {
+export const runLLMCompletion = async (messages, modelName = DEFAULT_MODEL, temperature = 0.8) => {
     if (!messages) {
         return { error: 'No messages provided!' };
     }
@@ -50,7 +50,7 @@ export const runLLMCompletion = async (messages, modelName = DEFAULT_MODEL, temp
     }
 };
 
-export const streamLLMCompletion = async (messages, modelName = DEFAULT_MODEL, temperature=0.8) => {
+export const streamLLMCompletion = async (messages, modelName = DEFAULT_MODEL, temperature = 0.8) => {
     if (!messages) {
         return { error: 'No messages provided!' };
     }
@@ -68,9 +68,8 @@ export const streamLLMCompletion = async (messages, modelName = DEFAULT_MODEL, t
         return {
             text: collectedData,
         };
-
     } catch (error) {
         console.error(error);
         return { error: error.message };
     }
-}
+};

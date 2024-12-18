@@ -5,6 +5,7 @@ import {
     getBioProjectsSummarizationPrompt,
     getGraphRAGMapSystemPrompt,
     getGraphRAGReduceSystemPrompt,
+    getGraphRAGMwasSystemPrompt,
     allowGeneralKnowledgeSystemPrompt,
     noDataFoundMessage,
 } from './prompts.mjs';
@@ -168,6 +169,7 @@ export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) 
 };
 
 export const getGraphRAGResults = async (message, conversation = []) => {
+    // See https://github.com/microsoft/graphrag for map and reduce functionality
     let communitySummaries;
     try {
         communitySummaries = await import('./virome_community_summaries.json', {
@@ -187,11 +189,11 @@ export const getGraphRAGResults = async (message, conversation = []) => {
 
     let index = 0;
     for (const community of communitySummaries) {
-        if (!INCLUDE_MWAS_IN_GRAPH_RAG) {
-            delete community.mwas;
-        }
+        let communityData = { ...community };
+        delete communityData.mwas;
+        delete communityData.max_biosafety;
 
-        const communityPrompt = getGraphRAGMapSystemPrompt(JSON.stringify(community));
+        const communityPrompt = getGraphRAGMapSystemPrompt(JSON.stringify(communityData));
         const communityConversation = [
             ...conversation,
             {
@@ -204,6 +206,7 @@ export const getGraphRAGResults = async (message, conversation = []) => {
             },
         ];
 
+        // Use model with high sensitivity content filters for high biosafety level communities
         const maxBioSafetyLevel = community.max_biosafety;
         if (maxBioSafetyLevel === 'RG4') {
             mapModel = 'gpt4oMini2';
@@ -265,5 +268,77 @@ export const getGraphRAGResults = async (message, conversation = []) => {
             content: reducerResult.text,
         },
     ];
+
+    if (INCLUDE_MWAS_IN_GRAPH_RAG) {
+        const mwasResponse = await getGraphRAGMWASResults(message, communitySummaries, reducerResult);
+        if (mwasResponse.text) {
+            reducerResult.text = `${reducerResult.text}\n\n---\n\n### Supporting MWAS Results\n${mwasResponse.text}`;
+            displayedConversation.push(...mwasResponse.conversation);
+        }
+    }
+
     return { text: reducerResult.text, conversation: displayedConversation };
+};
+
+// Additional GraphRAG prompt to get relevant MWAS results for GraphRAG output
+const getGraphRAGMWASResults = async (message, communitySummaries, reducerResult) => {
+    const model = 'gpt4o';
+    const temperature = 1;
+    const role = 'system';
+
+    const referencedMWAS = [];
+    const communityIds = reducerResult.text.match(/{{community: (\d+)}}/g);
+    if (!communityIds) {
+        return [];
+    }
+    communityIds.forEach((id) => {
+        const communityId = id.match(/(\d+)/)[0];
+        const community = communitySummaries.find((summary) => summary.community === parseInt(communityId));
+        if (community && community.mwas) {
+            referencedMWAS.push(community.mwas);
+        }
+    });
+
+    if (referencedMWAS.length === 0) {
+        return '';
+    }
+    const instructionsPrompt = `
+    ${getGraphRAGMwasSystemPrompt(message, reducerResult.text)}
+
+    ${allowGeneralKnowledgeSystemPrompt()}
+    `;
+
+    const documentsPrompt = `
+    <documents>
+    ---User query---
+
+    ${message}
+
+    ---Metadata Association---
+
+    ${JSON.stringify(referencedMWAS)}
+
+    </documents>
+    `;
+    let mwasConversation = [
+        {
+            role: role,
+            content: instructionsPrompt,
+        },
+        {
+            role: 'user',
+            content: documentsPrompt,
+        },
+    ];
+    const mwasResult = await streamLLMCompletion(mwasConversation, model, temperature);
+
+    mwasConversation.push({
+        role: role,
+        content: mwasResult.text,
+    });
+
+    if (mwasResult.text === '###') {
+        return { text: '', conversation: mwasConversation };
+    }
+    return { text: mwasResult.text, conversation: mwasConversation };
 };

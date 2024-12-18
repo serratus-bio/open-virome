@@ -800,9 +800,8 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                                     {truncate(attributeName + ': ' + attributeValue, 40)}
                                 </div>
                                 <div style={{ height: '8px' }}></div>
-                                <div>
-                                </div>
-                                <div style={{ alignItems:'baseline', display: 'flex' }}>
+                                <div></div>
+                                <div style={{ alignItems: 'baseline', display: 'flex' }}>
                                     <div style={{ flex: '1 0' }}>
                                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                                             <span>LAT / LON</span>
@@ -826,14 +825,16 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                                         </div>
                                         <div style={{ fontSize: '14px', margin: '2px 0 0 0' }}>{latLon}</div>
                                     </div>
-                                    {elevation && <div style={{ flex: '1 0' }}>
-                                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                                            <span>ELEVATION</span>
+                                    {elevation && (
+                                        <div style={{ flex: '1 0' }}>
+                                            <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                                                <span>ELEVATION</span>
+                                            </div>
+                                            <div style={{ margin: '0 0 0 0' }}>
+                                                <span style={{ fontSize: '14px' }}>{elevation}</span>
+                                            </div>
                                         </div>
-                                        <div style={{ margin: '0 0 0 0' }}>
-                                            <span style={{ fontSize: '14px' }}>{elevation}</span>
-                                        </div>
-                                    </div>}
+                                    )}
                                 </div>
                                 <div style={{ height: '8px' }}></div>
                                 <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
@@ -855,23 +856,29 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                                 </div>
                                 <div style={{ height: '8px' }}></div>
                                 <div style={{ display: 'flex' }}>
-                                    {countryID && <div style={{ flex: '1 0' }}>
-                                        <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
-                                            <span>COUNTRY</span>
+                                    {countryID && (
+                                        <div style={{ flex: '1 0' }}>
+                                            <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
+                                                <span>COUNTRY</span>
+                                            </div>
+                                            <div style={{ margin: '2px 0 0 0' }}>
+                                                <Flag
+                                                    code={countryID}
+                                                    height='16'
+                                                    style={{ verticalAlign: 'middle' }}
+                                                />
+                                                <span
+                                                    style={{
+                                                        fontSize: '14px',
+                                                        margin: '0 0 0 8px',
+                                                        verticalAlign: 'middle',
+                                                    }}
+                                                >
+                                                    {countryID}
+                                                </span>
+                                            </div>
                                         </div>
-                                        <div style={{ margin: '2px 0 0 0' }}>
-                                            <Flag code={countryID} height='16' style={{ verticalAlign: 'middle' }} />
-                                            <span
-                                                style={{
-                                                    fontSize: '14px',
-                                                    margin: '0 0 0 8px',
-                                                    verticalAlign: 'middle',
-                                                }}
-                                            >
-                                                {countryID}
-                                            </span>
-                                        </div>
-                                    </div>}
+                                    )}
                                     <div style={{ flex: '1 0' }}>
                                         <div style={{ color: '#CCC', fontSize: '12px', fontWeight: 700 }}>
                                             <span>REGION</span>

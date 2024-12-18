@@ -169,13 +169,13 @@ const OnbaordingMessage = () => {
                 >
                     {iconMap[name]}
                     {name === 'Prompt' ? (
-                        <Typography variant='body' sx={{ textAlign: 'left' }}>
+                        <Typography variant='body2' sx={{ textAlign: 'left' }}>
                             {`Query the global virome with a prompt`}
                         </Typography>
                     ) : (
-                        <Typography variant='body' sx={{ textAlign: 'left' }}>
+                        <Typography variant='body2' sx={{ textAlign: 'left' }}>
                             {`Query the `}
-                            <Typography variant='body' component='span' fontStyle='italic'>
+                            <Typography variant='body2' component='span' fontStyle='italic'>
                                 {name}
                             </Typography>
                             {` ${filterTypeMap[name]} virome`}
