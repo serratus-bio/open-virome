@@ -49,3 +49,28 @@ export const runLLMCompletion = async (messages, modelName = DEFAULT_MODEL, temp
         return { error: error.message };
     }
 };
+
+export const streamLLMCompletion = async (messages, modelName = DEFAULT_MODEL, temperature=0.8) => {
+    if (!messages) {
+        return { error: 'No messages provided!' };
+    }
+    try {
+        const openai = getOpenAIClient(modelName);
+        const result = await openai.chat.completions.create({
+            messages,
+            temperature,
+            stream: true,
+        });
+        let collectedData = '';
+        for await (const chunk of result) {
+            collectedData += chunk?.choices[0]?.delta?.content ?? '';
+        }
+        return {
+            text: collectedData,
+        };
+
+    } catch (error) {
+        console.error(error);
+        return { error: error.message };
+    }
+}

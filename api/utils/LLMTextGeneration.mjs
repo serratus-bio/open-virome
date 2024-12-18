@@ -1,4 +1,4 @@
-import { runLLMCompletion } from '../clients/oai.mjs';
+import { streamLLMCompletion } from '../clients/oai.mjs';
 import { runCypherQuery } from '../clients/neo4j.mjs';
 import {
     getMwasHypothesisSystemPrompt,
@@ -93,7 +93,7 @@ export const getBioprojectsSummarization = async (bioprojects) => {
             content: `Please provide a brief overview of the following bioprojects: \n ${bioprojectContext}`,
         },
     ];
-    const result = await runLLMCompletion(conversation, model);
+    const result = await streamLLMCompletion(conversation, model);
 
     conversation.push({
         role: role,
@@ -157,7 +157,7 @@ export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) 
             content: documentsPrompt,
         },
     ];
-    const result = await runLLMCompletion(conversation, model);
+    const result = await streamLLMCompletion(conversation, model);
 
     conversation.push({
         role: role,
@@ -211,7 +211,7 @@ export const getGraphRAGResults = async (message, conversation = []) => {
             mapModel = 'gpt4oMini';
         }
 
-        const result = runLLMCompletion(communityConversation, mapModel);
+        const result = streamLLMCompletion(communityConversation, mapModel);
         promises.push(result);
         index++;
     }
@@ -252,7 +252,7 @@ export const getGraphRAGResults = async (message, conversation = []) => {
             content: getGraphRAGReduceSystemPrompt(JSON.stringify(parsedResults)),
         },
     ];
-    const reducerResult = await runLLMCompletion(reducerConversation, reduceModel);
+    const reducerResult = await streamLLMCompletion(reducerConversation, reduceModel);
 
     const displayedConversation = [
         {
