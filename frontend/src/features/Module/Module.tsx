@@ -15,10 +15,10 @@ import { capitalize } from '../../common/utils/textFormatting.ts';
 
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import SRARunLayout from '../Figures/SRARun/SRARunLayout.tsx';
-import EcologyLayout from '../Figures/Ecology/EcologyLayout.tsx';
-import ViromeLayout from '../Figures/Virome/ViromeLayout.tsx';
-import HostLayout from '../Figures/Host/HostLayout.tsx';
+import SRARunLayout from '../Module/SRARun/SRARunLayout.tsx';
+import EcologyLayout from '../Module/Ecology/EcologyLayout.tsx';
+import ViromeLayout from '../Module/Virome/ViromeLayout.tsx';
+import HostLayout from '../Module/Host/HostLayout.tsx';
 import IconButton from '@mui/material/IconButton';
 import TableIcon from '@mui/icons-material/TableRows';
 import PlotIcon from '@mui/icons-material/InsertChart';

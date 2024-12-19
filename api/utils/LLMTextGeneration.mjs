@@ -337,7 +337,7 @@ const getGraphRAGMWASResults = async (message, communitySummaries, reducerResult
         content: mwasResult.text,
     });
 
-    if (mwasResult.text === '###') {
+    if (mwasResult.text.includes('###')) {
         return { text: '', conversation: mwasConversation };
     }
     return { text: mwasResult.text, conversation: mwasConversation };

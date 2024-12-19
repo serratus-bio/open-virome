@@ -11,7 +11,7 @@ import {
     LOGAN_RDS_PROXY_LAMBDA_ENDPOINT,
     MAPLIBREDECKGLMAP_FETCH_DATA_ON_VIEWPORT_CHANGE,
     REGION_COUNTRIES,
-} from '../features/Figures/Ecology/constants.ts';
+} from '../features/Module/Ecology/constants.ts';
 
 import Flag from 'react-world-flags';
 

@@ -251,10 +251,11 @@ Generate a response of the target length and format that responds or ellucidates
 MWAS results contain significant correlations between metadata terms and viral expression in the dataset.
 If possible, MWAS data can be used to propose a hypothesis to explain and support an answer or idea, but you must provide reference to the BioProject ID.
 When generating a hypothesis, include a rationale with strong supporting evidence and possible mechanisms.
-**Be specific, you must include the provided "metadata_field" and "metadata_value" in the hypothesis.**
+**You must include the specific "metadata_field" and "metadata_value" used for generating the hypothesis.**
+**If the MWAS results do not contain sufficient information to provide a clear hypothesis, return '###'. Do not make anything up.**
 
 BioProject IDs should be referenced in the response similarly to the following example:
-"This is an example sentence supported by MWAS data references [Filters: {{bioproject: <bioproject_id>}}]"
+"This is an example sentence supported by MWAS data references [Filters: {{bioproject: PRJNA387205}}]"
 
 ---Target response length and format---
 
