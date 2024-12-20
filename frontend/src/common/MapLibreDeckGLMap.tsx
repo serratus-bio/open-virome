@@ -267,7 +267,7 @@ const DeckGLRenderScatterplot: any = ({
             const selectBGLJSON = await (async () => {
                 const SELECT: any = {
                     text: `accession, attribute_name, attribute_value, ST_Y(lat_lon) as lat, ST_X(lat_lon) as lon, elevation, gm4326_id, gp4326_wwf_tew_id
-                    FROM bgl_gm4326_gp4326_e
+                    FROM bgl_gm4326_gp4326
                     ${getWhereClause(palmprintOnly, identifiers)}
                     LIMIT 65536;`,
                 };
@@ -313,7 +313,7 @@ const DeckGLRenderScatterplot: any = ({
                     text: `run, bio_sample, palm_id, sotu
                     FROM (SELECT DISTINCT(accession)
                         FROM (SELECT accession
-                            FROM bgl_gm4326_gp4326_e
+                            FROM bgl_gm4326_gp4326
                             ${getWhereClause(palmprintOnly, identifiers)}
                             LIMIT 65536)) AS t
                     JOIN palm_virome ON t.accession = palm_virome.bio_sample;`,
