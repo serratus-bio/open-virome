@@ -83,7 +83,6 @@ export const getBioprojectsSummarization = async (bioprojects) => {
     } else {
         role = 'assistant'; // o1
     }
-
     let conversation = [
         {
             role: role,
@@ -100,9 +99,15 @@ export const getBioprojectsSummarization = async (bioprojects) => {
         role: role,
         content: result.text,
     });
-
     return { text: result.text, conversation: conversation };
 };
+
+export const getViromeSummarization = async (viromeIds) => {
+    const viromeContext = await getBioprojectContext(viromeIds);
+    const context = getBioProjectsSummarizationPrompt();
+};
+
+
 
 export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) => {
     let model, role;
@@ -164,7 +169,7 @@ export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) 
         role: role,
         content: result.text,
     });
-
+    console.log(result.text);
     return { text: result.text, conversation: conversation };
 };
 
