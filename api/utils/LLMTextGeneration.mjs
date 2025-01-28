@@ -3,6 +3,9 @@ import { runCypherQuery } from '../clients/neo4j.mjs';
 import {
     getMwasHypothesisSystemPrompt,
     getBioProjectsSummarizationPrompt,
+    getViromeSummarizationPrompt,
+    getEcologySummarizationPrompt,
+    getHostSummarizationPrompt,
     getGraphRAGMapSystemPrompt,
     getGraphRAGReduceSystemPrompt,
     getGraphRAGMwasSystemPrompt,
@@ -102,11 +105,43 @@ export const getBioprojectsSummarization = async (bioprojects) => {
     return { text: result.text, conversation: conversation };
 };
 
-export const getViromeSummarization = async (viromeIds) => {
-    const viromeContext = await getBioprojectContext(viromeIds);
-    const context = getBioProjectsSummarizationPrompt();
-};
+export const getFigureSummarization = async (dataObj, dataType) => {
+    const model = 'gpt4o';
+    const role = 'system';
+    const context = ''
+    switch (dataType) {
+        case 'virome':
+            context = getViromeSummarizationPrompt();
+            break;
+        case 'ecology':
+            context = getEcologySummarizationPrompt();
+            break;
+        case 'host':
+            context = getHostSummarizationPrompt();
+            break;
+    }
+    const data = [];
+    Object.values(dataObj).forEach(value => {
+        data.push(value);
+    });
+    let conversation = [
+        {
+            role: role,
+            content: context,
+        },
+        {
+            role: 'user',
+            content: JSON.stringify(dataObj),
+        },
+    ];
+    const result = await streamLLMCompletion(conversation, model);
 
+    conversation.push({
+        role: role,
+        content: result.text,
+    });
+    return { text: result.text, conversation: conversation };
+};
 
 
 export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) => {

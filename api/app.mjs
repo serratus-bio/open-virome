@@ -197,23 +197,14 @@ app.post('/summary', async (req, res) => {
         return res.status(400).json({ error: 'Invalid request!' });
     }
     const ids = body?.ids ?? [];
+    const dataObj = body?.dataObj ?? [];
     const dataType = body?.idColumn ?? '';
     let result = {};
-    switch (dataType) {
-        case 'bioproject':
-            result = await getBioprojectsSummarization(ids);
-            break;
-        case 'virome':
-            result = await getViromeSummarization(ids);
-            break;
-        case 'ecology':
-            result = await getEcologySummarization(ids);
-            break;
-        case 'host':
-            result = await getHostSummarization(ids);
-            break;
-        default:
-            result = { error: 'Invalid data type!'};
+    if (dataType === 'bioproject') {
+        result = await getBioprojectsSummarization(ids);
+    }
+    else{
+        result = await getFigureSummarization(ids, dataObj, dataType);
     }
     if (result?.error) {
         console.error(result.error);
