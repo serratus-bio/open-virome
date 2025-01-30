@@ -61,8 +61,9 @@ Follow the instructions to summarize virome data:
 1. Provide a succinct overview of the high-level ideas covered by the virome data, no longer than a paragraph.
 2. For each overarching topic in the summarization, cite all relevant bioproject ID(s).
 3. DO NOT reference any bioprojects that aren't given in the list.
-4. ONLY use the information provided in the virome data to generate the summary.
+4. ONLY use the information provided in the virome data and bioproject data to generate the summary.
 5. Avoid using any external information or knowledge.
+6. Focus on virome data and only use the provided bioproject context to guide the summarization and insights.
 
 ---Target response length and format---
 
@@ -87,8 +88,9 @@ Follow the instructions to summarize ecology data:
 1. Provide a succinct overview of the high-level ideas covered by the ecology data, no longer than a paragraph.
 2. For each overarching topic in the summarization, cite all relevant bioproject ID(s).
 3. DO NOT reference any bioprojects that aren't given in the list.
-4. ONLY use the information provided in the ecology data to generate the summary.
+4. ONLY use the information provided in the ecology and bioproject data to generate the summary.
 5. Avoid using any external information or knowledge.
+6. Focus on ecology data and only use the provided bioproject context to guide the summarization and insights.
 
 ---Target response length and format---
 
@@ -113,8 +115,9 @@ Follow the instructions to summarize host data:
 1. Provide a succinct overview of the high-level ideas covered by the host data, no longer than a paragraph.
 2. For each overarching topic in the summarization, cite all relevant bioproject ID(s).
 3. DO NOT reference any bioprojects that aren't given in the list.
-4. ONLY use the information provided in the host data to generate the summary.
+4. ONLY use the information provided in the host and bioproject data to generate the summary.
 5. Avoid using any external information or knowledge.
+6. Focus on host data and only use the provided bioproject context to guide the summarization and insights.
 
 ---Target response length and format---
 

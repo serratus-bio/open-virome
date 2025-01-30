@@ -214,7 +214,7 @@ const Module = ({ sectionKey }) => {
                             </Select>
                         </Button>
                     </Box>
-                    <GenerateSummary identifiers={identifiersData} dataType={sectionKey}/>
+                    {sectionKey != "ecology" && <GenerateSummary identifiers={identifiersData} dataType={sectionKey} palmprintOnly={palmprintOnly}/>}
                 </Box>
 
                 <Box>

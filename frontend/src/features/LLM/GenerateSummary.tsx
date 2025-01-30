@@ -7,20 +7,185 @@ import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import GenerateButton from './GenerateButton.tsx';
 
-const GenerateSummary = ({ identifiers, dataType }) => {
-    console.log(identifiers);
+import { useSelector } from 'react-redux';
+import { selectAllFilters } from '../Query/slice.ts';
+import { useGetResultQuery, useGetCountsQuery } from '../../api/client.ts';
+import { moduleConfig } from '../Module/constants.ts';
+import { isSummaryView } from '../../common/utils/plotHelpers.ts';
+import { handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
+import { useState } from 'react';
+import cytoscape from 'cytoscape';
+import { shouldDisableFigureView, isSimpleLayout } from '../../common/utils/plotHelpers.ts';
+
+const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
+     // figure data
+     const viromeFigureData = (identifiers) => {
+        const allFilters = useSelector(selectAllFilters);
+        const [randomized, setRandomized] = useState(0);
+        const [activeSubgraph, setActiveSubgraph] = useState('1');
+        const [isSummaryTableOpen, setIsSummaryTableOpen] = useState(false);
+        const [selectedNetworkItem, setSelectedNetworkItem] = useState(null);
+        const [activeModule, setActiveModule] = useState('species');
+        const [headlessCy, setHeadlessCy] = useState(
+            cytoscape({
+                headless: true,
+                elements: [],
+            }),
+        );
+        const containerRef = React.useRef(null);
+    
+        const {
+            data: resultData,
+            error: resultError,
+            isFetching: resultIsFetching,
+        } = useGetResultQuery(
+            {
+                idColumn: moduleConfig[activeModule].resultsIdColumn,
+                ids: identifiers
+                    ? identifiers[handleIdKeyIrregularities(moduleConfig[activeModule].resultsIdColumn)].single
+                    : [],
+                idRanges: identifiers
+                    ? identifiers[handleIdKeyIrregularities(moduleConfig[activeModule].resultsIdColumn)].range
+                    : [],
+                table: moduleConfig[activeModule].resultsTable,
+                pageStart: 0,
+                pageEnd: isSummaryView(identifiers) ? 100 : undefined,
+                sortBy: isSummaryView(identifiers) ? 'gb_pid' : undefined,
+            },
+            {
+                skip: !identifiers,
+            },
+        );
+    
+        const getFilteredResultData = () => {
+            // If virome filters are applied, we only want to plot data that matches the filters
+            // (i.e. exclude all other viruses that co-occur in the matching runs)
+            if (allFilters.length === 0 || !resultData) {
+                return resultData;
+            }
+    
+            const familyFilters = allFilters.filter((filter) => filter.filterType === 'family');
+            const speciesFilters = allFilters.filter((filter) => filter.filterType === 'species');
+            const sotuFilters = allFilters.filter((filter) => filter.filterType === 'sotu');
+    
+            let filteredData = resultData;
+            if (familyFilters.length > 0) {
+                filteredData = filteredData.filter((row) => {
+                    return familyFilters.some((filter) => row['tax_family'] === filter.filterValue);
+                });
+            }
+    
+            if (speciesFilters.length > 0) {
+                filteredData = filteredData.filter((row) => {
+                    return speciesFilters.some((filter) => row['tax_species'] === filter.filterValue);
+                });
+            }
+    
+            if (sotuFilters.length > 0) {
+                filteredData = filteredData.filter((row) => {
+                    return sotuFilters.some((filter) => row['sotu'] === filter.filterValue);
+                });
+            }
+            return filteredData;
+        };
+        return getFilteredResultData();
+    }
+
+    const hostFigureData = (identifiers, sectionLayout, palmprintOnly) => {
+        const {
+            data: tissueCountData,
+            error: hostCountError,
+            isFetching: tissueCountIsFetching,
+        } = useGetCountsQuery(
+            {
+                idColumn: moduleConfig['tissue'].resultsIdColumn,
+                ids: identifiers ? identifiers[moduleConfig['tissue'].resultsIdColumn].single : [],
+                idRanges: identifiers ? identifiers[moduleConfig['tissue'].resultsIdColumn].range : [],
+                groupBy: moduleConfig['tissue'].groupByKey,
+                table: moduleConfig['tissue'].resultsTable,
+                palmprintOnly,
+            },
+            {
+                skip: shouldDisableFigureView(identifiers),
+            },
+        );
+    
+        const {
+            data: diseaseCountData,
+            error: diseaseCountError,
+            isFetching: diseaseCountIsFetching,
+        } = useGetCountsQuery(
+            {
+                idColumn: moduleConfig['disease'].resultsIdColumn,
+                ids: identifiers ? identifiers[moduleConfig['disease'].resultsIdColumn].single : [],
+                idRanges: identifiers ? identifiers[moduleConfig['disease'].resultsIdColumn].range : [],
+                groupBy: moduleConfig['disease'].groupByKey,
+                table: moduleConfig['disease'].resultsTable,
+                palmprintOnly,
+            },
+            {
+                skip: shouldDisableFigureView(identifiers),
+            },
+        );
+    
+        const {
+            data: organismCountData,
+            error: organismCountError,
+            isFetching: organismCountIsFetching,
+        } = useGetCountsQuery(
+            {
+                idColumn: moduleConfig['statOrganism'].resultsIdColumn,
+                ids: identifiers ? identifiers[moduleConfig['statOrganism'].resultsIdColumn].single : [],
+                idRanges: identifiers ? identifiers[moduleConfig['statOrganism'].resultsIdColumn].range : [],
+                groupBy: moduleConfig['statOrganism'].groupByKey,
+                table: moduleConfig['statOrganism'].resultsTable,
+                palmprintOnly,
+            },
+            {
+                skip: shouldDisableFigureView(identifiers) || isSimpleLayout(sectionLayout),
+            },
+        );
+    
+        const {
+            data: sexCountData,
+            error: sexCountError,
+            isFetching: sexCountIsFetching,
+        } = useGetCountsQuery(
+            {
+                idColumn: moduleConfig['sex'].resultsIdColumn,
+                ids: identifiers ? identifiers[moduleConfig['sex'].resultsIdColumn].single : [],
+                idRanges: identifiers ? identifiers[moduleConfig['sex'].resultsIdColumn].range : [],
+                groupBy: moduleConfig['sex'].groupByKey,
+                table: moduleConfig['sex'].resultsTable,
+                palmprintOnly,
+            },
+            {
+                skip: shouldDisableFigureView(identifiers) || isSimpleLayout(sectionLayout),
+            },
+        );
+        return {
+            tissueCountData,
+            diseaseCountData,
+            organismCountData,
+            sexCountData
+        };
+    }
+    var dataObj = {};
     switch (dataType) {
         case 'sra':
-            dataType = 'bioproject';
+            dataType = 'bioproject'; 
             break;
         case 'palmdb':
             dataType = 'virome';
+            dataObj = viromeFigureData(identifiers);
             break;
         case 'ecology': // stays the same
             dataType = 'ecology';
+            // idk what the data here is
             break;
         case 'host':
             dataType = 'host';
+            dataObj = hostFigureData(identifiers, "simple", palmprintOnly);
             break;
         default:
             dataType = ''; // throw err
@@ -34,10 +199,9 @@ const GenerateSummary = ({ identifiers, dataType }) => {
         }
         await getSummaryText(
             {
-                idColumn: 'bioproject',
-                ids: identifiers 
-                ? (dataType == 'bioproject' ? identifiers['bioproject'].single : identifiers) 
-                : [],
+                idColumn: dataType,
+                ids: identifiers ? identifiers['bioproject'].single : [],
+                dataObj: dataObj,
             },
             true,
         );
@@ -51,6 +215,7 @@ const GenerateSummary = ({ identifiers, dataType }) => {
     };
 
     const summaryTextIsNonEmpty = () => summaryData && summaryData?.text?.length > 0;
+
     return (
         <Box
         sx={{

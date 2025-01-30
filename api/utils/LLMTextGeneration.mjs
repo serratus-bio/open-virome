@@ -12,7 +12,6 @@ import {
     allowGeneralKnowledgeSystemPrompt,
     noDataFoundMessage,
 } from './prompts.mjs';
-
 const INCLUDE_MWAS_IN_GRAPH_RAG = true;
 
 const getBioprojectContext = async (bioprojects) => {
@@ -78,6 +77,7 @@ const getFilterQueryContext = (filters) => {
 
 export const getBioprojectsSummarization = async (bioprojects) => {
     const bioprojectContext = await getBioprojectContext(bioprojects);
+    console.log(bioprojectContext);
     const context = getBioProjectsSummarizationPrompt();
     let model, role;
     model = 'gpt4o';
@@ -105,33 +105,31 @@ export const getBioprojectsSummarization = async (bioprojects) => {
     return { text: result.text, conversation: conversation };
 };
 
-export const getFigureSummarization = async (dataObj, dataType) => {
+export const getFigureSummarization = async (bioprojects, dataObj, dataType) => {
     const model = 'gpt4o';
     const role = 'system';
-    const context = ''
+    const bioprojectContext = await getBioprojectContext(bioprojects);
+    var prompt = ''
+    var figureData = ''
     switch (dataType) {
         case 'virome':
-            context = getViromeSummarizationPrompt();
+            prompt = getViromeSummarizationPrompt();
             break;
         case 'ecology':
-            context = getEcologySummarizationPrompt();
+            prompt = getEcologySummarizationPrompt();
             break;
         case 'host':
-            context = getHostSummarizationPrompt();
+            prompt = getHostSummarizationPrompt();
             break;
     }
-    const data = [];
-    Object.values(dataObj).forEach(value => {
-        data.push(value);
-    });
     let conversation = [
         {
             role: role,
-            content: context,
+            content: prompt,
         },
         {
             role: 'user',
-            content: JSON.stringify(dataObj),
+            content: `Please provide a brief overview of the following ${dataType} data: \n ${JSON.stringify(dataObj, null, 2)} \n bioproject context: \n ${bioprojectContext}`,
         },
     ];
     const result = await streamLLMCompletion(conversation, model);
@@ -142,7 +140,6 @@ export const getFigureSummarization = async (dataObj, dataType) => {
     });
     return { text: result.text, conversation: conversation };
 };
-
 
 export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) => {
     let model, role;
