@@ -77,7 +77,6 @@ const getFilterQueryContext = (filters) => {
 
 export const getBioprojectsSummarization = async (bioprojects) => {
     const bioprojectContext = await getBioprojectContext(bioprojects);
-    console.log(bioprojectContext);
     const context = getBioProjectsSummarizationPrompt();
     let model, role;
     model = 'gpt4o';
@@ -201,7 +200,6 @@ export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) 
         role: role,
         content: result.text,
     });
-    console.log(result.text);
     return { text: result.text, conversation: conversation };
 };
 
