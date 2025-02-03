@@ -16,7 +16,7 @@ import {
     getSearchStringClause,
 } from './utils/queryBuilder.mjs';
 import { getMWASResults } from './utils/mwas.mjs';
-import { getBioprojectsSummarization, getMwasHypothesis, getGraphRAGResults } from './utils/LLMTextGeneration.mjs';
+import { getBioprojectsSummarization, getMwasHypothesis, getGraphRAGResults, getFigureSummarization } from './utils/LLMTextGeneration.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 
 const app = express();
@@ -197,7 +197,15 @@ app.post('/summary', async (req, res) => {
         return res.status(400).json({ error: 'Invalid request!' });
     }
     const ids = body?.ids ?? [];
-    const result = await getBioprojectsSummarization(ids);
+    const dataObj = body?.dataObj ?? [];
+    const dataType = body?.idColumn ?? '';
+    let result = {};
+    if (dataType === 'bioproject') {
+        result = await getBioprojectsSummarization(ids);
+    }
+    else{
+        result = await getFigureSummarization(ids, dataObj, dataType);
+    }
     if (result?.error) {
         console.error(result.error);
         return res.status(500).json({ error: result.error });

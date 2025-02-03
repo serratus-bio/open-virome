@@ -3,13 +3,16 @@ import { runCypherQuery } from '../clients/neo4j.mjs';
 import {
     getMwasHypothesisSystemPrompt,
     getBioProjectsSummarizationPrompt,
+    getViromeSummarizationPrompt,
+    getEcologySummarizationPrompt,
+    getHostSummarizationPrompt,
+    getSummaryPrompt,
     getGraphRAGMapSystemPrompt,
     getGraphRAGReduceSystemPrompt,
     getGraphRAGMwasSystemPrompt,
     allowGeneralKnowledgeSystemPrompt,
     noDataFoundMessage,
 } from './prompts.mjs';
-
 const INCLUDE_MWAS_IN_GRAPH_RAG = true;
 
 const getBioprojectContext = async (bioprojects) => {
@@ -83,7 +86,6 @@ export const getBioprojectsSummarization = async (bioprojects) => {
     } else {
         role = 'assistant'; // o1
     }
-
     let conversation = [
         {
             role: role,
@@ -100,7 +102,66 @@ export const getBioprojectsSummarization = async (bioprojects) => {
         role: role,
         content: result.text,
     });
+    return { text: result.text, conversation: conversation };
+};
 
+export const getFigureSummarization = async (bioprojects, dataObj, dataType) => {
+    const model = 'gpt4o';
+    const role = 'system';
+    const bioprojectContext = await getBioprojectContext(bioprojects);
+    const maxTotalLength = 110000;
+    const dataObjSummaries = [];
+    let content = `Please provide a brief overview of the following ${dataType} data: \n ${JSON.stringify(dataObj, null, 2)} \n bioproject context: \n ${bioprojectContext}`
+    if(JSON.stringify(dataObj, null, 2).length / 4> maxTotalLength){
+        const splitDataObj = split_data(dataObj, maxTotalLength);
+        const summaryPrompt = getSummaryPrompt();
+        for (const obj of splitDataObj){
+            let summaryConversation = [
+                {
+                    role: role,
+                    content: summaryPrompt,
+                },
+                {
+                    role: 'user',
+                    content: `Please provide a contextual summary of the following data: ${obj}`,
+                },
+            ];
+            const summaryResult = await streamLLMCompletion(summaryConversation, model);
+            dataObjSummaries.push({text: summaryResult.text});
+        }
+    }
+    if(dataObjSummaries.length > 0){
+        console.log("Data object too large, splitting into multiple summaries");
+        content = `Please provide a brief overview of the following pre-summarized ${dataType} data: \n ${JSON.stringify(dataObjSummaries)} \n bioproject context: \n ${bioprojectContext}`
+    }
+
+    let prompt = ''
+    switch (dataType) {
+        case 'virome':
+            prompt = getViromeSummarizationPrompt();
+            break;
+        case 'ecology':
+            prompt = getEcologySummarizationPrompt();
+            break;
+        case 'host':
+            prompt = getHostSummarizationPrompt();
+            break;
+    }
+    let conversation = [
+        {
+            role: role,
+            content: prompt,
+        },
+        {
+            role: 'user',
+            content: content,
+        },
+    ];
+    const result = await streamLLMCompletion(conversation, model);
+    conversation.push({
+        role: role,
+        content: result.text,
+    });
     return { text: result.text, conversation: conversation };
 };
 
@@ -164,7 +225,6 @@ export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) 
         role: role,
         content: result.text,
     });
-
     return { text: result.text, conversation: conversation };
 };
 
@@ -341,4 +401,24 @@ const getGraphRAGMWASResults = async (message, communitySummaries, reducerResult
         return { text: '', conversation: mwasConversation };
     }
     return { text: mwasResult.text, conversation: mwasConversation };
+};
+
+const split_data = (data, maxTotalLength) => {
+    let batches  = [];
+    let currentBatch = [];
+    let currentSize = 0;
+
+    for(const entry of data){
+        if (currentSize + (JSON.stringify(entry).length / 4) > maxTotalLength){
+            batches.push(currentBatch);
+            currentBatch = [];
+            currentSize = 0;
+        }
+        currentBatch.push(entry);
+        currentSize += JSON.stringify(entry).length / 4;
+    }
+    if (currentBatch.length > 0){
+        batches.push(currentBatch);
+    };
+    return batches;
 };

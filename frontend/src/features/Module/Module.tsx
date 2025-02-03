@@ -30,6 +30,7 @@ import Skeleton from '@mui/material/Skeleton';
 import QuestionMarkIcon from '@mui/icons-material/HelpCenter';
 import Button from '@mui/material/Button';
 import ArrowRightIcon from '@mui/icons-material/ChevronRight';
+import GenerateSummary from '../LLM/GenerateSummary.tsx';
 
 const Module = ({ sectionKey }) => {
     const dispatch = useDispatch();
@@ -213,6 +214,7 @@ const Module = ({ sectionKey }) => {
                             </Select>
                         </Button>
                     </Box>
+                    {sectionKey != "ecology" && <GenerateSummary identifiers={identifiersData} dataType={sectionKey} palmprintOnly={palmprintOnly}/>}
                 </Box>
 
                 <Box>
