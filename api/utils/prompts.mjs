@@ -58,12 +58,21 @@ You are a helpful bioinformatics research assistant being used to summarize viro
 ---Goal---
 
 Follow the instructions to summarize virome data:
-1. Provide a succinct overview of the high-level ideas covered by the virome data, no longer than a paragraph.
-2. For each overarching topic in the summarization, cite all relevant bioproject ID(s).
-3. DO NOT reference any bioprojects that aren't given in the list.
-4. ONLY use the information provided in the virome data and bioproject data to generate the summary.
-5. Avoid using any external information or knowledge.
-6. Focus on virome data and only use the provided bioproject context to guide the summarization and insights.
+1. Start with a concise, factual overview of the virome data based only on the provided bioprojects.
+2. Progressively incorporate inferred insights by identifying patterns, trends, or broader implications of the virome data while staying within the given bioproject context.
+3. For each overarching topic in the summarization, cite all relevant bioproject ID(s).
+4. DO NOT reference any bioprojects that aren't given in the list.
+5. ONLY use the information provided in the virome data and bioproject data to generate the summary.
+6. Avoid using any external information or knowledge.
+7. Focus on virome data and only use the provided bioproject context to guide the summarization and insights.
+
+--- Inference Guidelines ---
+
+Start by reporting observed data directly.
+
+As the summary progresses, highlight trends, correlations, or significant findings that emerge.
+
+End with a higher-level insight that connects findings to broader implications in virology, ecology, or host-pathogen interactions, while staying grounded in the provided data.
 
 ---Target response length and format---
 
@@ -112,12 +121,21 @@ You are a helpful bioinformatics research assistant being used to summarize host
 ---Goal---
 
 Follow the instructions to summarize host data:
-1. Provide a succinct overview of the high-level ideas covered by the host data, no longer than a paragraph.
-2. For each overarching topic in the summarization, cite all relevant bioproject ID(s).
-3. DO NOT reference any bioprojects that aren't given in the list.
-4. ONLY use the information provided in the host and bioproject data to generate the summary.
-5. Avoid using any external information or knowledge.
-6. Focus on host data and only use the provided bioproject context to guide the summarization and insights.
+1. Start with a concise, factual overview of the host/tissue data based only on the provided bioprojects.
+2. Progressively incorporate inferred insights by identifying patterns, trends, or broader implications of the host/tissue data while staying within the given bioproject context.
+3. For each overarching topic in the summarization, cite all relevant bioproject ID(s).
+4. DO NOT reference any bioprojects that aren't given in the list.
+5. ONLY use the information provided in the host/tissue data and bioproject data to generate the summary.
+6. Avoid using any external information or knowledge.
+7. Focus on host/tissue and only use the provided bioproject context to guide the summarization and insights.
+
+--- Inference Guidelines ---
+
+Start by reporting observed data directly.
+
+As the summary progresses, highlight trends, correlations, or significant findings that emerge.
+
+End with a higher-level insight that connects findings to broader implications in virology, ecology, or host-pathogen interactions, while staying grounded in the provided data.
 
 ---Target response length and format---
 
@@ -130,6 +148,10 @@ DO NOT use any other delimiter in your summary, unless it is part of the host da
 
 ---
 `;
+
+export const getSummaryPrompt = () => `
+Please summarize the following data, keeping all the relationships between the virome data, tissue data, disease data, scientific names, and sequences intact. Make sure that key details, such as the bio project IDs, taxonomic species, and node sequences, are retained in the summary. Use concise bullet points to highlight these critical pieces of information, and ensure that no essential context is lost in the process. When shortening sequences or data, summarize them instead of truncating them completely. Ensure that the summary you provide can be used by Large language models to further summarize the data.
+`
 
 export const getMwasHypothesisSystemPrompt = (queryContext, bioProjectContext) => `
 ---Role---

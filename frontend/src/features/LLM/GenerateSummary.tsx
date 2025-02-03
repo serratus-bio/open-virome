@@ -253,6 +253,10 @@ const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
                                 overflow: 'auto',
                                 colorScheme: 'dark',
                                 maxHeight: 300,
+                                scrollbarWidth: 'none',
+                                '&::-webkit-scrollbar': {
+                                    display: 'none',
+                                },
                             }}
                         >
                             <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>

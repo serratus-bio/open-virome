@@ -6,6 +6,7 @@ import {
     getViromeSummarizationPrompt,
     getEcologySummarizationPrompt,
     getHostSummarizationPrompt,
+    getSummaryPrompt,
     getGraphRAGMapSystemPrompt,
     getGraphRAGReduceSystemPrompt,
     getGraphRAGMwasSystemPrompt,
@@ -108,8 +109,33 @@ export const getFigureSummarization = async (bioprojects, dataObj, dataType) => 
     const model = 'gpt4o';
     const role = 'system';
     const bioprojectContext = await getBioprojectContext(bioprojects);
-    var prompt = ''
-    var figureData = ''
+    const maxTotalLength = 110000;
+    const dataObjSummaries = [];
+    let content = `Please provide a brief overview of the following ${dataType} data: \n ${JSON.stringify(dataObj, null, 2)} \n bioproject context: \n ${bioprojectContext}`
+    if(JSON.stringify(dataObj, null, 2).length / 4> maxTotalLength){
+        const splitDataObj = split_data(dataObj, maxTotalLength);
+        const summaryPrompt = getSummaryPrompt();
+        for (const obj of splitDataObj){
+            let summaryConversation = [
+                {
+                    role: role,
+                    content: summaryPrompt,
+                },
+                {
+                    role: 'user',
+                    content: `Please provide a contextual summary of the following data: ${obj}`,
+                },
+            ];
+            const summaryResult = await streamLLMCompletion(summaryConversation, model);
+            dataObjSummaries.push({text: summaryResult.text});
+        }
+    }
+    if(dataObjSummaries.length > 0){
+        console.log("Data object too large, splitting into multiple summaries");
+        content = `Please provide a brief overview of the following pre-summarized ${dataType} data: \n ${JSON.stringify(dataObjSummaries)} \n bioproject context: \n ${bioprojectContext}`
+    }
+
+    let prompt = ''
     switch (dataType) {
         case 'virome':
             prompt = getViromeSummarizationPrompt();
@@ -128,11 +154,10 @@ export const getFigureSummarization = async (bioprojects, dataObj, dataType) => 
         },
         {
             role: 'user',
-            content: `Please provide a brief overview of the following ${dataType} data: \n ${JSON.stringify(dataObj, null, 2)} \n bioproject context: \n ${bioprojectContext}`,
+            content: content,
         },
     ];
     const result = await streamLLMCompletion(conversation, model);
-
     conversation.push({
         role: role,
         content: result.text,
@@ -376,4 +401,24 @@ const getGraphRAGMWASResults = async (message, communitySummaries, reducerResult
         return { text: '', conversation: mwasConversation };
     }
     return { text: mwasResult.text, conversation: mwasConversation };
+};
+
+const split_data = (data, maxTotalLength) => {
+    let batches  = [];
+    let currentBatch = [];
+    let currentSize = 0;
+
+    for(const entry of data){
+        if (currentSize + (JSON.stringify(entry).length / 4) > maxTotalLength){
+            batches.push(currentBatch);
+            currentBatch = [];
+            currentSize = 0;
+        }
+        currentBatch.push(entry);
+        currentSize += JSON.stringify(entry).length / 4;
+    }
+    if (currentBatch.length > 0){
+        batches.push(currentBatch);
+    };
+    return batches;
 };
