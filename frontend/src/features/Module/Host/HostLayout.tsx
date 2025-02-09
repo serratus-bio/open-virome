@@ -9,8 +9,11 @@ import Typography from '@mui/material/Typography';
 import BarPlot from '../../../common/BarPlot.tsx';
 import PolarBarPlot from '../../../common/PolarBarPlot.tsx';
 import Skeleton from '@mui/material/Skeleton';
+import HostFigure from './HostFigure.tsx';
 
 const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
+
+    const filePath = "/figures/human.svg";
     const {
         data: tissueCountData,
         error: hostCountError,
@@ -170,6 +173,10 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                     </Box>
                 </Box>
             )}
+            <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
+                HostDiagram Test
+                <HostFigure svgFile={filePath} data={tissueCountData} />
+            </Box>
         </Box>
     );
 };
