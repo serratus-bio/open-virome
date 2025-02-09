@@ -13,7 +13,7 @@ import HostFigure from './HostFigure.tsx';
 
 const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
 
-    const filePath = "/figures/human.svg";
+    const filePath = "/figures/intestine.png";
     const {
         data: tissueCountData,
         error: hostCountError,
@@ -100,7 +100,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
         }
         if (tissueCountData && tissueCountData.length > 0) {
             const maxRows = isSimpleLayout(sectionLayout) ? 9 : undefined;
-            return <BarPlot plotData={getBarPlotData(tissueCountData, maxRows)} />;
+            return <BarPlot plotData={getBarPlotData(tissueCountData, maxRows)}  imagePath={filePath}/>;
         }
         return getEmptyResultsMessage();
     };
@@ -150,6 +150,8 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                     </Typography>
                     {getTissuePlot()}
                 </Box>
+            </Box>
+            <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
                     <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
                         {`Disease`}
@@ -158,6 +160,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                 </Box>
             </Box>
             {isSimpleLayout(sectionLayout) ? null : (
+            <>
                 <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
                         <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
@@ -165,6 +168,8 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                         </Typography>
                         {getOrganismPlot()}
                     </Box>
+                </Box>
+                <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
                         <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
                             {`Sex`}
@@ -172,11 +177,8 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                         {getSexPlot()}
                     </Box>
                 </Box>
+            </>
             )}
-            <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
-                HostDiagram Test
-                <HostFigure svgFile={filePath} data={tissueCountData} />
-            </Box>
         </Box>
     );
 };
