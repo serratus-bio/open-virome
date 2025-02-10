@@ -12,7 +12,6 @@ import Skeleton from '@mui/material/Skeleton';
 import HostFigure from './HostFigure.tsx';
 
 const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
-
     const filePath = "/figures/intestine.png";
     const {
         data: tissueCountData,
@@ -31,6 +30,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
             skip: shouldDisableFigureView(identifiers),
         },
     );
+    console.log(tissueCountData)
 
     const {
         data: diseaseCountData,

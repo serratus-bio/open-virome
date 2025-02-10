@@ -104,6 +104,7 @@ app.post('/counts', async (req, res) => {
     `;
 
     const result = await runPSQLQuery(query);
+    console.log(result);
     if (result.error) {
         console.error(result.error);
         console.error(query);
