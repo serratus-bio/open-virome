@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 
 const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}, imagePath = "" }) => {
-    const [imageDimensions, setImageDimensions] = useState({ width: 100, height: 100, padding: 30, maxCategoryLength: 0, loaded: false });
+    const [imageDimensions, setImageDimensions] = useState({ width: 100, height: 100, padding: 20, maxCategoryLength: 0, loaded: false });
     const [options, setOptions] = useState({});
 
     useEffect(() => {
@@ -16,7 +16,7 @@ const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}, imagePath = "" }) 
                     setImageDimensions({
                         width: 100,
                         height: 100 / aspectRatio,
-                        padding: 30,
+                        padding: 20,
                         maxCategoryLength: maxCategoryLength,
                         loaded: true, // Ensures we re-render after image loads
                     });
@@ -43,7 +43,6 @@ const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}, imagePath = "" }) 
             };
 
             if (imageDimensions.loaded) {
-                console.log(imageDimensions)
                 newOptions.graphic = [
                     {
                         type: 'image',
