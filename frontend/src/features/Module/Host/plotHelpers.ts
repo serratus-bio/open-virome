@@ -43,23 +43,6 @@ export const getBarPlotData = (data, maxRows = undefined, imagePath="") => {
         },
     ];
 
-    // let imageWidth = 100;
-    // let imagePadding = 0;
-    // let estimatedLabelWidth = 0;
-    // let aspectRatio = 1;
-    // console.log("2", imagePath);
-    // if (imagePath) {
-    //     const img = new Image();
-    //     img.src = imagePath;
-    //     img.onload = () => {
-    //         imageWidth = img.width;
-    //     };
-    //     aspectRatio = img.width / img.height
-    //     imagePadding = 30;
-    //     estimatedLabelWidth = Math.max(...rows.map(row => row[0]?.length || 10), 10) * 7;
-    // }
-
-    // const gridLeft = imagePath ? Math.max(imageWidth + imagePadding + estimatedLabelWidth, 150) : 150;
     return {
         xAxis: {
             type: 'value',
@@ -104,19 +87,5 @@ export const getBarPlotData = (data, maxRows = undefined, imagePath="") => {
             },
         },
         dataZoom: dataZoom,
-        // graphic: imagePath
-        //     ? [
-        //           {
-        //               type: 'image',
-        //               left: 10,
-        //               top: 'center',
-        //               style: {
-        //                   image: imagePath,
-        //                   width: imageWidth,
-        //                   height: imageWidth / aspectRatio,
-        //               },
-        //           },
-        //       ]
-        //     : [],
     };
 };

@@ -101,9 +101,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
             const maxRows = isSimpleLayout(sectionLayout) ? 9 : undefined;
             let imagePath = "";
             if(tissueCountData){
-                console.log("0", tissueCountData);
                 imagePath = chooseFigure(tissueCountData.at(-1));
-                console.log("1", imagePath);
             }
             return <BarPlot plotData={getBarPlotData(tissueCountData, maxRows, imagePath)} imagePath={imagePath}/>;
         }

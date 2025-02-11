@@ -5,14 +5,10 @@ const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}, imagePath = "" }) 
     const [imageDimensions, setImageDimensions] = useState({ width: 100, height: 100, padding: 30, maxCategoryLength: 0, loaded: false });
     const [options, setOptions] = useState({});
 
-
-
     useEffect(() => {
         const initializeChart = async () => {
             if (imagePath) {
-                console.log("2", plotData);
                 const maxCategoryLength = Math.max(...plotData.dataset.source.map(row => row[0]?.length || 10), 10) * 7;
-                console.log(maxCategoryLength)
                 const img = new Image();
                 img.src = imagePath;
                 img.onload = () => {
@@ -27,9 +23,6 @@ const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}, imagePath = "" }) 
                 };
             }
             const gridLeft = imageDimensions.loaded ? Math.max(imageDimensions.width + imageDimensions.padding + imageDimensions.maxCategoryLength, 150) : 150;
-            console.log(plotData)
-            console.log(Math.max(imageDimensions.width + imageDimensions.padding + imageDimensions.maxCategoryLength, 150))
-            console.log(gridLeft)
             const newOptions = {
                 backgroundColor: 'transparent',
                 textStyle: { color: 'white' },
