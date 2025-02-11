@@ -106,7 +106,7 @@ app.post('/counts', async (req, res) => {
 
     let result = await runPSQLQuery(query);
 
-    if(result && table == "biosample_tissue") { 
+    if(result.length > 0 && "bto_ids" in result[0] && table == "biosample_tissue") { 
         const btoIDs = result.map(item => item.bto_ids.split(', ')).flat();
         const bestParentTissueQuery = `
             MATCH (specific:Tissue)
