@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGetCountsQuery } from '../../../api/client.ts';
-import { shouldDisableFigureView, isSimpleLayout } from '../../../common/utils/plotHelpers.ts';
+import { shouldDisableFigureView, isSimpleLayout, chooseFigure } from '../../../common/utils/plotHelpers.ts';
 import { moduleConfig } from '../../Module/constants.ts';
 import { getBarPlotData } from './plotHelpers.ts';
 
@@ -9,10 +9,9 @@ import Typography from '@mui/material/Typography';
 import BarPlot from '../../../common/BarPlot.tsx';
 import PolarBarPlot from '../../../common/PolarBarPlot.tsx';
 import Skeleton from '@mui/material/Skeleton';
-import HostFigure from './HostFigure.tsx';
 
 const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
-    const filePath = "/figures/intestine.png";
+
     const {
         data: tissueCountData,
         error: hostCountError,
@@ -30,7 +29,12 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
             skip: shouldDisableFigureView(identifiers),
         },
     );
-    console.log(tissueCountData)
+    let imagePath = "";
+    if(tissueCountData){
+        imagePath = chooseFigure(tissueCountData.at(-1));
+        console.log("1", imagePath);
+    }
+
 
     const {
         data: diseaseCountData,
@@ -100,7 +104,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
         }
         if (tissueCountData && tissueCountData.length > 0) {
             const maxRows = isSimpleLayout(sectionLayout) ? 9 : undefined;
-            return <BarPlot plotData={getBarPlotData(tissueCountData, maxRows)}  imagePath={filePath}/>;
+            return <BarPlot plotData={getBarPlotData(tissueCountData, maxRows, imagePath)}/>;
         }
         return getEmptyResultsMessage();
     };
