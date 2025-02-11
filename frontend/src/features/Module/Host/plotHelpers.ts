@@ -1,6 +1,6 @@
 import { truncate, abbreviateNumber } from '../../../common/utils/textFormatting.ts';
 
-export const getBarPlotData = (data, maxRows = undefined) => {
+export const getBarPlotData = (data, maxRows = undefined, imagePath="") => {
     let rows = data.map((row) => {
         return {
             name: row.name,

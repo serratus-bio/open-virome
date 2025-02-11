@@ -122,11 +122,13 @@ export const getTotalCountsQuery = ({ ids, idRanges, idColumn, table }) => {
 };
 
 export const getGroupedCountsByIdentifiers = ({ ids, idRanges, idColumn, groupBy, table }) => {
+
     let clauses = getIdClauses(ids, idRanges, idColumn, table);
     let remappedGroupBy = handleIdKeyIrregularities(groupBy, table);
+    const btoIdSelect = remappedGroupBy === 'tissue' ? "STRING_AGG(DISTINCT bto_id, ', ') AS bto_ids," : "";
     clauses = `${clauses.length > 0 ? `WHERE ${clauses.join(' OR ')}` : ''}`;
     return `
-        SELECT ${remappedGroupBy} as name, COUNT(*) as count ${table === 'sra' ? ', SUM(mbases)/POWER(10,3) as gbp' : ''}
+        SELECT ${remappedGroupBy} as name, ${btoIdSelect} COUNT(*) as count ${table === 'sra' ? ', SUM(mbases)/POWER(10,3) as gbp' : ''}
         FROM ${table}
         ${clauses}
         GROUP BY ${remappedGroupBy}

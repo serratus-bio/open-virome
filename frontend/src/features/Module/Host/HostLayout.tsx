@@ -1,6 +1,6 @@
 import React from 'react';
 import { useGetCountsQuery } from '../../../api/client.ts';
-import { shouldDisableFigureView, isSimpleLayout } from '../../../common/utils/plotHelpers.ts';
+import { shouldDisableFigureView, isSimpleLayout, chooseFigure } from '../../../common/utils/plotHelpers.ts';
 import { moduleConfig } from '../../Module/constants.ts';
 import { getBarPlotData } from './plotHelpers.ts';
 
@@ -11,7 +11,7 @@ import PolarBarPlot from '../../../common/PolarBarPlot.tsx';
 import Skeleton from '@mui/material/Skeleton';
 
 const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
-    const {
+    const { 
         data: tissueCountData,
         error: hostCountError,
         isFetching: tissueCountIsFetching,
@@ -91,13 +91,19 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
         );
     };
 
+
+
     const getTissuePlot = () => {
         if (tissueCountIsFetching) {
             return <Skeleton variant='rectangular' height={400} width={'80%'} />;
         }
         if (tissueCountData && tissueCountData.length > 0) {
             const maxRows = isSimpleLayout(sectionLayout) ? 9 : undefined;
-            return <BarPlot plotData={getBarPlotData(tissueCountData, maxRows)} />;
+            let imagePath = "";
+            if(tissueCountData){
+                imagePath = chooseFigure(tissueCountData.at(-1));
+            }
+            return <BarPlot plotData={getBarPlotData(tissueCountData, maxRows, imagePath)} imagePath={imagePath}/>;
         }
         return getEmptyResultsMessage();
     };
@@ -147,6 +153,8 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                     </Typography>
                     {getTissuePlot()}
                 </Box>
+            </Box>
+            <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
                     <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
                         {`Disease`}
@@ -155,6 +163,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                 </Box>
             </Box>
             {isSimpleLayout(sectionLayout) ? null : (
+            <>
                 <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
                         <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
@@ -162,6 +171,8 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                         </Typography>
                         {getOrganismPlot()}
                     </Box>
+                </Box>
+                <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
                         <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
                             {`Sex`}
@@ -169,6 +180,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                         {getSexPlot()}
                     </Box>
                 </Box>
+            </>
             )}
         </Box>
     );

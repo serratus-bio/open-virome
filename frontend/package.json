@@ -12,7 +12,7 @@
         "chroma-js": "^2.4.2",
         "cytoscape": "^3.30.0",
         "cytoscape-fcose": "^2.2.0",
-        "echarts": "^5.5.0",
+        "echarts": "^5.6.0",
         "echarts-for-react": "^3.0.2",
         "echarts-stat": "^1.2.0",
         "markdown-to-jsx": "^7.7.1",

@@ -5,6 +5,7 @@ import compression from 'compression';
 import awsServerlessExpressMiddleware from 'aws-serverless-express/middleware.js';
 
 import { runPSQLQuery } from './clients/psql.mjs';
+import { runCypherQuery } from './clients/neo4j.mjs';
 import {
     getIdClauses,
     getMinimalJoinSubQuery,
@@ -103,7 +104,37 @@ app.post('/counts', async (req, res) => {
         ${pageEnd !== undefined ? `LIMIT ${pageEnd - pageStart} OFFSET ${pageStart}` : ''}
     `;
 
-    const result = await runPSQLQuery(query);
+    let result = await runPSQLQuery(query);
+
+    if(result.length > 0 && "bto_ids" in result[0] && table == "biosample_tissue") { 
+        const btoIDs = result.map(item => item.bto_ids.split(', ')).flat();
+        const bestParentTissueQuery = `
+            MATCH (specific:Tissue)
+            WHERE specific.btoId IN [${btoIDs.map(id => `'${id}'`).join(', ')}]
+            WITH specific AS ancestor, COUNT(specific) AS direct_matches
+
+            OPTIONAL MATCH (specific:Tissue)-[:HAS_PARENT*1..5]->(ancestor)
+            WHERE specific.btoId IN [${btoIDs.map(id => `'${id}'`).join(', ')}]
+            WITH ancestor, 
+                SUM(direct_matches) + COUNT(DISTINCT specific) AS num_bto_matches
+            ORDER BY num_bto_matches DESC
+            LIMIT 5
+            RETURN ancestor.btoId AS common_bto, 
+                ancestor.scientificName AS common_tissue, 
+                num_bto_matches;
+        `
+        const bestParentTissue = await runCypherQuery(bestParentTissueQuery);
+        const bestParentTissueObject = {};
+        bestParentTissue.forEach((item, index) => {
+            bestParentTissueObject[`best_${index + 1}`] = {
+                btoId: item.common_bto,
+                tissue: item.common_tissue,
+                count: item.num_bto_matches
+            };
+        });
+
+        result.push(bestParentTissueObject);
+    }
     if (result.error) {
         console.error(result.error);
         console.error(query);
