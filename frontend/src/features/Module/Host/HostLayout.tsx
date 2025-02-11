@@ -11,8 +11,7 @@ import PolarBarPlot from '../../../common/PolarBarPlot.tsx';
 import Skeleton from '@mui/material/Skeleton';
 
 const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
-
-    const {
+    const { 
         data: tissueCountData,
         error: hostCountError,
         isFetching: tissueCountIsFetching,
@@ -29,12 +28,6 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
             skip: shouldDisableFigureView(identifiers),
         },
     );
-    let imagePath = "";
-    if(tissueCountData){
-        imagePath = chooseFigure(tissueCountData.at(-1));
-        console.log("1", imagePath);
-    }
-
 
     const {
         data: diseaseCountData,
@@ -98,13 +91,21 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
         );
     };
 
+
+
     const getTissuePlot = () => {
         if (tissueCountIsFetching) {
             return <Skeleton variant='rectangular' height={400} width={'80%'} />;
         }
         if (tissueCountData && tissueCountData.length > 0) {
             const maxRows = isSimpleLayout(sectionLayout) ? 9 : undefined;
-            return <BarPlot plotData={getBarPlotData(tissueCountData, maxRows, imagePath)}/>;
+            let imagePath = "";
+            if(tissueCountData){
+                console.log("0", tissueCountData);
+                imagePath = chooseFigure(tissueCountData.at(-1));
+                console.log("1", imagePath);
+            }
+            return <BarPlot plotData={getBarPlotData(tissueCountData, maxRows, imagePath)} imagePath={imagePath}/>;
         }
         return getEmptyResultsMessage();
     };

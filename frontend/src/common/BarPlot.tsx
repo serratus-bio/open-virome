@@ -1,53 +1,76 @@
 import React, { useEffect, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
 
-const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}}) => {
+const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}, imagePath = "" }) => {
+    const [imageDimensions, setImageDimensions] = useState({ width: 100, height: 100, padding: 30, maxCategoryLength: 0, loaded: false });
+    const [options, setOptions] = useState({});
 
-    const defaultConfig = {
-        backgroundColor: 'transparent',
-        textStyle: {
-            color: 'white',
-        },
-        subtextStyle: {
-            color: 'white',
-        },
-        legend: {
-            textStyle: {
-                color: 'white',
-            },
-        },
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-                type: 'shadow',
-            },
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true,
-            borderColor: 'white',
-        },
-        xAxis: {
-            type: 'value',
-        },
-        yAxis: {
-            type: 'category',
-        },
-        series: [],
-    };
 
-    const options = {
-        ...defaultConfig,
-        ...plotData,
-    };
 
-    options.series.forEach((obj) => {
-        if (obj.label != null) {
-            obj.label.position = 'inside';
-        }
-    });
+    useEffect(() => {
+        const initializeChart = async () => {
+            if (imagePath) {
+                console.log("2", plotData);
+                const maxCategoryLength = Math.max(...plotData.dataset.source.map(row => row[0]?.length || 10), 10) * 7;
+                console.log(maxCategoryLength)
+                const img = new Image();
+                img.src = imagePath;
+                img.onload = () => {
+                    const aspectRatio = img.width / img.height
+                    setImageDimensions({
+                        width: 100,
+                        height: 100 / aspectRatio,
+                        padding: 30,
+                        maxCategoryLength: maxCategoryLength,
+                        loaded: true, // Ensures we re-render after image loads
+                    });
+                };
+            }
+            const gridLeft = imageDimensions.loaded ? Math.max(imageDimensions.width + imageDimensions.padding + imageDimensions.maxCategoryLength, 150) : 150;
+            console.log(plotData)
+            console.log(Math.max(imageDimensions.width + imageDimensions.padding + imageDimensions.maxCategoryLength, 150))
+            console.log(gridLeft)
+            const newOptions = {
+                backgroundColor: 'transparent',
+                textStyle: { color: 'white' },
+                subtextStyle: { color: 'white' },
+                legend: { textStyle: { color: 'white' } },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: { type: 'shadow' },
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true,
+                    borderColor: 'white',
+                },
+                ...plotData,
+            };
+
+            if (imageDimensions.loaded) {
+                console.log(imageDimensions)
+                newOptions.graphic = [
+                    {
+                        type: 'image',
+                        left: 10,
+                        top: 'center',
+                        style: {
+                            image: imagePath,
+                            width: imageDimensions.width,
+                            height: imageDimensions.height,
+                        },
+                    },
+                ];
+                newOptions.grid.left = gridLeft;
+            }
+
+            setOptions(newOptions);
+        };
+
+        initializeChart();
+    }, [imagePath, imageDimensions.loaded, plotData]);
 
     return <ReactEcharts option={options} style={styles} onEvents={onEvents} />;
 };

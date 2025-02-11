@@ -5,7 +5,7 @@ export const tissueImageMap = {
     "stomach": "/figures/intestine.png",
     "brain": "/figures/BrainLateral.png",
     "liver": "/figures/HumanLiver.png",
-    "lung": "/figures/HumanLung.png",
+    "lung": "/figures/HumanLungs.png",
     "heart": "/figures/HumanHeart.png",
     // "skin": "/figures/skin.png",
     "blood": "/figures/veins.png",
