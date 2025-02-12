@@ -89,19 +89,32 @@ DO NOT use any other delimiter in your summary, unless it is part of the virome 
 export const getEcologySummarizationPrompt = () => `
 ---Role---
 
-You are a helpful bioinformatics research assistant being used to summarize ecology data for a research paper.
+You are a helpful bioinformatics research assistant being used to summarize geographical data for a research paper.
 
 ---Goal---
 
-Follow the instructions to summarize ecology data:
-1. Provide a succinct overview of the high-level ideas covered by the ecology data, no longer than a paragraph.
-2. For each overarching topic in the summarization, cite all relevant bioproject ID(s).
-3. DO NOT reference any bioprojects that aren't given in the list.
-4. ONLY use the information provided in the ecology and bioproject data to generate the summary.
-5. Avoid using any external information or knowledge.
-6. Focus on ecology data and only use the provided bioproject context to guide the summarization and insights.
+Follow the instructions to summarize ecological data:
+1. Start with a concise, factual overview of the geographical data based only on the provided bioprojects.
+2. Progressively incorporate inferred insights by identifying patterns, trends, or broader implications of the geography data while staying within the given bioproject context.
+3. For each overarching topic in the summarization, cite all relevant bioproject ID(s).
+4. DO NOT reference any bioprojects that aren't given in the list.
+5. DO NOT reference biosamples (items start with 'SAMN'), only reference bioprojects (items start with 'PRJNA').
+6. ONLY use the information provided in the geography data and bioproject data to generate the summary.
+7. Avoid using any external information or knowledge.
+8. Focus on geographical data and making connections based on the geographical data to the provided bioproject context to guide the summarization and insights.
+9. Try to discuss any geological patterns or trends among the provided data.
+10. Avoid mentioning summarizations of bioprojects or virome data.
+11. When naming locations, avoid using latitude, longitude and elevation, instead use the location name.
 
----Target response length and format---
+--- Inference Guidelines ---
+
+Start by reporting observed data directly.
+
+As the summary progresses, highlight trends, correlations, or significant findings that emerge.
+
+End with a higher-level insight that connects findings to broader implications in virology, geological, or host-pathogen interactions, while staying grounded in the provided data.
+
+--- Target response length and format ---
 
 One paragraph
 
@@ -110,7 +123,24 @@ Use standard markdown delimiter ** to surround/highlight important topics or key
 DO NOT use any other delimiter in your summary, unless it is part of the ecology data.
 **Do not list more than 5 bioprojects in a single reference**. Instead, list the top 5 most relevant bioprojects and add "+more" to indicate that there are more.
 
----
+--- Biome Mapping ---
+Below is a mapping of biome Ids to their respective names, please use the following to translate any biome Ids in the data and avoid using the biome Ids themselves in the summary:
+WWF_TEW_BIOME_01: { hex: '#008346', name: 'Tropical & Subtropical Moist Broadleaf Forests' },
+WWF_TEW_BIOME_02: { hex: '#9DCC00', name: 'Tropical & Subtropical Dry Broadleaf Forests' },
+WWF_TEW_BIOME_03: { hex: '#C4B72E', name: 'Tropical & Subtropical Coniferous Forests' },
+WWF_TEW_BIOME_04: { hex: '#015C31', name: 'Temperate Broadleaf & Mixed Forests' },
+WWF_TEW_BIOME_05: { hex: '#006E84', name: 'Temperate Conifer Forests' },
+WWF_TEW_BIOME_06: { hex: '#FFA8BB', name: 'Boreal Forests/Taiga' },
+WWF_TEW_BIOME_07: { hex: '#FAD505', name: 'Tropical & Subtropical Grasslands, Savannas & Shrublands' },
+WWF_TEW_BIOME_08: { hex: '#8F7C00', name: 'Temperate Grasslands, Savannas & Shrublands' },
+WWF_TEW_BIOME_09: { hex: '#67C7BF', name: 'Flooded Grasslands & Savannas' },
+WWF_TEW_BIOME_10: { hex: '#993E01', name: 'Montane Grasslands & Shrublands' },
+WWF_TEW_BIOME_11: { hex: '#C20088', name: 'Tundra' },
+WWF_TEW_BIOME_12: { hex: '#0275DC', name: 'Mediterranean Forests, Woodlands & Scrub' },
+WWF_TEW_BIOME_13: { hex: '#FFA405', name: 'Deserts & Xeric Shrublands' },
+WWF_TEW_BIOME_14: { hex: '#FFCC99', name: 'Mangroves' },
+WWF_TEW_BIOME_98: { hex: '#000000', name: 'Ocean' },
+WWF_TEW_BIOME_99: { hex: '#000000', name: 'Ocean' },
 `;
 
 export const getHostSummarizationPrompt = () => `

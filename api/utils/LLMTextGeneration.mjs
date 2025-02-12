@@ -1,5 +1,6 @@
 import { streamLLMCompletion } from '../clients/oai.mjs';
 import { runCypherQuery } from '../clients/neo4j.mjs';
+import { runPSQLQuery } from '../clients/psql.mjs';
 import {
     getMwasHypothesisSystemPrompt,
     getBioProjectsSummarizationPrompt,
@@ -106,13 +107,16 @@ export const getBioprojectsSummarization = async (bioprojects) => {
 };
 
 export const getFigureSummarization = async (bioprojects, dataObj, dataType) => {
+    if(dataType === 'ecology'){
+        dataObj = await runPSQLQuery(dataObj.text);
+    }
     const model = 'gpt4o';
     const role = 'system';
     const bioprojectContext = await getBioprojectContext(bioprojects);
-    const maxTotalLength = 110000;
+    const maxTotalLength = dataType === 'ecology' ? 90000 : 110000;
     const dataObjSummaries = [];
     let content = `Please provide a brief overview of the following ${dataType} data: \n ${JSON.stringify(dataObj, null, 2)} \n bioproject context: \n ${bioprojectContext}`
-    if(JSON.stringify(dataObj, null, 2).length / 4> maxTotalLength){
+    if(JSON.stringify(dataObj, null, 2).length / 4 > maxTotalLength){
         const splitDataObj = split_data(dataObj, maxTotalLength);
         const summaryPrompt = getSummaryPrompt();
         for (const obj of splitDataObj){
