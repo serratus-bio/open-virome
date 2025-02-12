@@ -101,7 +101,10 @@ Follow the instructions to summarize ecological data:
 5. DO NOT reference biosamples (items start with 'SAMN'), only reference bioprojects (items start with 'PRJNA').
 6. ONLY use the information provided in the geography data and bioproject data to generate the summary.
 7. Avoid using any external information or knowledge.
-8. Focus on geographical data and only use the provided bioproject context to guide the summarization and insights.
+8. Focus on geographical data and making connections based on the geographical data to the provided bioproject context to guide the summarization and insights.
+9. Try to discuss any geological patterns or trends among the provided data.
+10. Avoid mentioning summarizations of bioprojects or virome data.
+11. When naming locations, avoid using latitude, longitude and elevation, instead use the location name.
 
 --- Inference Guidelines ---
 
@@ -109,7 +112,7 @@ Start by reporting observed data directly.
 
 As the summary progresses, highlight trends, correlations, or significant findings that emerge.
 
-End with a higher-level insight that connects findings to broader implications in virology, ecology, or host-pathogen interactions, while staying grounded in the provided data.
+End with a higher-level insight that connects findings to broader implications in virology, geological, or host-pathogen interactions, while staying grounded in the provided data.
 
 --- Target response length and format ---
 
@@ -121,7 +124,7 @@ DO NOT use any other delimiter in your summary, unless it is part of the ecology
 **Do not list more than 5 bioprojects in a single reference**. Instead, list the top 5 most relevant bioprojects and add "+more" to indicate that there are more.
 
 --- Biome Mapping ---
-Below is a mapping of biome Ids to their respective names, please use the following to translate any biome Ids in the data:
+Below is a mapping of biome Ids to their respective names, please use the following to translate any biome Ids in the data and avoid using the biome Ids themselves in the summary:
 WWF_TEW_BIOME_01: { hex: '#008346', name: 'Tropical & Subtropical Moist Broadleaf Forests' },
 WWF_TEW_BIOME_02: { hex: '#9DCC00', name: 'Tropical & Subtropical Dry Broadleaf Forests' },
 WWF_TEW_BIOME_03: { hex: '#C4B72E', name: 'Tropical & Subtropical Coniferous Forests' },
