@@ -14,25 +14,13 @@ import { moduleConfig } from '../Module/constants.ts';
 import { isSummaryView } from '../../common/utils/plotHelpers.ts';
 import { handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
 import { useState } from 'react';
-import cytoscape from 'cytoscape';
 import { shouldDisableFigureView, isSimpleLayout } from '../../common/utils/plotHelpers.ts';
 
 const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
      // figure data
      const viromeFigureData = (identifiers) => {
         const allFilters = useSelector(selectAllFilters);
-        const [randomized, setRandomized] = useState(0);
-        const [activeSubgraph, setActiveSubgraph] = useState('1');
-        const [isSummaryTableOpen, setIsSummaryTableOpen] = useState(false);
-        const [selectedNetworkItem, setSelectedNetworkItem] = useState(null);
         const [activeModule, setActiveModule] = useState('species');
-        const [headlessCy, setHeadlessCy] = useState(
-            cytoscape({
-                headless: true,
-                elements: [],
-            }),
-        );
-        const containerRef = React.useRef(null);
     
         const {
             data: resultData,
