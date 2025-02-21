@@ -397,3 +397,118 @@ BioProject IDs should be referenced in the response similarly to the following e
 **If the MWAS results do not contain sufficient information to provide a clear hypothesis, return '###'. Do not make anything up.**
 ---
 `;
+
+export const getCaptionPrompt = (type, title) => `
+Your task is to create 3 different captions that summarize given user data that will be used to create a figure.
+The data will be given as a JSON string in the user prompt.
+
+### Figure Caption
+
+The format of a Figure Caption is Declarative title + Description + Statistical information (optional).
+Declarative title: summarises the result or major finding of the data you are presenting in the figure. (A mere representation of the x and y axes cannot be a title.)
+Description: a brief description of the results necessary for understanding the figure without having to refer to the main text
+Statistical information: for example, number of replicates, asterisks denoting P-values, statistical tests, etc.
+
+Try to generate captions that are clear, concise, consistent, and provide specific information, especially not false.
+Prioritize caption flow, if necessary, minimize the declaritiveness of the title.
+### Background
+
+Figure is a ${type}.
+Figure is a category related to Eimeria sequencing run metadata for molecular genetics.
+Figure title is ${title}.
+
+### Rules
+
+1. Caption MUST have a word count of 60 words or less.
+2. Caption MUST have a tone and sentence structure appropriate for a top-tier conference (e.g., NeurIPS, ICLR,
+CVPR, ACL, EMNLP). 
+3. It is not a caption to describe the x-axis y-axis.
+4. Caption MUST be clear, concise, consistent, and provide specific information, especially not false.
+5. If the given paragraph uses abbreviations, use them in the
+caption.
+
+### Output format
+Answer results in JSON format: {“caption_#”: }, where the '#' sign will enumerate the captions you generate.
+Please generate 3 captions based on the given data.
+`;
+
+// export const getCaptionPrompt = () => `
+// Your task is to create a caption that summarizes based on a paragraph.
+
+// ### Figure Caption
+
+// The format of a Figure Caption is Declarative title + Description + Statistical information (optional).
+// Declarative title: summarises the result or major finding of the data you are presenting in the figure. (A mere representation of the x and y axes cannot be a title.)
+// Description: a brief description of the results necessary for understanding the figure without having to refer to the main text
+// Statistical information: for example, number of replicates, asterisks denoting P-values, statistical tests, etc.
+
+// ### Background
+
+// Figure is a [Figure Type].
+// Figure is a category related to [Subject].
+
+// ### Rules
+
+// 1. Caption MUST have a word count of 60 words or less.
+// 2. Caption MUST have a tone and sentence structure appropriate for a top-tier conference (e.g., NeurIPS, ICLR,
+// CVPR, ACL, EMNLP). 
+// 3. It is not a caption to describe the x-axis y-axis.
+// 4. Caption MUST be clear, concise, consistent, and provide specific information, especially not false.
+// 5. If the given paragraph uses abbreviations, use them in the
+// caption.
+
+// ### Best Caption Examples
+
+// [Few-shot Examples]
+
+// ### Input
+
+// Paragraph: [Paragraphs]
+// Figure Summary: [Figure Description]
+// Mention: [Mentions]
+// OCR text: [OCR]
+// ### Output format
+// Answer results in JSON format: {“caption”: }.
+// `;
+
+export const getCaptionJudgementPrompt = () => `
+A good figure caption should include the following elements:
+1. **Clear Description**: Clearly describe what the figure represents so that readers can understand the main point of the figure just by reading the caption.
+2. **Conciseness**: Keep it concise while including all essential information. The caption MUST be brief yet informative (important!!).
+3. **Relevant Information**: Include background information, experimental conditions, or methods used that are necessary to understand the figure. This helps the reader interpret the data correctly.
+4. **Consistency**: Maintain consistency with the rest of the paper in terms of terminology and style. Ensure that the terms used in the caption match those used in the text.
+5. **Citation**: If necessary, include citations of related research or references in the paragraph.
+
+You are given a summarization of the figure, relevant paragraphs, a mentioned sentences, and four caption candidates:
+
+### Summarization of the Figure
+[Figure Description]
+### Paragraph
+[Paragraphs]
+### Mention
+[Mentions]
+### Caption A
+[Pegasus Caption]
+### Caption B
+[LLaMA-3-8B Caption]
+### Caption C
+[Yi-1.5-9B Caption]
+### Caption D
+[GPT-4o Caption]
+1. Choose the best and worst caption and answer in JSON format (For
+example, if A is the best and B is the worst, the answer is: "Good": "A",
+"Bad": "B). Candidate captions shouldn’t be scored low just because
+they’re concise.
+2. If even the best caption could be improved, use the candidate captions
+and paragraphs to improve it (math symbols, legend, grammar, etc.).
+3. The improved sentence should have a tone and sentence structure
+appropriate for a top-tier conference (e.g., NeurIPS, ICLR, CVPR, ACL,
+EMNLP) and MUST have a word count of 60 words or less.
+4. If you find that sentences are becoming long and complex, making it
+difficult for readers to understand, break the sentences up to effectively
+convey the important information.
+5. If you already provided a perfect caption, keep it the same.
+
+Provide them in JSON format with the following keys: Good, Bad, Improved Caption "Good" : "", "Bad" : "", "Improved Caption": "".
+`;
+// 6. Do not omit the figure numbers, such as in "Fig. 3" or "Figure 5".

@@ -17,7 +17,7 @@ import {
     getSearchStringClause,
 } from './utils/queryBuilder.mjs';
 import { getMWASResults } from './utils/mwas.mjs';
-import { getBioprojectsSummarization, getMwasHypothesis, getGraphRAGResults, getFigureSummarization } from './utils/LLMTextGeneration.mjs';
+import { getBioprojectsSummarization, getMwasHypothesis, getGraphRAGResults, getFigureSummarization, generateFigureCaptions } from './utils/LLMTextGeneration.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 
 const app = express();
@@ -54,6 +54,7 @@ app.post('/counts', async (req, res) => {
     const pageEnd = body?.pageEnd ?? undefined;
     const searchString = body?.searchString ?? undefined;
     const palmprintOnly = body?.palmprintOnly ?? true;
+    const tableDescription = body?.tableDescription ?? undefined;
 
     if (idColumn && filters.length > 0) {
         return res.status(400).json({ error: 'Cannot have both idColumn and filters!' });
@@ -105,6 +106,13 @@ app.post('/counts', async (req, res) => {
     `;
 
     let result = await runPSQLQuery(query);
+
+    if(tableDescription) {
+        console.log("Table Description: ", tableDescription+'\n');
+        const caption = await generateFigureCaptions(tableDescription, result);
+        console.log(caption+'\n');
+        console.log(caption.text)
+    }
 
     if(result.length > 0 && "bto_ids" in result[0] && table == "biosample_tissue") { 
         const btoIDs = result.map(item => item.bto_ids.split(', ')).flat();
@@ -268,6 +276,21 @@ app.post('/globalChat', async (req, res) => {
     const conversation = body?.conversation ?? [];
     const message = body?.message ?? '';
     const result = await getGraphRAGResults(message, conversation);
+    if (result.error) {
+        console.error(result.error);
+        return res.status(500).json({ error: result.error });
+    }
+    return res.json(result);
+});
+
+app.post('/caption', async (req, res) => {
+    const body = getRequestBody(req);
+    if (body === undefined) {
+        return res.status(400).json({ error: 'Invalid request!' });
+    }
+    const figureData = body?.figureData ?? [];
+    const figureDescription = body?.figureDescription ?? '';
+    const result = generateFigureCaptions(figureDescription);
     if (result.error) {
         console.error(result.error);
         return res.status(500).json({ error: result.error });

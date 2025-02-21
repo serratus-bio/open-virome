@@ -77,6 +77,13 @@ export const apiSlice = createApi({
                 body: args,
             }),
         }),
+        getCaption: build.query({
+            query: (args) => ({
+                url: 'caption',
+                method: 'POST',
+                body: args,
+            }),
+        }),
     }),
 });
 
@@ -88,5 +95,6 @@ export const {
     useLazyGetSummaryTextQuery,
     useLazyGetHypothesisQuery,
     useLazyGetGlobalChatQuery,
+    useLazyGetCaptionQuery,
 } = apiSlice;
 export const { endpoints, reducerPath, reducer, middleware } = apiSlice;

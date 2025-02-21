@@ -14,6 +14,7 @@ import Skeleton from '@mui/material/Skeleton';
 import Box from '@mui/material/Box';
 
 const BioprojectFigure = ({ identifiers, palmprintOnly }) => {
+    /* remove? */
     const {
         data: targetCountData = [],
         error: targetCountError,
@@ -31,7 +32,6 @@ const BioprojectFigure = ({ identifiers, palmprintOnly }) => {
             skip: shouldDisableFigureView(identifiers) || isSummaryView(identifiers),
         },
     );
-
     const {
         data: controlCountData,
         error: controlCountError,

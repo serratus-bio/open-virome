@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLazyGetSummaryTextQuery } from '../../api/client.ts';
+import { useLazyGetSummaryTextQuery, useLazyGetCaptionQuery  } from '../../api/client.ts';
 import { formatLLMGeneratedText } from './textFormatting.tsx';
 
 import Box from '@mui/material/Box';
@@ -196,11 +196,10 @@ const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
         return SELECT;
     }
 
-
     var dataObj = {};
     switch (dataType) {
         case 'sra':
-            dataType = 'bioproject'; 
+            dataType = 'bioproject';
             break;
         case 'palmdb':
             dataType = 'virome';
@@ -220,6 +219,9 @@ const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
     }
     const [getSummaryText, { data: summaryData, isFetching: isFetchingSummary, error: errorSummary }] =
         useLazyGetSummaryTextQuery();
+
+    const [getCaptionText, { data: captionData, isFetching: isFetchingCaption, error: errorCaption }] =
+        useLazyGetCaptionQuery();
 
     const onButtonClick = async () => {
         if (isFetchingSummary) {
