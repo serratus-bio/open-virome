@@ -334,6 +334,7 @@ const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
                         >
                             <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
                                 {formatLLMGeneratedText(summaryData?.text, summaryData?.conversation)}
+                                <br />
                                 {formatLLMGeneratedText("Figure Caption: " + summaryData?.caption, summaryData?.conversation)}
                             </Typography>
                         </Box>
