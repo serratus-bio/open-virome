@@ -13,6 +13,12 @@ import {
     getGraphRAGMwasSystemPrompt,
     allowGeneralKnowledgeSystemPrompt,
     noDataFoundMessage,
+    getCaptionPrompt,
+    getCaptionJudgementPrompt,
+    getSRAFigureDescription,
+    getEcologyFigureDescription,
+    getHostFigureDescription,
+    getViromeFigureDescription,
 } from './prompts.mjs';
 const INCLUDE_MWAS_IN_GRAPH_RAG = true;
 
@@ -77,16 +83,12 @@ const getFilterQueryContext = (filters) => {
     return filterContext.join('\n');
 };
 
-export const getBioprojectsSummarization = async (bioprojects) => {
+export const getBioprojectsSummarization = async (bioprojects, dataObj) => {
     const bioprojectContext = await getBioprojectContext(bioprojects);
     const context = getBioProjectsSummarizationPrompt();
-    let model, role;
-    model = 'gpt4o';
-    if (model === 'gpt4o') {
-        role = 'system';
-    } else {
-        role = 'assistant'; // o1
-    }
+    const model = chooseModel('bioproject');
+    const role = 'system';
+    const figureDescription = getSRAFigureDescription();
     let conversation = [
         {
             role: role,
@@ -103,14 +105,22 @@ export const getBioprojectsSummarization = async (bioprojects) => {
         role: role,
         content: result.text,
     });
-    return { text: result.text, conversation: conversation };
+
+    const captionResults = await generateFigureCaptions(figureDescription, dataObj);
+    const jsonString = captionResults.text.replace(/^```json\s*|\s*```$/g, '');
+    const captions = JSON.parse(jsonString);
+    const improvedCaption = captions["Improved Caption"];
+    console.log(improvedCaption);
+    return { text: result.text, conversation: conversation, caption: improvedCaption };
 };
 
-export const getFigureSummarization = async (bioprojects, dataObj, dataType) => {
+export const getFigureSummarization = async (bioprojects, dataObj, dataType, figureDescription) => {
+    let exceedTokenLimit = false;
     if(dataType === 'ecology'){
         dataObj = await runPSQLQuery(dataObj.text);
     }
-    const model = 'gpt4o';
+    console.log(dataObj);
+    const model = chooseModel(dataType);
     const role = 'system';
     const bioprojectContext = await getBioprojectContext(bioprojects);
     const maxTotalLength = dataType === 'ecology' ? 90000 : 110000;
@@ -135,6 +145,7 @@ export const getFigureSummarization = async (bioprojects, dataObj, dataType) => 
         }
     }
     if(dataObjSummaries.length > 0){
+        exceedTokenLimit = true;
         console.log("Data object too large, splitting into multiple summaries");
         content = `Please provide a brief overview of the following pre-summarized ${dataType} data: \n ${JSON.stringify(dataObjSummaries)} \n bioproject context: \n ${bioprojectContext}`
     }
@@ -143,12 +154,15 @@ export const getFigureSummarization = async (bioprojects, dataObj, dataType) => 
     switch (dataType) {
         case 'virome':
             prompt = getViromeSummarizationPrompt();
+            figureDescription = getViromeFigureDescription();
             break;
         case 'ecology':
             prompt = getEcologySummarizationPrompt();
+            figureDescription = getEcologyFigureDescription();
             break;
         case 'host':
             prompt = getHostSummarizationPrompt();
+            figureDescription = getHostFigureDescription();
             break;
     }
     let conversation = [
@@ -166,17 +180,19 @@ export const getFigureSummarization = async (bioprojects, dataObj, dataType) => 
         role: role,
         content: result.text,
     });
-    return { text: result.text, conversation: conversation };
+    if (exceedTokenLimit) {
+        return { text: result.text, conversation: conversation, caption: 'Token Limit Exceeded' };
+    }
+    const captionResults = await generateFigureCaptions(figureDescription, dataObj);
+    const jsonString = captionResults.text.replace(/^```json\s*|\s*```$/g, '');
+    const captions = JSON.parse(jsonString);
+    const improvedCaption = captions["Improved Caption"];
+    console.log(improvedCaption);
+    return { text: result.text, conversation: conversation, caption: improvedCaption};
 };
 
 export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) => {
-    let model, role;
-    model = 'gpt4o';
-    if (model === 'gpt4o') {
-        role = 'system';
-    } else {
-        role = 'assistant'; // o1
-    }
+    const model = chooseModel('virome');
 
     const filterQueryContext = getFilterQueryContext(filters);
 
@@ -407,6 +423,25 @@ const getGraphRAGMWASResults = async (message, communitySummaries, reducerResult
     return { text: mwasResult.text, conversation: mwasConversation };
 };
 
+const chooseModel = (dataType) => {
+    switch (dataType) {
+        case 'bioproject':
+            return 'gpt4o';
+        case 'virome':
+            return 'gpt4o';
+        // case 'mwas':
+        //     return 'o1';
+        case 'ecology':
+            return 'gpt4o';
+        case 'host':
+            return 'gpt4o';
+        case 'caption':
+            return 'gpt4o';
+        default:
+            return 'gpt4o';
+    }
+};
+
 const split_data = (data, maxTotalLength) => {
     let batches  = [];
     let currentBatch = [];
@@ -426,3 +461,34 @@ const split_data = (data, maxTotalLength) => {
     };
     return batches;
 };
+
+export const generateFigureCaptions = async (figureDescription, figureData) => {
+    const prompt = getCaptionPrompt(figureDescription);
+
+    const model = chooseModel('caption');
+    const role = 'system';
+    let conversation = [
+        {
+            role: role,
+            content: prompt,
+        },
+        {
+            role: 'user',
+            content: JSON.stringify(figureData),
+        },
+    ];
+    const captionResults = await streamLLMCompletion(conversation, model);
+    const jsonString = captionResults.text.replace(/^```json\s*|\s*```$/g, '');
+    const captions = JSON.parse(jsonString);
+    console.log("captions:\n", captions);
+    const judgePrompt = getCaptionJudgementPrompt(JSON.stringify(figureData), JSON.stringify(captions, null, 2));
+    let judgeConversation = [
+        {
+            role: role,
+            content: judgePrompt,
+        },
+    ];
+    const result = await streamLLMCompletion(judgeConversation, model);
+    console.log("Judging:\n", result.text);
+    return { text: result.text, conversation: conversation };
+}

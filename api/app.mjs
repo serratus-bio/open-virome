@@ -17,7 +17,7 @@ import {
     getSearchStringClause,
 } from './utils/queryBuilder.mjs';
 import { getMWASResults } from './utils/mwas.mjs';
-import { getBioprojectsSummarization, getMwasHypothesis, getGraphRAGResults, getFigureSummarization } from './utils/LLMTextGeneration.mjs';
+import { getBioprojectsSummarization, getMwasHypothesis, getGraphRAGResults, getFigureSummarization, generateFigureCaptions } from './utils/LLMTextGeneration.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 
 const app = express();
@@ -54,6 +54,7 @@ app.post('/counts', async (req, res) => {
     const pageEnd = body?.pageEnd ?? undefined;
     const searchString = body?.searchString ?? undefined;
     const palmprintOnly = body?.palmprintOnly ?? true;
+    const tableDescription = body?.tableDescription ?? undefined;
 
     if (idColumn && filters.length > 0) {
         return res.status(400).json({ error: 'Cannot have both idColumn and filters!' });
@@ -230,12 +231,15 @@ app.post('/summary', async (req, res) => {
     const ids = body?.ids ?? [];
     const dataObj = body?.dataObj ?? [];
     const dataType = body?.idColumn ?? '';
+    const figureData = body?.figureData ?? [];
+    const figureDescription = body?.figureDescription ?? '';
     let result = {};
     if (dataType === 'bioproject') {
-        result = await getBioprojectsSummarization(ids);
+        console.log(dataObj);
+        result = await getBioprojectsSummarization(ids, dataObj);
     }
     else{
-        result = await getFigureSummarization(ids, dataObj, dataType);
+        result = await getFigureSummarization(ids, dataObj, dataType, figureDescription);
     }
     if (result?.error) {
         console.error(result.error);

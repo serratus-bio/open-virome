@@ -18,6 +18,51 @@ import { shouldDisableFigureView, isSimpleLayout } from '../../common/utils/plot
 
 const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
      // figure data
+     const sraFigureData = (identifiers) => {
+        const [activeCountKey, setActiveCountKey] = useState('count');
+        const moduleKey = 'label';
+        const {
+            data: targetCountData,
+            error: targetCountError,
+            isFetching: targetCountIsFetching,
+        } = useGetCountsQuery(
+            {
+                idColumn: 'run',
+                ids: identifiers ? identifiers['run'].single : [],
+                idRanges: identifiers ? identifiers['run'].range : [],
+                groupBy: moduleConfig[moduleKey].groupByKey,
+                palmprintOnly,
+                tableDescription: {type: 'bar', title: 'Run Count Target Set (n)'},
+            },
+            {
+                skip: shouldDisableFigureView(identifiers) || isSummaryView(identifiers),
+            },
+        );
+        const {
+            data: controlCountData,
+            error: controlCountError,
+            isFetching: controlCountIsFetching,
+        } = useGetCountsQuery(
+            {
+                idColumn: 'bioproject',
+                ids: identifiers ? identifiers['bioproject'].single : [],
+                idRanges: identifiers ? identifiers['bioproject'].range : [],
+                groupBy: moduleConfig[moduleKey].groupByKey,
+                pageStart: isSummaryView(identifiers) ? 0 : undefined,
+                pageEnd: isSummaryView(identifiers) ? (moduleKey === 'label' ? 10 : 4) : undefined,
+                sortBy: isSummaryView(identifiers) ? activeCountKey : undefined,
+                palmprintOnly,
+            },
+            {
+                skip: shouldDisableFigureView(identifiers),
+            },
+        );
+        return {
+            targetCountData,
+            controlCountData
+        };
+    }
+    
      const viromeFigureData = (identifiers) => {
         const allFilters = useSelector(selectAllFilters);
         const [activeModule, setActiveModule] = useState('species');
@@ -196,11 +241,11 @@ const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
         return SELECT;
     }
 
-
     var dataObj = {};
     switch (dataType) {
         case 'sra':
-            dataType = 'bioproject'; 
+            dataType = 'bioproject';
+            dataObj = sraFigureData(identifiers);
             break;
         case 'palmdb':
             dataType = 'virome';
@@ -289,6 +334,7 @@ const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
                         >
                             <Typography variant='body' sx={{ mt: 2, mb: 4, whiteSpace: 'pre-wrap' }}>
                                 {formatLLMGeneratedText(summaryData?.text, summaryData?.conversation)}
+                                {formatLLMGeneratedText("Figure Caption: " + summaryData?.caption, summaryData?.conversation)}
                             </Typography>
                         </Box>
                     ) : null}

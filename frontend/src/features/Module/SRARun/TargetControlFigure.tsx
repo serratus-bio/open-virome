@@ -25,12 +25,12 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout
             idRanges: identifiers ? identifiers['run'].range : [],
             groupBy: moduleConfig[moduleKey].groupByKey,
             palmprintOnly,
+            tableDescription: {type: 'bar', title: 'Run Count Target Set (n)'},
         },
         {
             skip: shouldDisableFigureView(identifiers) || isSummaryView(identifiers),
         },
     );
-
     const {
         data: controlCountData,
         error: controlCountError,
