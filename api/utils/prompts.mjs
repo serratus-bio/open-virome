@@ -398,8 +398,8 @@ BioProject IDs should be referenced in the response similarly to the following e
 ---
 `;
 
-export const getCaptionPrompt = (type, title) => `
-Your task is to create 3 different captions that summarize given user data that will be used to create a figure.
+export const getCaptionPrompt = (type) => `
+Your task is to create 5 different captions that summarize given user data that will be used to create a figure.
 The data will be given as a JSON string in the user prompt.
 
 ### Figure Caption
@@ -413,9 +413,8 @@ Try to generate captions that are clear, concise, consistent, and provide specif
 Prioritize caption flow, if necessary, minimize the declaritiveness of the title.
 ### Background
 
-Figure is a ${type}.
+Figure is ${type}.
 Figure is a category related to Eimeria sequencing run metadata for molecular genetics.
-Figure title is ${title}.
 
 ### Rules
 
@@ -428,11 +427,28 @@ CVPR, ACL, EMNLP).
 caption.
 
 ### Output format
-Answer results in JSON format: {“caption_#”: }, where the '#' sign will enumerate the captions you generate.
-Please generate 3 captions based on the given data.
+Your output must be a valid JSON array of objects with the following format:
+{
+  "captions": [
+    {
+      "id": 1,
+      "text": "Your first caption here."
+    },
+    {
+      "id": 2,
+      "text": "Your second caption here."
+    }
+  ]
+}
+Rules:
+1. Ensure correct JSON syntax (no trailing commas, no duplicate keys).
+2. Do not include extra text outside of the JSON block.
+3. Always return responses as a JSON object. Do not add explanations.
+4. Wrap the JSON output inside triple backticks (\`\`\`json) for easy extraction.
+Please generate 5 captions based on the given data.
 `;
 
-export const getCaptionJudgementPrompt = (data, captions) => `
+export const getCaptionJudgementPrompt = (data, caption_a, caption_b, caption_c, caption_d, caption_e) => `
 A good figure caption should include the following elements:
 1. **Clear Description**: Clearly describe what the figure represents so that readers can understand the main point of the figure just by reading the caption.
 2. **Conciseness**: Keep it concise while including all essential information. The caption MUST be brief yet informative (important!!).
@@ -446,15 +462,15 @@ You are given a summarization of the figure, relevant paragraphs, a mentioned se
 ${data}
 
 ### Caption A
-${captions[0]}
+${caption_a}
 ### Caption B
-${captions[1]}
+${caption_b}
 ### Caption C
-${captions[2]}
+${caption_c}
 ### Caption D
-${captions[3]}
+${caption_d}
 ### Caption E
-${captions[4]}
+${caption_e}
 
 1. Choose the best and worst caption and answer in JSON format (For example, if A is the best and B is the worst, the answer is: "Good": "A", "Bad": "B). Candidate captions shouldn’t be scored low just because they’re concise.
 2. If even the best caption could be improved, use the candidate captions and paragraphs to improve it (math symbols, legend, grammar, etc.).
@@ -465,3 +481,11 @@ ${captions[4]}
 Provide them in JSON format with the following keys: Good, Bad, Improved Caption "Good" : "", "Bad" : "", "Improved Caption": "".
 `;
 // 6. Do not omit the figure numbers, such as in "Fig. 3" or "Figure 5".
+
+export const getSRAFigureDescription = () => `Two bar charts comparing control and target SRA run data, each displaying run counts (or gigabasepairs/percent) by category. The first chart shows control data, the second shows target data.`;
+
+export const getEcologyFigureDescription = () => `A scatterplot map depicting contig or sample points across various geographies. Points are color‑coded by biome and can be clicked to reveal metadata like run, biosample, and biome attributes.`;
+
+export const getHostFigureDescription = () => `A layout with four bar charts summarizing host-related data: Tissue, Disease, STAT Organism, and Sex. Tissue, Disease, and STAT Organism use standard bar plots, while Sex is displayed as a polar bar plot, each visually representing category counts derived from user‑provided identifiers.`;
+
+export const getViromeFigureDescription = () => `A network-based figure showing relationships between runs and viruses, organized into connected components. A companion scatterplot highlights the size and distribution of each component by node/edge count. Clicking on a node or edge brings up a summary pop‑up with run/virus/contig details, including BioSample/BioProject links, top GenBank/palmprint hits, and BLAST options.`;

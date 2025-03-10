@@ -107,13 +107,6 @@ app.post('/counts', async (req, res) => {
 
     let result = await runPSQLQuery(query);
 
-    if(tableDescription) {
-        console.log("Table Description: ", tableDescription+'\n');
-        const caption = await generateFigureCaptions(tableDescription, result);
-        console.log(caption+'\n');
-        console.log(caption.text)
-    }
-
     if(result.length > 0 && "bto_ids" in result[0] && table == "biosample_tissue") { 
         const btoIDs = result.map(item => item.bto_ids.split(', ')).flat();
         const bestParentTissueQuery = `
@@ -238,12 +231,15 @@ app.post('/summary', async (req, res) => {
     const ids = body?.ids ?? [];
     const dataObj = body?.dataObj ?? [];
     const dataType = body?.idColumn ?? '';
+    const figureData = body?.figureData ?? [];
+    const figureDescription = body?.figureDescription ?? '';
     let result = {};
     if (dataType === 'bioproject') {
-        result = await getBioprojectsSummarization(ids);
+        console.log(dataObj);
+        result = await getBioprojectsSummarization(ids, dataObj);
     }
     else{
-        result = await getFigureSummarization(ids, dataObj, dataType);
+        result = await getFigureSummarization(ids, dataObj, dataType, figureDescription);
     }
     if (result?.error) {
         console.error(result.error);
@@ -276,21 +272,6 @@ app.post('/globalChat', async (req, res) => {
     const conversation = body?.conversation ?? [];
     const message = body?.message ?? '';
     const result = await getGraphRAGResults(message, conversation);
-    if (result.error) {
-        console.error(result.error);
-        return res.status(500).json({ error: result.error });
-    }
-    return res.json(result);
-});
-
-app.post('/caption', async (req, res) => {
-    const body = getRequestBody(req);
-    if (body === undefined) {
-        return res.status(400).json({ error: 'Invalid request!' });
-    }
-    const figureData = body?.figureData ?? [];
-    const figureDescription = body?.figureDescription ?? '';
-    const result = generateFigureCaptions(figureDescription);
     if (result.error) {
         console.error(result.error);
         return res.status(500).json({ error: result.error });

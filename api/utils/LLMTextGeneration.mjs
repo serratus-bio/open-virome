@@ -14,6 +14,11 @@ import {
     allowGeneralKnowledgeSystemPrompt,
     noDataFoundMessage,
     getCaptionPrompt,
+    getCaptionJudgementPrompt,
+    getSRAFigureDescription,
+    getEcologyFigureDescription,
+    getHostFigureDescription,
+    getViromeFigureDescription,
 } from './prompts.mjs';
 const INCLUDE_MWAS_IN_GRAPH_RAG = true;
 
@@ -78,10 +83,12 @@ const getFilterQueryContext = (filters) => {
     return filterContext.join('\n');
 };
 
-export const getBioprojectsSummarization = async (bioprojects) => {
+export const getBioprojectsSummarization = async (bioprojects, dataObj) => {
     const bioprojectContext = await getBioprojectContext(bioprojects);
     const context = getBioProjectsSummarizationPrompt();
     const model = chooseModel('bioproject');
+    const role = 'system';
+    const figureDescription = getSRAFigureDescription();
     let conversation = [
         {
             role: role,
@@ -98,13 +105,21 @@ export const getBioprojectsSummarization = async (bioprojects) => {
         role: role,
         content: result.text,
     });
-    return { text: result.text, conversation: conversation };
+
+    const captionResults = await generateFigureCaptions(figureDescription, dataObj);
+    const jsonString = captionResults.text.replace(/^```json\s*|\s*```$/g, '');
+    const captions = JSON.parse(jsonString);
+    const improvedCaption = captions["Improved Caption"];
+    console.log(improvedCaption);
+    return { text: result.text, conversation: conversation, caption: improvedCaption };
 };
 
-export const getFigureSummarization = async (bioprojects, dataObj, dataType) => {
+export const getFigureSummarization = async (bioprojects, dataObj, dataType, figureDescription) => {
+    let exceedTokenLimit = false;
     if(dataType === 'ecology'){
         dataObj = await runPSQLQuery(dataObj.text);
     }
+    console.log(dataObj);
     const model = chooseModel(dataType);
     const role = 'system';
     const bioprojectContext = await getBioprojectContext(bioprojects);
@@ -130,6 +145,7 @@ export const getFigureSummarization = async (bioprojects, dataObj, dataType) => 
         }
     }
     if(dataObjSummaries.length > 0){
+        exceedTokenLimit = true;
         console.log("Data object too large, splitting into multiple summaries");
         content = `Please provide a brief overview of the following pre-summarized ${dataType} data: \n ${JSON.stringify(dataObjSummaries)} \n bioproject context: \n ${bioprojectContext}`
     }
@@ -138,12 +154,15 @@ export const getFigureSummarization = async (bioprojects, dataObj, dataType) => 
     switch (dataType) {
         case 'virome':
             prompt = getViromeSummarizationPrompt();
+            figureDescription = getViromeFigureDescription();
             break;
         case 'ecology':
             prompt = getEcologySummarizationPrompt();
+            figureDescription = getEcologyFigureDescription();
             break;
         case 'host':
             prompt = getHostSummarizationPrompt();
+            figureDescription = getHostFigureDescription();
             break;
     }
     let conversation = [
@@ -161,7 +180,15 @@ export const getFigureSummarization = async (bioprojects, dataObj, dataType) => 
         role: role,
         content: result.text,
     });
-    return { text: result.text, conversation: conversation };
+    if (exceedTokenLimit) {
+        return { text: result.text, conversation: conversation, caption: 'Token Limit Exceeded' };
+    }
+    const captionResults = await generateFigureCaptions(figureDescription, dataObj);
+    const jsonString = captionResults.text.replace(/^```json\s*|\s*```$/g, '');
+    const captions = JSON.parse(jsonString);
+    const improvedCaption = captions["Improved Caption"];
+    console.log(improvedCaption);
+    return { text: result.text, conversation: conversation, caption: improvedCaption};
 };
 
 export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) => {
@@ -436,7 +463,8 @@ const split_data = (data, maxTotalLength) => {
 };
 
 export const generateFigureCaptions = async (figureDescription, figureData) => {
-    const prompt = getCaptionPrompt(figureDescription.type, figureDescription.title);
+    const prompt = getCaptionPrompt(figureDescription);
+
     const model = chooseModel('caption');
     const role = 'system';
     let conversation = [
@@ -449,11 +477,18 @@ export const generateFigureCaptions = async (figureDescription, figureData) => {
             content: JSON.stringify(figureData),
         },
     ];
-    const result = await streamLLMCompletion(conversation, model);
-
-    conversation.push({
-        role: role,
-        content: result.text,
-    });
+    const captionResults = await streamLLMCompletion(conversation, model);
+    const jsonString = captionResults.text.replace(/^```json\s*|\s*```$/g, '');
+    const captions = JSON.parse(jsonString);
+    console.log("captions:\n", captions);
+    const judgePrompt = getCaptionJudgementPrompt(JSON.stringify(figureData), JSON.stringify(captions, null, 2));
+    let judgeConversation = [
+        {
+            role: role,
+            content: judgePrompt,
+        },
+    ];
+    const result = await streamLLMCompletion(judgeConversation, model);
+    console.log("Judging:\n", result.text);
     return { text: result.text, conversation: conversation };
 }
