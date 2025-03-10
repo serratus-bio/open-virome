@@ -235,7 +235,6 @@ app.post('/summary', async (req, res) => {
     const figureDescription = body?.figureDescription ?? '';
     let result = {};
     if (dataType === 'bioproject') {
-        console.log(dataObj);
         result = await getBioprojectsSummarization(ids, dataObj);
     }
     else{

@@ -110,7 +110,6 @@ export const getBioprojectsSummarization = async (bioprojects, dataObj) => {
     const jsonString = captionResults.text.replace(/^```json\s*|\s*```$/g, '');
     const captions = JSON.parse(jsonString);
     const improvedCaption = captions["Improved Caption"];
-    console.log(improvedCaption);
     return { text: result.text, conversation: conversation, caption: improvedCaption };
 };
 
@@ -119,7 +118,6 @@ export const getFigureSummarization = async (bioprojects, dataObj, dataType, fig
     if(dataType === 'ecology'){
         dataObj = await runPSQLQuery(dataObj.text);
     }
-    console.log(dataObj);
     const model = chooseModel(dataType);
     const role = 'system';
     const bioprojectContext = await getBioprojectContext(bioprojects);
@@ -187,7 +185,6 @@ export const getFigureSummarization = async (bioprojects, dataObj, dataType, fig
     const jsonString = captionResults.text.replace(/^```json\s*|\s*```$/g, '');
     const captions = JSON.parse(jsonString);
     const improvedCaption = captions["Improved Caption"];
-    console.log(improvedCaption);
     return { text: result.text, conversation: conversation, caption: improvedCaption};
 };
 
@@ -480,7 +477,6 @@ export const generateFigureCaptions = async (figureDescription, figureData) => {
     const captionResults = await streamLLMCompletion(conversation, model);
     const jsonString = captionResults.text.replace(/^```json\s*|\s*```$/g, '');
     const captions = JSON.parse(jsonString);
-    console.log("captions:\n", captions);
     const judgePrompt = getCaptionJudgementPrompt(JSON.stringify(figureData), JSON.stringify(captions, null, 2));
     let judgeConversation = [
         {
@@ -489,6 +485,5 @@ export const generateFigureCaptions = async (figureDescription, figureData) => {
         },
     ];
     const result = await streamLLMCompletion(judgeConversation, model);
-    console.log("Judging:\n", result.text);
     return { text: result.text, conversation: conversation };
 }
