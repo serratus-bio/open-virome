@@ -278,6 +278,22 @@ app.post('/globalChat', async (req, res) => {
     return res.json(result);
 });
 
+app.post('/umap', async (req, res) => {
+    const body = getRequestBody(req);
+    if (body === undefined) {
+        return res.status(400).json({ error: 'Invalid request!' });
+    }
+    const ids = body?.ids ?? [];
+    const filters = body?.filters ?? [];
+    console.log(filters)
+    const result = await getUmapResults(ids);
+    if (result.error) {
+        console.error(result.error);
+        return res.status(500).json({ error: result.error });
+    }
+    return res.json(result);
+});
+
 app.listen(port, () => console.log(`API listening on port ${port}`));
 
 export default app;

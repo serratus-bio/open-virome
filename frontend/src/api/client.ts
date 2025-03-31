@@ -77,6 +77,13 @@ export const apiSlice = createApi({
                 body: args,
             }),
         }),
+        getUmapResults: build.query({
+            query: (args) => ({
+                url: 'umap',
+                method: 'POST',
+                body: args,
+            }),
+        }),
     }),
 });
 
@@ -88,5 +95,6 @@ export const {
     useLazyGetSummaryTextQuery,
     useLazyGetHypothesisQuery,
     useLazyGetGlobalChatQuery,
+    useLazyGetUmapResultsQuery,
 } = apiSlice;
 export const { endpoints, reducerPath, reducer, middleware } = apiSlice;

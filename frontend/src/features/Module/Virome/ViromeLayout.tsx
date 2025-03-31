@@ -17,6 +17,7 @@ import ScatterPlot from '../../../common/ScatterPlot.tsx';
 import ViromeSummaryTable from './ViromeSummaryTable.tsx';
 import RadioButtonsGroup from '../../../common/RadioButtonsGroup.tsx';
 import ViromeMWAS from './ViromeMWAS.tsx';
+import Umap from './Umap.tsx';
 
 const ViromeLayout = ({ identifiers, sectionLayout }) => {
     const allFilters = useSelector(selectAllFilters);
@@ -311,6 +312,14 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
                         ) : (
                             renderScatterPlot()
                         )}
+                    </Box>
+                    <Box sx={{ flex: 1, width: '50%' }}>
+                        <Umap
+                            identifiers={identifiers}
+                            virusFamilies={getVirusFamilies()}
+                            styles={{ height: '70vh', width: '100%' }}
+                            onEvents={onScatterPlotEvents}
+                        />
                     </Box>
                 </Box>
             )}
