@@ -313,21 +313,26 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
                             renderScatterPlot()
                         )}
                     </Box>
-                    <Box sx={{ flex: 1, width: '50%' }}>
-                        <Umap
-                            identifiers={identifiers}
-                            virusFamilies={getVirusFamilies()}
-                            styles={{ height: '70vh', width: '100%' }}
-                            onEvents={onScatterPlotEvents}
-                        />
-                    </Box>
                 </Box>
             )}
+            {/* <Box sx={{ flex: 1, width: '100%' }}>
+                <Umap
+                    identifiers={identifiers}
+                    virusFamilies={getVirusFamilies()}
+                    palmprintOnly={false}
+                />
+            </Box> */}
             {isSimpleLayout(sectionLayout) ? null : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%' }}>
                     <ViromeMWAS identifiers={identifiers} virusFamilies={getVirusFamilies()} />
+                    <Umap
+                    identifiers={identifiers}
+                    virusFamilies={getVirusFamilies()}
+                    palmprintOnly={false}
+                    />
                 </Box>
             )}
+
         </Box>
     );
 };

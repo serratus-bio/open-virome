@@ -17,6 +17,7 @@ import {
     getSearchStringClause,
 } from './utils/queryBuilder.mjs';
 import { getMWASResults } from './utils/mwas.mjs';
+import { getUmap } from './utils/umap.mjs';
 import { getBioprojectsSummarization, getMwasHypothesis, getGraphRAGResults, getFigureSummarization, generateFigureCaptions } from './utils/LLMTextGeneration.mjs';
 import { getRequestBody, formatIdentifiersResponse } from './utils/format.mjs';
 
@@ -282,11 +283,13 @@ app.post('/umap', async (req, res) => {
     const body = getRequestBody(req);
     if (body === undefined) {
         return res.status(400).json({ error: 'Invalid request!' });
-    }
+    }  
+    const idColumn = body?.idColumn ?? 'run_id';
     const ids = body?.ids ?? [];
+    const idRanges = body?.idRanges ?? [];
     const filters = body?.filters ?? [];
-    console.log(filters)
-    const result = await getUmapResults(ids);
+    const palmprintOnly = body?.palmprintOnly ?? true;    
+    const result = await getUmap(ids, filters, palmprintOnly);
     if (result.error) {
         console.error(result.error);
         return res.status(500).json({ error: result.error });

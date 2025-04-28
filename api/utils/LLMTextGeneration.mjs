@@ -190,6 +190,7 @@ export const getFigureSummarization = async (bioprojects, dataObj, dataType, fig
 
 export const getMwasHypothesis = async (bioprojects, filters, selectedMetadata) => {
     const model = chooseModel('virome');
+    const role = 'system';
 
     const filterQueryContext = getFilterQueryContext(filters);
 

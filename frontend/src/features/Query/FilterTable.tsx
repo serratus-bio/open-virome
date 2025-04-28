@@ -14,6 +14,7 @@ import Skeleton from '@mui/material/Skeleton';
 import FormHelperText from '@mui/material/FormHelperText';
 import QuerySummaryText from './QuerySummaryText.tsx';
 import PalmprintOnlyToggle from './PalmprintOnlyToggle.tsx';
+import { get } from 'http';
 
 const FilterTable = ({ palmprintOnly }) => {
     const dispatch = useDispatch();
@@ -27,7 +28,6 @@ const FilterTable = ({ palmprintOnly }) => {
         setIsTypingInterval(0);
         setSearchString('');
     }, [activeQueryModule]);
-
     const {
         data: identifiersData,
         error: identifiersError,
