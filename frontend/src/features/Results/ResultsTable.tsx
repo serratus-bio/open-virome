@@ -3,7 +3,8 @@ import { moduleConfig } from '../Module/constants.ts';
 import { handleIdKeyIrregularities } from '../../common/utils/queryHelpers.ts';
 
 import PagedTable from '../../common/PagedTable.tsx';
-import { useGetResultQuery, useGetCountsQuery } from '../../api/client.ts';
+import { useGetResultQuery, useGetCountsQuery, useLazyGetResultQuery } from '../../api/client.ts';
+import { exportToCSV } from '../../common/utils/exportHelpers.ts';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Skeleton from '@mui/material/Skeleton';
@@ -54,6 +55,34 @@ const ResultsTable = ({ identifiers, moduleKey, shouldSkipFetching }) => {
             skip: shouldSkipFetching,
         },
     );
+
+    const [triggerFetchAll] = useLazyGetResultQuery();
+
+    const handleExportAll = async () => {
+        const idColumn = moduleConfig[moduleKey].resultsIdColumn;
+        const totalRows = totalCount?.length ? totalCount[0]?.count : 0;
+        if (!totalRows || shouldSkipFetching) return;
+
+        const allData = await triggerFetchAll({
+            idColumn,
+            ids: identifiers
+                ? identifiers[handleIdKeyIrregularities(idColumn)].single
+                : [],
+            idRanges: identifiers
+                ? identifiers[handleIdKeyIrregularities(idColumn)].range
+                : [],
+            table: moduleConfig[moduleKey].resultsTable,
+            sortByColumn: idColumn,
+            sortByDirection: 'asc',
+            pageStart: 0,
+            pageEnd: totalRows,
+        }).unwrap();
+
+        if (allData?.length) {
+            const exportHeaders = Object.keys(allData[0]);
+            exportToCSV(allData, exportHeaders, 'table-export.csv');
+        }
+    };
 
     const onPageChange = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -110,6 +139,7 @@ const ResultsTable = ({ identifiers, moduleKey, shouldSkipFetching }) => {
                     total={totalCount?.length ? totalCount[0]?.count : 0}
                     rows={resultData}
                     headers={getTableHeaders(resultData)}
+                    onExportAll={handleExportAll}
                 />
             )}
         </>

@@ -27,7 +27,7 @@ const appSlice = createSlice({
             ecology: 'simple',
             host: 'simple',
         },
-        darkMode: true,
+        darkMode: false,
         palmprintOnly: true,
     },
     reducers: {

@@ -10,8 +10,6 @@ const Footer = () => {
             display='flex'
             justifyContent='flex-start'
             alignItems='flex-start'
-            bgcolor='black'
-            color='white'
             width={'100%'}
             pt={'5%'}
             pr={'10%'}

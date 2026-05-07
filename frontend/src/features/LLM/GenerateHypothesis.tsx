@@ -61,11 +61,10 @@ const GenerateHypothesis = ({ identifiers, selectedMetadata }) => {
                 {!isFetchingHypothesis && hypothesisTextIsNonEmpty() ? (
                     <Box
                         sx={{
-                            backgroundColor: '#484848',
+                            backgroundColor: 'action.hover',
                             p: 2,
                             borderRadius: 2,
                             overflow: 'auto',
-                            colorScheme: 'dark',
                             maxHeight: 300,
                         }}
                     >

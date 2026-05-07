@@ -1,8 +1,10 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleSidebar, selectSidebarOpen } from './slice.ts';
-import { toggleChat, selectChatOpen } from '../features/LLM/slice.ts';
+import { toggleSidebar, selectSidebarOpen, toggleDarkMode, selectDarkMode } from './slice.ts';
 import { useTheme } from '@mui/material/styles';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
+import { toggleChat, selectChatOpen } from '../features/LLM/slice.ts';
 
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -18,8 +20,10 @@ const AppToolbar = () => {
     const dispatch = useDispatch();
     const isFilterOpen = useSelector(selectSidebarOpen);
     const isChatOpen = useSelector(selectChatOpen);
+    const darkMode = useSelector(selectDarkMode);
     const theme = useTheme();
     const drawerWidth = 100;
+    const iconBtnBg = darkMode ? 'rgba(86, 86, 86, 0.7)' : 'rgba(0, 0, 0, 0.08)';
 
     const getAppBarStyles = () => ({
         'transition': theme.transitions.create(['margin', 'width'], {
@@ -63,7 +67,7 @@ const AppToolbar = () => {
                             onClick={handleFilterClick}
                             edge='start'
                             sx={{
-                                backgroundColor: 'rgba(86, 86, 86, 0.7)',
+                                backgroundColor: iconBtnBg,
                                 mr: 2,
                                 ml: '3%',
                             }}
@@ -86,7 +90,7 @@ const AppToolbar = () => {
                             onClick={handleChatClick}
                             edge='start'
                             sx={{
-                                backgroundColor: 'rgba(86, 86, 86, 0.7)',
+                                backgroundColor: iconBtnBg,
                                 position: 'absolute',
                                 right: '3%',
                                 ...(isChatOpen && { display: 'none' }),
@@ -96,6 +100,19 @@ const AppToolbar = () => {
                         </IconButton>
                     </Tooltip>
                 ) : null}
+                <Tooltip title={darkMode ? 'Light mode' : 'Dark mode'} placement='bottom'>
+                    <IconButton
+                        onClick={() => dispatch(toggleDarkMode())}
+                        edge='start'
+                        sx={{
+                            backgroundColor: iconBtnBg,
+                            position: 'absolute',
+                            right: isChatOpen ? '80px' : '80px',
+                        }}
+                    >
+                        {darkMode ? <LightModeIcon fontSize='medium' /> : <DarkModeIcon fontSize='medium' />}
+                    </IconButton>
+                </Tooltip>
             </Toolbar>
         </AppBar>
     );

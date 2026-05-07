@@ -103,7 +103,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
             if(tissueCountData){
                 imagePath = chooseFigure(tissueCountData.at(-1));
             }
-            return <BarPlot plotData={getBarPlotData(tissueCountData, maxRows, imagePath)} imagePath={imagePath}/>;
+            return <BarPlot plotData={getBarPlotData(tissueCountData, maxRows, imagePath)} imagePath={imagePath} title="Tissue"/>;
         }
         return getEmptyResultsMessage();
     };
@@ -115,7 +115,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
 
         if (diseaseCountData && diseaseCountData.length > 0) {
             const maxRows = isSimpleLayout(sectionLayout) ? 9 : undefined;
-            return <BarPlot plotData={getBarPlotData(diseaseCountData, maxRows)} />;
+            return <BarPlot plotData={getBarPlotData(diseaseCountData, maxRows)} title="Disease"/>;
         }
         return getEmptyResultsMessage();
     };
@@ -127,7 +127,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
 
         if (organismCountData && organismCountData.length > 0) {
             const maxRows = isSimpleLayout(sectionLayout) ? 9 : undefined;
-            return <BarPlot plotData={getBarPlotData(organismCountData, maxRows)} />;
+            return <BarPlot plotData={getBarPlotData(organismCountData, maxRows)} title="STAT Organism"/>;
         }
         return getEmptyResultsMessage();
     };
@@ -139,7 +139,7 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
 
         if (sexCountData && sexCountData.length > 0) {
             const maxRows = isSimpleLayout(sectionLayout) ? 9 : undefined;
-            return <PolarBarPlot plotData={getBarPlotData(sexCountData, maxRows)} />;
+            return <PolarBarPlot plotData={getBarPlotData(sexCountData, maxRows)} title="Sex"/>;
         }
         return getEmptyResultsMessage();
     };
@@ -148,17 +148,11 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
         <Box sx={{ display: 'flex', flexDirection: 'column', width: '100%', width: '80vw', maxWidth: 1500 }}>
             <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-                    <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
-                        {`Tissue`}
-                    </Typography>
                     {getTissuePlot()}
                 </Box>
             </Box>
             <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                 <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-                    <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
-                        {`Disease`}
-                    </Typography>
                     {getDiseasePlot()}
                 </Box>
             </Box>
@@ -166,17 +160,11 @@ const HostLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
             <>
                 <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-                        <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
-                            {`STAT Organism`}
-                        </Typography>
                         {getOrganismPlot()}
                     </Box>
                 </Box>
                 <Box sx={{ flex: 1, display: 'flex', width: '100%', mb: 2 }}>
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
-                        <Typography variant='h6' sx={{ mt: 2, mb: 2 }}>
-                            {`Sex`}
-                        </Typography>
                         {getSexPlot()}
                     </Box>
                 </Box>

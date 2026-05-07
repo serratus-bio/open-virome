@@ -26,6 +26,8 @@ const SearchBar = ({ query, setQuery, placeholder = 'Search' }) => {
                 alignItems: 'center',
                 height: 40,
                 flex: 1,
+                boxShadow: 'none',
+                backgroundImage: 'none',
             }}
         >
             <InputBase

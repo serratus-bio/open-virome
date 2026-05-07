@@ -10,6 +10,8 @@ import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Paper from '@mui/material/Paper';
 import { visuallyHidden } from '@mui/utils';
+import ExportButton from '../common/ExportButton.tsx';
+import { exportToCSV } from '../common/utils/exportHelpers.ts';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
     if (b[orderBy] < a[orderBy]) {
@@ -104,11 +106,12 @@ function EnhancedTableHead(props: EnhancedTableProps) {
     );
 }
 
-const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange, pageRows = 10 }) => {
+const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange, pageRows = 10, allRows = null, onExportAll = null }) => {
     const [order, setOrder] = React.useState<Order>('asc');
     const [orderBy, setOrderBy] = React.useState('calories');
     const [dense, setDense] = React.useState(true);
     const [rowsPerPage, setRowsPerPage] = React.useState(pageRows);
+    const [exporting, setExporting] = React.useState(false);
 
     const onRequestSort = (event: React.MouseEvent<unknown>, property: keyof Data) => {
         const isAsc = orderBy === property && order === 'asc';
@@ -124,9 +127,33 @@ const PagedTable = ({ page = 0, rows = [], headers = [], total, onPageChange, pa
         [order, orderBy, page, rowsPerPage, rows],
     );
 
+    const hasAllData = allRows && allRows.length > 0;
+    const hasExportAllHandler = !!onExportAll;
+
+    const handleExport = React.useCallback(async () => {
+        if (onExportAll) {
+            setExporting(true);
+            try {
+                await onExportAll();
+            } finally {
+                setExporting(false);
+            }
+        } else if (hasAllData) {
+            exportToCSV(allRows, headers, 'table-export.csv');
+        } else {
+            exportToCSV(rows, headers, 'table-export.csv');
+        }
+    }, [rows, headers, allRows, hasAllData, onExportAll]);
+
     return (
         <Box sx={{ width: '100%', overflow: 'hidden' }}>
-            <Paper sx={{ overflow: 'hidden' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.5 }}>
+                <ExportButton
+                    onClick={handleExport}
+                    tooltip={exporting ? 'Downloading...' : hasExportAllHandler || hasAllData ? 'Download all as CSV' : 'Download current page as CSV'}
+                />
+            </Box>
+            <Paper sx={{ overflow: 'hidden', boxShadow: 'none', backgroundImage: 'none' }}>
                 <TableContainer>
                     <Table aria-labelledby='tableTitle' size={dense ? 'small' : 'medium'}>
                         <EnhancedTableHead

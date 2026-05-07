@@ -161,7 +161,7 @@ const SRAIdsInput = ({ palmprintOnly }) => {
                         id='outlined-multiline-static'
                         multiline
                         rows={4}
-                        sx={{ backgroundColor: 'rgba(40, 40, 40, 0.3)' }}
+                        sx={{ backgroundColor: 'action.hover' }}
                         defaultValue={inputIdString}
                         onChange={(event) => handleIdsChange(event)}
                         helperText={'Enter search terms seperated by comma or whitespace'}

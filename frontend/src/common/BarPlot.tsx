@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReactEcharts from 'echarts-for-react';
+import ExportButton from '../common/ExportButton.tsx';
+import { exportEChartsToPNG } from '../common/utils/exportHelpers.ts';
 
-const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}, imagePath = "" }) => {
+const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}, imagePath = "", title = "" }) => {
+    const echartsRef = useRef<any>(null);
     const [imageDimensions, setImageDimensions] = useState({ width: 100, height: 100, padding: 20, maxCategoryLength: 0, loaded: false });
     const [options, setOptions] = useState({});
 
@@ -25,9 +28,6 @@ const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}, imagePath = "" }) 
             const gridLeft = imageDimensions.loaded ? Math.max(imageDimensions.width + imageDimensions.padding + imageDimensions.maxCategoryLength, 150) : 150;
             const newOptions = {
                 backgroundColor: 'transparent',
-                textStyle: { color: 'white' },
-                subtextStyle: { color: 'white' },
-                legend: { textStyle: { color: 'white' } },
                 tooltip: {
                     trigger: 'axis',
                     axisPointer: { type: 'shadow' },
@@ -37,10 +37,23 @@ const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}, imagePath = "" }) 
                     right: '4%',
                     bottom: '3%',
                     containLabel: true,
-                    borderColor: 'white',
                 },
                 ...plotData,
             };
+
+            if (title) {
+                newOptions.title = {
+                    text: title,
+                    textStyle: {
+                        color: '#333',
+                        fontSize: 14,
+                        fontWeight: 'normal',
+                        fontStyle: 'italic',
+                    },
+                    left: 0,
+                    top: 5,
+                };
+            }
 
             if (imageDimensions.loaded) {
                 newOptions.graphic = [
@@ -64,7 +77,19 @@ const BarPlot = ({ plotData = {}, styles = {}, onEvents = {}, imagePath = "" }) 
         initializeChart();
     }, [imagePath, imageDimensions.loaded, plotData]);
 
-    return <ReactEcharts option={options} style={styles} onEvents={onEvents} />;
+    return (
+        <div style={{ position: 'relative' }}>
+            <div style={{ position: 'absolute', right: 8, top: 8, zIndex: 10 }}>
+                <ExportButton
+                    onClick={() => {
+                        const instance = echartsRef.current?.getEchartsInstance();
+                        if (instance) exportEChartsToPNG(instance, 'bar-plot.png');
+                    }}
+                />
+            </div>
+            <ReactEcharts ref={echartsRef} option={options} style={styles} onEvents={onEvents} />
+        </div>
+    );
 };
 
 export default BarPlot;

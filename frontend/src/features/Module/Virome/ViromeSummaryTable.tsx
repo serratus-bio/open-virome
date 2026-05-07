@@ -286,6 +286,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                     rows={getPagedRows()}
                     headers={Object.keys(filteredRows[0])}
                     pageRows={getRowsPerPage()}
+                    allRows={filteredRows}
                 />
             </Box>
         );
@@ -303,7 +304,7 @@ const ViromeSummaryTable = ({ activeModule, selectedItem, onClose, rows, maxWidt
                 flexDirection: 'column',
                 width: '95%',
                 height: '100%',
-                backgroundColor: 'rgba(86, 86, 86, 0.6)',
+                backgroundColor: 'background.paper',
                 borderRadius: 2,
                 padding: 1.5,
             }}
