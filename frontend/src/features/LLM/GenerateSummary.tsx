@@ -320,11 +320,10 @@ const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
                     {!isFetchingSummary && summaryTextIsNonEmpty() ? (
                         <Box
                             sx={{
-                                backgroundColor: '#484848',
+                                backgroundColor: 'action.hover',
                                 p: 2,
                                 borderRadius: 2,
                                 overflow: 'auto',
-                                colorScheme: 'dark',
                                 maxHeight: 300,
                                 scrollbarWidth: 'none',
                                 '&::-webkit-scrollbar': {

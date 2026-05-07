@@ -143,7 +143,7 @@ const OnbaordingMessage = () => {
             <Card
                 sx={{
                     borderWidth: 1,
-                    borderColor: 'rgba(255, 255, 255, 0.48)',
+                    borderColor: 'divider',
                     borderRadius: 8,
                     margin: 2,
                 }}
@@ -159,7 +159,7 @@ const OnbaordingMessage = () => {
                         alignItems: 'center',
                         alignContent: 'center',
                         borderWidth: 2,
-                        borderColor: 'rgba(255, 255, 255, 0.48)',
+                        borderColor: 'divider',
                         borderRadius: 8,
                         borderStyle: 'solid',
                         height: 80,

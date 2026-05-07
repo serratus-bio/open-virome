@@ -112,11 +112,10 @@ const GlobalChat = () => {
         return (
             <Box
                 sx={{
-                    backgroundColor: 'rgba(72, 72, 72, 0.9)',
+                    backgroundColor: 'background.paper',
                     p: 2,
                     borderRadius: 2,
                     overflow: 'auto',
-                    colorScheme: 'dark',
                     display: 'flex',
                     flexDirection: 'column',
                     gap: 2,
@@ -190,7 +189,7 @@ const GlobalChat = () => {
                             'width': '50%',
                             '& .MuiInputBase-root': {
                                 borderRadius: 4,
-                                backgroundColor: '#2f2f2f',
+                                backgroundColor: 'action.hover',
                             },
                             '& .MuiOutlinedInput-root': {
                                 '& fieldset': {

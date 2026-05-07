@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { selectSidebarOpen, toggleSidebar, selectActiveQueryModule, selectPalmprintOnly } from '../../app/slice.ts';
+import { selectSidebarOpen, toggleSidebar, selectActiveQueryModule, selectPalmprintOnly, selectDarkMode } from '../../app/slice.ts';
 import { moduleConfig } from '../Module/constants.ts';
 
 import Box from '@mui/material/Box';
@@ -14,6 +14,7 @@ const QueryView = () => {
     const activeQueryModule = useSelector(selectActiveQueryModule);
     const sidebarOpen = useSelector(selectSidebarOpen);
     const palmprintOnly = useSelector(selectPalmprintOnly);
+    const darkMode = useSelector(selectDarkMode);
 
     return (
         <Modal
@@ -35,7 +36,7 @@ const QueryView = () => {
                             position: 'absolute',
                             top: 60,
                             left: 240,
-                            backgroundColor: '#252427',
+                            backgroundColor: darkMode ? '#252427' : '#FFF',
                         }}
                     >
                         {moduleConfig[activeQueryModule].queryBuilderDisplay === 'input' ? (

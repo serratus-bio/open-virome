@@ -16,7 +16,7 @@ const GenerateButton = ({ onButtonClick, title }) => {
 
     return (
         <Tooltip title={title} placement='bottom'>
-            <IconButton style={{ backgroundColor: 'rgba(86, 86, 86, 0.4)' }} onClick={onClick}>
+            <IconButton sx={{ backgroundColor: 'action.hover' }} onClick={onClick}>
                 <BlurOnIcon
                     style={{
                         color: '#9be3ef',

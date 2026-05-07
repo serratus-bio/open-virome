@@ -196,13 +196,13 @@ export const getViromeScatterPlotData = (rows = []) => {
             right: '6%',
             bottom: '6%',
             containLabel: true,
-            borderColor: 'white',
+            borderColor: '#ccc',
         },
         title: {
             show: true,
             text: '   Virome Component Summary',
             textStyle: {
-                color: 'white',
+                color: '#333',
                 fontSize: 14,
                 fontWeight: 'normal',
                 fontStyle: 'italic',
@@ -230,7 +230,7 @@ export const getViromeScatterPlotData = (rows = []) => {
                 type: 'scatter',
                 label: {
                     show: false,
-                    color: 'white',
+                    color: '#333',
                 },
                 emphasis: {
                     focus: 'series',
@@ -317,19 +317,20 @@ export const getMWASScatterPlotData = (data, activeMetadataType) => {
         title: {
             text: 'Metadata-wide association study (MWAS)',
             textStyle: {
-                color: 'white',
+                color: '#333',
                 fontSize: 14,
                 fontWeight: 'normal',
                 fontStyle: 'italic',
             },
             left: 0,
-            top: 0,
-            show: false,
+            top: 10,
+            show: true,
         },
         grid: {
-            left: '7%',
-            right: '7%',
-            bottom: '7%',
+            left: 60,
+            right: 60,
+            top: 50,
+            bottom: 50,
             containLabel: true,
             show: false,
         },
@@ -361,6 +362,8 @@ export const getMWASScatterPlotData = (data, activeMetadataType) => {
         },
         tooltip: {
             trigger: 'item',
+            confine: true,
+            extraCssText: 'max-width: 400px; white-space: normal; word-break: break-all;',
             axisPointer: {
                 type: 'shadow',
             },
@@ -375,7 +378,7 @@ export const getMWASScatterPlotData = (data, activeMetadataType) => {
                 type: 'scatter',
                 label: {
                     show: false,
-                    color: 'white',
+                    color: '#333',
                 },
                 emphasis: {
                     focus: 'series',

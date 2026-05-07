@@ -135,7 +135,7 @@ export const getTargetControlPlotData = (
                 stack: 'total',
                 label: {
                     show: true,
-                    color: 'white',
+                    color: '#333',
                 },
                 emphasis: {
                     focus: 'series',
@@ -148,7 +148,7 @@ export const getTargetControlPlotData = (
                 stack: 'total',
                 label: {
                     show: true,
-                    color: 'white',
+                    color: '#333',
                 },
                 emphasis: {
                     focus: 'series',
@@ -201,7 +201,7 @@ export const getBioprojectSizePlotData = (controlRows = []) => {
         title: {
             text: 'BioProject size',
             textStyle: {
-                color: 'white',
+                color: '#333',
                 fontSize: 14,
                 fontWeight: 'normal',
                 fontStyle: 'italic',
@@ -220,7 +220,7 @@ export const getBioprojectSizePlotData = (controlRows = []) => {
                 stack: 'total',
                 label: {
                     show: false,
-                    color: 'white',
+                    color: '#333',
                 },
                 emphasis: {
                     focus: 'series',
@@ -278,7 +278,7 @@ export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRo
         title: {
             text: '% of BioProject in Target set',
             textStyle: {
-                color: 'white',
+                color: '#333',
                 fontSize: 14,
                 fontWeight: 'normal',
                 fontStyle: 'italic',
@@ -310,7 +310,7 @@ export const getBioprojectTargetPercentagePlotData = (controlRows = [], targetRo
                 stack: 'total',
                 label: {
                     show: false,
-                    color: 'white',
+                    color: '#333',
                 },
                 emphasis: {
                     focus: 'series',
@@ -362,7 +362,7 @@ export const getBioprojectSizeVsPercentagePlotData = (controlRows = [], targetRo
         title: {
             text: 'Runs per BioProject vs. BioProject runs in Target set (%)',
             textStyle: {
-                color: 'white',
+                color: '#333',
                 fontSize: 14,
                 fontWeight: 'normal',
                 fontStyle: 'italic',
@@ -400,7 +400,7 @@ export const getBioprojectSizeVsPercentagePlotData = (controlRows = [], targetRo
                 type: 'scatter',
                 label: {
                     show: false,
-                    color: 'white',
+                    color: '#333',
                 },
                 emphasis: {
                     focus: 'series',

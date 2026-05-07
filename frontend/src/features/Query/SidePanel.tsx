@@ -1,6 +1,6 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setActiveQueryModule, toggleSidebar, selectSidebarOpen, selectActiveQueryModule } from '../../app/slice.ts';
+import { setActiveQueryModule, toggleSidebar, selectSidebarOpen, selectActiveQueryModule, selectDarkMode } from '../../app/slice.ts';
 import { moduleConfig, sectionConfig } from '../Module/constants.ts';
 
 import MenuList from '@mui/material/MenuList';
@@ -16,6 +16,7 @@ const SidePanel = () => {
     const dispatch = useDispatch();
     const sidebarOpen = useSelector(selectSidebarOpen);
     const sectionLayout = useSelector(selectActiveQueryModule);
+    const darkMode = useSelector(selectDarkMode);
 
     const onItemClick = (moduleKey: string) => {
         dispatch(setActiveQueryModule(moduleKey));
@@ -40,11 +41,14 @@ const SidePanel = () => {
                 '& .MuiDrawer-paper': {
                     width: drawerWidth,
                     boxSizing: 'border-box',
-                    backgroundColor: 'rgb(40, 40, 40)',
+                    backgroundColor: darkMode ? '#1E1E1E' : '#FFF',
+                    backgroundImage: 'none',
+                    boxShadow: 'none',
                     border: 'none',
                     overflow: 'hidden',
                 },
             }}
+        >
         >
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', mt: 0.5 }}>
                 <IconButton onClick={handleDrawerClose}>

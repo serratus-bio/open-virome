@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import MdCopyAll from '@mui/icons-material/CopyAll';
 import MdOpenInNew from '@mui/icons-material/OpenInNew';
 import { deflate } from 'pako';
 import { isSimpleLayout } from '../common/utils/plotHelpers.ts';
 import { truncate } from '../common/utils/textFormatting.ts';
+import ExportButton from '../common/ExportButton.tsx';
+import { exportCanvasToPNG } from '../common/utils/exportHelpers.ts';
 import {
     WWF_BIOMES,
     AMAZON_LOCATION_API_KEY,
@@ -461,6 +463,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
     };
 
     const mapRef = useRef(null);
+    const mlglMapRef = useRef<any>(null);
     const [attributeName, setAttributeName] = useState('');
     const [attributeValue, setAttributeValue] = useState('');
     const [biomeID, setBiomeID] = useState('');
@@ -506,6 +509,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                     AMAZON_LOCATION_API_KEY,
                 zoom: 0.8,
             });
+            mlglMapRef.current = mlglMap;
             mlglMap.dragRotate.disable();
             mlglMap.getCanvas().style.cursor = 'crosshair';
 
@@ -586,6 +590,11 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
         else setCountryRegionID('');
     }, [biomeID, countryID]);
 
+    const handleExport = useCallback(() => {
+        const canvas = mlglMapRef.current?.getCanvas();
+        if (canvas) exportCanvasToPNG(canvas, 'ecology-map.png');
+    }, []);
+
     const MapLibreDeckGLMapModeButton: any = ({ onClick, selected, text }) => (
         <div
             onClick={onClick}
@@ -609,7 +618,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
         <div style={style}>
             <div style={{ alignItems: 'flex-end', display: 'flex', padding: '0 6px 0 6px' }}>
                 <div style={{ flex: '1 0' }}>
-                    <div style={{ color: '#EEE', fontSize: '16px', fontWeight: 700 }}>
+                    <div style={{ color: '#333', fontSize: '16px', fontWeight: 700 }}>
                         {'Showing ' +
                             siteCount.toLocaleString() +
                             ' contigs, representing ' +
@@ -649,6 +658,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                             selected={mapMode === 'SAMPLES'}
                             text='Samples'
                         />
+                        <ExportButton onClick={handleExport} />
                     </div>
                 )}
             </div>
@@ -1238,7 +1248,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
 const MapLibreDeckGLMapCopyButton = ({ ...props }) => (
     <MdCopyAll
         style={{
-            color: '#FFF',
+            color: '#333',
             cursor: 'pointer',
             fontSize: '16px',
             userSelect: 'none',
@@ -1250,7 +1260,7 @@ const MapLibreDeckGLMapURLButton = ({ fontSize, ...props }) => {
     if (!fontSize) fontSize = '18px';
 
     return (
-        <a style={{ color: '#FFF', userSelect: 'none' }} target='_blank' {...props}>
+        <a style={{ color: '#333', userSelect: 'none' }} target='_blank' {...props}>
             <MdOpenInNew style={{ fontSize, verticalAlign: 'bottom' }} />
         </a>
     );
