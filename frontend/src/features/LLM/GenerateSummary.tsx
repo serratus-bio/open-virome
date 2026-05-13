@@ -5,6 +5,11 @@ import { formatLLMGeneratedText } from './textFormatting.tsx';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CheckIcon from '@mui/icons-material/Check';
+import { useTheme } from '@mui/material/styles';
 import GenerateButton from './GenerateButton.tsx';
 
 import { useSelector } from 'react-redux';
@@ -17,6 +22,8 @@ import { useState } from 'react';
 import { shouldDisableFigureView, isSimpleLayout } from '../../common/utils/plotHelpers.ts';
 
 const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
+     const theme = useTheme();
+     const resultBg = theme.palette.mode === 'dark' ? '#484848' : '#f5f5f5';
      // figure data
      const sraFigureData = (identifiers) => {
         const [activeCountKey, setActiveCountKey] = useState('count');
@@ -266,18 +273,26 @@ const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
     const [getSummaryText, { data: summaryData, isFetching: isFetchingSummary, error: errorSummary }] =
         useLazyGetSummaryTextQuery();
 
+    const [llmClicked, setLlmClicked] = useState(false);
+    const [copied, setCopied] = useState(false);
+
     const onButtonClick = async () => {
-        if (isFetchingSummary) {
+        if (isFetchingSummary || llmClicked) {
             return;
         }
-        await getSummaryText(
-            {
-                idColumn: dataType,
-                ids: identifiers ? identifiers['bioproject'].single : [],
-                dataObj: dataObj,
-            },
-            true,
-        );
+        setLlmClicked(true);
+        try {
+            await getSummaryText(
+                {
+                    idColumn: dataType,
+                    ids: identifiers ? identifiers['bioproject'].single : [],
+                    dataObj: dataObj,
+                },
+                true,
+            ).unwrap();
+        } finally {
+            setLlmClicked(false);
+        }
     };
 
     const renderPlaceholder = () => {
@@ -289,6 +304,16 @@ const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
 
     const summaryTextIsNonEmpty = () => summaryData && summaryData?.text?.length > 0;
 
+    const handleCopy = () => {
+        const text = summaryData?.text || '';
+        const caption = summaryData?.caption || '';
+        const fullText = text + '\n\nFigure Caption: ' + caption;
+        navigator.clipboard.writeText(fullText).then(() => {
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        });
+    };
+
     return (
         <Box
         sx={{
@@ -299,6 +324,13 @@ const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
         }}
         >
             <GenerateButton onButtonClick={onButtonClick} title={'Generate Summary'} />
+            {summaryTextIsNonEmpty() && (
+                <Tooltip title={copied ? 'Copied!' : 'Copy to clipboard'}>
+                    <IconButton onClick={handleCopy} size="small" sx={{ ml: 1 }}>
+                        {copied ? <CheckIcon fontSize="small" color="success" /> : <ContentCopyIcon fontSize="small" />}
+                    </IconButton>
+                </Tooltip>
+            )}
             <Box
                 sx={{
                     display: 'flex',
@@ -320,11 +352,10 @@ const GenerateSummary = ({ identifiers, dataType, palmprintOnly }) => {
                     {!isFetchingSummary && summaryTextIsNonEmpty() ? (
                         <Box
                             sx={{
-                                backgroundColor: '#484848',
+                                backgroundColor: resultBg,
                                 p: 2,
                                 borderRadius: 2,
                                 overflow: 'auto',
-                                colorScheme: 'dark',
                                 maxHeight: 300,
                                 scrollbarWidth: 'none',
                                 '&::-webkit-scrollbar': {

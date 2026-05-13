@@ -58,8 +58,9 @@ const ViromeMWAS = ({ identifiers, virusFamilies }) => {
         return (
             <ScatterPlot
                 plotData={getMWASScatterPlotData(data, activeMetadataType)}
-                styles={{ width: '55%', height: '70vh' }}
+                styles={{ width: '100%', height: '70vh', maxWidth: '100%' }}
                 onEvents={onEvents}
+                module="Virome"
             />
         );
     };
@@ -81,9 +82,6 @@ const ViromeMWAS = ({ identifiers, virusFamilies }) => {
     return (
         <Box sx={{ width: '100%', height: '100%' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                <Typography variant='h6' component={'div'} sx={{ flex: 1.2 }}>
-                    {`Metadata-wide association study (MWAS) `}
-                </Typography>
                 {identifiers && identifiers['bioproject'].single.length > 100 ? (
                     <Typography variant='h7' component={'div'} sx={{ mt: 2, flex: 1 }}>
                         {`Dataset is too large. Displaying partial results.`}
@@ -105,9 +103,11 @@ const ViromeMWAS = ({ identifiers, virusFamilies }) => {
                     mt: 2,
                 }}
             >
-                {isFetching ? renderPlaceholder() : data ? scatterPlot : null}
+                <Box sx={{ width: '55%', flexShrink: 0 }}>
+                    {isFetching ? renderPlaceholder() : data ? scatterPlot : null}
+                </Box>
                 {selectedMetadata ? (
-                    <Box sx={{ mt: 2, width: '45%' }}>
+                    <Box sx={{ mt: 2, width: '45%', flexShrink: 0 }}>
                         {renderSearchBox()}
                         <hr />
                         <Box sx={{ mt: 2 }}>

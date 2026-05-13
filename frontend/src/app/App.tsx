@@ -67,7 +67,7 @@ const App = () => {
         /* set to -240 to offset Sidebar "drawerWidth" in SidePanel.tsx */
         marginLeft: `-240px`,
         marginRight: `0px`,
-        backgroundColor: 'rgba(29, 30, 32, 0.6)',
+        backgroundColor: darkMode ? 'rgba(29, 30, 32, 0.6)' : 'transparent',
     });
 
     const showOnboardingMessage = () => {

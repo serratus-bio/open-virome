@@ -52,6 +52,9 @@ export const getBarPlotData = (data, maxRows = undefined, imagePath="") => {
         },
         yAxis: {
             type: 'category',
+            axisTick: {
+                alignWithLabel: true,
+            },
             axisLabel: {
                 formatter: (value) => truncate(value, 20),
             },
@@ -72,7 +75,7 @@ export const getBarPlotData = (data, maxRows = undefined, imagePath="") => {
                 stack: 'total',
                 label: {
                     show: true,
-                    color: 'white',
+                    color: textColor,
                 },
                 emphasis: {
                     focus: 'series',
@@ -82,9 +85,6 @@ export const getBarPlotData = (data, maxRows = undefined, imagePath="") => {
         ],
         legend: {
             show: false,
-            textStyle: {
-                color: 'white',
-            },
         },
         dataZoom: dataZoom,
     };
