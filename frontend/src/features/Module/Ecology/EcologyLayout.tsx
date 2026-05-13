@@ -14,7 +14,7 @@ const EcologyLayout = ({ identifiers, sectionLayout, palmprintOnly }) => {
                 mb: 10,
             }}
         >
-            <MapPlot identifiers={identifiers} layout={sectionLayout} palmprintOnly={palmprintOnly} />
+            <MapPlot identifiers={identifiers} layout={sectionLayout} palmprintOnly={palmprintOnly} module="Ecology"/>
         </Box>
     );
 };

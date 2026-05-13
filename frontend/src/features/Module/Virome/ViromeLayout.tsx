@@ -231,7 +231,7 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
     const renderNetworkFigure = () => {
         return (
             <Box ref={containerRef}>
-                <NetworkPlot plotData={plotData} onNodeClick={onNetworkPlotClick} onEdgeClick={onNetworkPlotClick} />
+                <NetworkPlot plotData={plotData} onNodeClick={onNetworkPlotClick} onEdgeClick={onNetworkPlotClick} module="Virome"/>
             </Box>
         );
     };
@@ -257,7 +257,7 @@ const ViromeLayout = ({ identifiers, sectionLayout }) => {
 
         const plotData = getViromeScatterPlotData(rows);
 
-        return <ScatterPlot plotData={plotData} styles={{ height: '70vh' }} onEvents={onScatterPlotEvents} />;
+        return <ScatterPlot plotData={plotData} styles={{ height: '70vh' }} onEvents={onScatterPlotEvents} module="Virome"/>;
     };
 
     const shouldRenderPlaceholder = (isError, isFetching, data) => {

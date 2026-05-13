@@ -79,8 +79,20 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout
         const maxRows = figureType === 'polar' ? 4 : isSimpleLayout(sectionLayout) ? 9 : undefined;
         const plotData = getTargetControlPlotData(targetCountData, controlCountData, activeCountKey, maxRows);
         let totalRuns = getTotalRuns(seriesName);
+        const countLabel = activeCountKey === 'gbp' ? ' (Gbp)' : activeCountKey === 'percent' ? ' (%)' : '';
         const filteredPlotData = {
             ...plotData,
+            title: {
+                text: `${seriesName} set${countLabel}${totalRuns ? ' (n = ' + totalRuns + ')' : ''}`,
+                textStyle: {
+                    color: 'white',
+                    fontSize: 14,
+                    fontWeight: 'normal',
+                    fontStyle: 'italic',
+                },
+                left: 0,
+                top: 5,
+            },
             legend: {
                 show: false,
                 selected: {
@@ -95,20 +107,14 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout
         if (figureType === 'polar') {
             return (
                 <Box sx={{ minWidth: 400 }}>
-                    <Typography variant='body2' sx={{ fontStyle: 'italic' }}>
-                        {`${seriesName} set ${totalRuns ? `(n = ${totalRuns})` : ''}`}
-                    </Typography>
-                    <PolarBarPlot plotData={filteredPlotData} />
+                    <PolarBarPlot plotData={filteredPlotData} module="SRA"/>
                 </Box>
             );
         }
         if (figureType === 'bar') {
             return (
                 <Box sx={{ minWidth: 400 }}>
-                    <Typography variant='body2' sx={{ position: 'absolute', fontStyle: 'italic' }}>
-                        {`${seriesName} set ${totalRuns ? `(n = ${totalRuns})` : ''}`}
-                    </Typography>
-                    <BarPlot plotData={filteredPlotData} />
+                    <BarPlot plotData={filteredPlotData} module="SRA"/>
                 </Box>
             );
         }

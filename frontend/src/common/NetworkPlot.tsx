@@ -1,13 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import cytoscape from 'cytoscape';
 import fcose from 'cytoscape-fcose';
 
 import CytoscapeComponent from 'react-cytoscapejs';
 import Box from '@mui/material/Box';
+import { useTheme } from '@mui/material/styles';
+import ExportButton from '../common/ExportButton.tsx';
+import { exportCytoscapeToPNG } from '../common/utils/exportHelpers.ts';
 
 cytoscape.use(fcose);
 
-const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
+const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick, module = "" }) => {
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
     const [cy, setCy] = useState(null);
 
     useEffect(() => {
@@ -35,7 +40,7 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
             style: {
                 backgroundColor: 'data(color)',
                 label: 'data(label)',
-                color: 'white',
+                color: isDark ? 'white' : '#333',
                 shape: 'round-hexagon',
                 opacity: 1,
                 width: 35,
@@ -46,8 +51,8 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
         {
             selector: 'node[type="run"]',
             style: {
-                backgroundColor: 'white',
-                color: 'white',
+                backgroundColor: isDark ? 'white' : '#666',
+                color: isDark ? 'white' : '#333',
                 shape: 'ellipse',
                 opacity: 0.7,
                 width: 20,
@@ -164,13 +169,20 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
         },
     ];
 
+    const handleExport = useCallback(() => {
+        if (cy) exportCytoscapeToPNG(cy, `open-virome-${module || 'Virome'}-NetworkPlot.png`);
+    }, [cy, module]);
+
     return (
-        <Box>
+        <Box sx={{ position: 'relative' }}>
+            <Box sx={{ position: 'absolute', right: 8, top: 8, zIndex: 10 }}>
+                <ExportButton onClick={handleExport} />
+            </Box>
             <CytoscapeComponent
                 cy={setCy}
                 stylesheet={stylesheet}
                 elements={plotData}
-                style={{ width: '100%', height: '75vh', background: 'rgba(29, 30, 32, 0.6)' }}
+                style={{ width: '100%', height: '75vh', background: isDark ? 'rgba(29, 30, 32, 0.6)' : '#f5f5f5' }}
                 layout={layouts[0]}
                 minZoom={0.1}
                 maxZoom={2}

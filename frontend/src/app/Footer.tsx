@@ -1,17 +1,20 @@
 import React from 'react';
+import { useTheme } from '@mui/material/styles';
 
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 
 const Footer = () => {
+    const theme = useTheme();
+    const isDark = theme.palette.mode === 'dark';
     return (
         <Box
             display='flex'
             justifyContent='flex-start'
             alignItems='flex-start'
-            bgcolor='black'
-            color='white'
+            bgcolor={isDark ? 'black' : '#f5f5f5'}
+            color={isDark ? 'white' : '#333'}
             width={'100%'}
             pt={'5%'}
             pr={'10%'}

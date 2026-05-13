@@ -57,7 +57,7 @@ const BioprojectFigure = ({ identifiers, palmprintOnly }) => {
     const renderTotalSizePlot = () => {
         return (
             <Box sx={{ flex: 1, width: 350 }}>
-                <HistogramPlot plotData={getBioprojectSizePlotData(controlCountData)} />
+                <HistogramPlot plotData={getBioprojectSizePlotData(controlCountData)} module="SRA"/>
             </Box>
         );
     };
@@ -65,7 +65,7 @@ const BioprojectFigure = ({ identifiers, palmprintOnly }) => {
     const renderTargetPercentagePlot = () => {
         return (
             <Box sx={{ flex: 1, width: 350 }}>
-                <HistogramPlot plotData={getBioprojectTargetPercentagePlotData(controlCountData, targetCountData)} />
+                <HistogramPlot plotData={getBioprojectTargetPercentagePlotData(controlCountData, targetCountData)} module="SRA"/>
             </Box>
         );
     };
@@ -84,6 +84,7 @@ const BioprojectFigure = ({ identifiers, palmprintOnly }) => {
                     plotData={getBioprojectSizeVsPercentagePlotData(controlCountData, targetCountData)}
                     styles={{ height: 600 }}
                     onEvents={handleScatterPlotEvents}
+                    module="SRA"
                 />
             </Box>
         );

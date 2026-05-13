@@ -103,12 +103,12 @@ export const Chat = () => {
                 sx={{
                     'zIndex': 1000,
                     '& .MuiDrawer-paper': {
-                        width: '50vw',
+                        width: '400px',
                         padding: '16px',
                         display: 'flex',
                         flexDirection: 'column',
                         justifyContent: 'space-between',
-                        backgroundColor: '#252427',
+                        backgroundColor: 'background.paper',
                         backgroundImage: 'unset',
                     },
                 }}
@@ -149,7 +149,7 @@ export const Chat = () => {
                         sx={{
                             '& .MuiInputBase-root': {
                                 borderRadius: 2,
-                                backgroundColor: '#484848',
+                                backgroundColor: 'action.hover',
                             },
                             '& .MuiOutlinedInput-root': {
                                 '& fieldset': {
