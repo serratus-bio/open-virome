@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -6,9 +6,11 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
+import Box from '@mui/material/Box';
 import { TableVirtuoso, TableComponents } from 'react-virtuoso';
+import ExportButton from '../common/ExportButton.tsx';
+import { exportToCSV } from '../common/utils/exportHelpers.ts';
 
 interface Data {
     name: string;
@@ -37,8 +39,12 @@ const defaultColumns: ColumnData[] = [
 ];
 
 const VirtuosoTableComponents: TableComponents<Data> = {
-    Scroller: React.forwardRef<HTMLDivElement>((props, ref) => (
-        <TableContainer component={Paper} {...props} ref={ref} />
+    Scroller: React.forwardRef<HTMLDivElement>((props: any, ref) => (
+        <TableContainer
+            {...props}
+            ref={ref}
+            sx={{ boxShadow: 'none', backgroundImage: 'none', backgroundColor: 'transparent', ...(props.sx || {}) }}
+        />
     )),
     Table: (props) => <Table {...props} sx={{ borderCollapse: 'separate', tableLayout: 'fixed' }} />,
     TableHead,
@@ -46,7 +52,7 @@ const VirtuosoTableComponents: TableComponents<Data> = {
     TableBody: React.forwardRef<HTMLTableSectionElement>((props, ref) => <TableBody {...props} ref={ref} />),
 };
 
-const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick, searchBar }) => {
+const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick, searchBar, module = "" }) => {
     const disableSelectAll = (rows) => rows.length === 0 || rows.length > 100;
     const hasCheckedRows = (rows) => rows.length > 0 && rows.some((row) => row.selected);
 
@@ -54,7 +60,7 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick, sea
         const isChecked = !disableSelectAll(rows) && rows.length > 0 && rows.every((row) => row.selected);
         return (
             <TableRow>
-                <TableCell padding='checkbox' sx={{ width: 8, pl: 2, backgroundColor: '#121212' }}>
+                <TableCell padding='checkbox' sx={{ width: 8, pl: 2, backgroundColor: 'background.paper' }}>
                     <Checkbox
                         color='primary'
                         checked={isChecked}
@@ -153,15 +159,25 @@ const VirtualizedTable = ({ rows = [], columns = defaultColumns, onRowClick, sea
         sortRowsBySelected(rows);
     }, [rows.length]);
 
+    const columnKeys = columns.map((c) => c.dataKey as string);
+    const handleExport = useCallback(() => {
+        exportToCSV(rows, columnKeys, `open-virome-${module || 'filter'}-VirtualizedTable.csv`);
+    }, [rows, columnKeys, module]);
+
     return (
-        <Paper style={{ height: '75vh', width: '100%' }}>
+        <Box sx={{ position: 'relative' }}>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 0.5 }}>
+                <ExportButton onClick={handleExport} tooltip="Download CSV" />
+            </Box>
+            <Box sx={{ height: '75vh', width: '100%' }}>
             <TableVirtuoso
                 data={rows}
                 components={VirtuosoTableComponents}
                 fixedHeaderContent={() => fixedHeaderContent(columns, rows, onSelectAllClick)}
                 itemContent={rowContent}
             />
-        </Paper>
+            </Box>
+        </Box>
     );
 };
 

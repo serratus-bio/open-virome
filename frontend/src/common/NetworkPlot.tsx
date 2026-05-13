@@ -1,13 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import cytoscape from 'cytoscape';
 import fcose from 'cytoscape-fcose';
 
 import CytoscapeComponent from 'react-cytoscapejs';
 import Box from '@mui/material/Box';
+import ExportButton from '../common/ExportButton.tsx';
+import { exportCytoscapeToPNG } from '../common/utils/exportHelpers.ts';
 
 cytoscape.use(fcose);
 
-const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
+const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick, module = "" }) => {
     const [cy, setCy] = useState(null);
 
     useEffect(() => {
@@ -164,8 +166,15 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick }) => {
         },
     ];
 
+    const handleExport = useCallback(() => {
+        if (cy) exportCytoscapeToPNG(cy, `open-virome-${module || 'Virome'}-NetworkPlot.png`);
+    }, [cy, module]);
+
     return (
-        <Box>
+        <Box sx={{ position: 'relative' }}>
+            <Box sx={{ position: 'absolute', right: 8, top: 8, zIndex: 10 }}>
+                <ExportButton onClick={handleExport} />
+            </Box>
             <CytoscapeComponent
                 cy={setCy}
                 stylesheet={stylesheet}

@@ -84,6 +84,7 @@ export const {
     useGetCountsQuery,
     useGetIdentifiersQuery,
     useGetResultQuery,
+    useLazyGetResultQuery,
     useGetMWASQuery,
     useLazyGetSummaryTextQuery,
     useLazyGetHypothesisQuery,
