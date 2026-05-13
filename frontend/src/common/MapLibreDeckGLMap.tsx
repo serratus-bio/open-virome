@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import MdCopyAll from '@mui/icons-material/CopyAll';
 import MdOpenInNew from '@mui/icons-material/OpenInNew';
 import { deflate } from 'pako';
 import { isSimpleLayout } from '../common/utils/plotHelpers.ts';
 import { truncate } from '../common/utils/textFormatting.ts';
+import ExportButton from '../common/ExportButton.tsx';
+import { exportCanvasToPNG, exportElementToPNG } from '../common/utils/exportHelpers.ts';
 import {
     WWF_BIOMES,
     AMAZON_LOCATION_API_KEY,
@@ -454,13 +456,17 @@ const DeckGLRenderScatterplot: any = ({
     });
 };
 
-const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) => {
+const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {}, module = "" }) => {
     style = {
         ...{ height: '100%', position: 'relative', width: '100%' },
         ...style,
     };
 
     const mapRef = useRef(null);
+    const mlglMapRef = useRef<any>(null);
+    const biomesRef = useRef<HTMLDivElement>(null);
+    const countriesRef = useRef<HTMLDivElement>(null);
+    const sOTUsRef = useRef<HTMLDivElement>(null);
     const [attributeName, setAttributeName] = useState('');
     const [attributeValue, setAttributeValue] = useState('');
     const [biomeID, setBiomeID] = useState('');
@@ -506,6 +512,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                     AMAZON_LOCATION_API_KEY,
                 zoom: 0.8,
             });
+            mlglMapRef.current = mlglMap;
             mlglMap.dragRotate.disable();
             mlglMap.getCanvas().style.cursor = 'crosshair';
 
@@ -586,6 +593,23 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
         else setCountryRegionID('');
     }, [biomeID, countryID]);
 
+    const handleExport = useCallback(() => {
+        const canvas = mlglMapRef.current?.getCanvas();
+        if (canvas) exportCanvasToPNG(canvas, `open-virome-${module || 'Ecology'}-MapLibreDeckGLMap.png`);
+    }, [module]);
+
+    const handleExportBiomes = useCallback(() => {
+        if (biomesRef.current) exportElementToPNG(biomesRef.current, `open-virome-${module || 'Ecology'}-TopBiomes.png`);
+    }, [module]);
+
+    const handleExportCountries = useCallback(() => {
+        if (countriesRef.current) exportElementToPNG(countriesRef.current, `open-virome-${module || 'Ecology'}-TopCountries.png`);
+    }, [module]);
+
+    const handleExportSOTUs = useCallback(() => {
+        if (sOTUsRef.current) exportElementToPNG(sOTUsRef.current, `open-virome-${module || 'Ecology'}-TopSOTUs.png`);
+    }, [module]);
+
     const MapLibreDeckGLMapModeButton: any = ({ onClick, selected, text }) => (
         <div
             onClick={onClick}
@@ -609,7 +633,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
         <div style={style}>
             <div style={{ alignItems: 'flex-end', display: 'flex', padding: '0 6px 0 6px' }}>
                 <div style={{ flex: '1 0' }}>
-                    <div style={{ color: '#EEE', fontSize: '16px', fontWeight: 700 }}>
+                    <div style={{ color: '#333', fontSize: '16px', fontWeight: 700 }}>
                         {'Showing ' +
                             siteCount.toLocaleString() +
                             ' contigs, representing ' +
@@ -649,6 +673,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                             selected={mapMode === 'SAMPLES'}
                             text='Samples'
                         />
+                        <ExportButton onClick={handleExport} />
                     </div>
                 )}
             </div>
@@ -963,7 +988,10 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
             </div>
             {!isSimpleLayout(layout) && (
                 <div style={{ display: 'flex', gap: '24px', margin: '16px 0 0 0', padding: '0 8px 0 8px' }}>
-                    <div style={{ flex: '1 0' }}>
+                    <div style={{ flex: '1 0', position: 'relative' }} ref={biomesRef}>
+                        <div style={{ position: 'absolute', right: 4, top: 0, zIndex: 10 }}>
+                            <ExportButton onClick={handleExportBiomes} />
+                        </div>
                         <div style={{ color: '#CCC', fontSize: '14px', fontWeight: 700 }}>Top Biomes</div>
                         <div
                             style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
@@ -1055,7 +1083,10 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                             </div>
                         )}
                     </div>
-                    <div style={{ flex: '1 0' }}>
+                    <div style={{ flex: '1 0', position: 'relative' }} ref={countriesRef}>
+                        <div style={{ position: 'absolute', right: 4, top: 0, zIndex: 10 }}>
+                            <ExportButton onClick={handleExportCountries} />
+                        </div>
                         <div style={{ color: '#CCC', fontSize: '14px', fontWeight: 700 }}>Top Countries</div>
                         <div
                             style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
@@ -1150,7 +1181,10 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
                             </div>
                         )}
                     </div>
-                    <div style={{ flex: '1 0' }}>
+                    <div style={{ flex: '1 0', position: 'relative' }} ref={sOTUsRef}>
+                        <div style={{ position: 'absolute', right: 4, top: 0, zIndex: 10 }}>
+                            <ExportButton onClick={handleExportSOTUs} />
+                        </div>
                         <div style={{ color: '#CCC', fontSize: '14px', fontWeight: 700 }}>Top sOTUs</div>
                         <div
                             style={{ backgroundColor: '#CCC', height: '1px', margin: '4px 0 4px 0', width: '100%' }}
@@ -1238,7 +1272,7 @@ const MapLibreDeckGLMap = ({ identifiers, layout, palmprintOnly, style = {} }) =
 const MapLibreDeckGLMapCopyButton = ({ ...props }) => (
     <MdCopyAll
         style={{
-            color: '#FFF',
+            color: '#333',
             cursor: 'pointer',
             fontSize: '16px',
             userSelect: 'none',
@@ -1250,7 +1284,7 @@ const MapLibreDeckGLMapURLButton = ({ fontSize, ...props }) => {
     if (!fontSize) fontSize = '18px';
 
     return (
-        <a style={{ color: '#FFF', userSelect: 'none' }} target='_blank' {...props}>
+        <a style={{ color: '#333', userSelect: 'none' }} target='_blank' {...props}>
             <MdOpenInNew style={{ fontSize, verticalAlign: 'bottom' }} />
         </a>
     );
