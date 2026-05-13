@@ -85,7 +85,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout
             title: {
                 text: `${seriesName} set${countLabel}${totalRuns ? ' (n = ' + totalRuns + ')' : ''}`,
                 textStyle: {
-                    color: textColor,
+                    color: 'white',
                     fontSize: 14,
                     fontWeight: 'normal',
                     fontStyle: 'italic',
@@ -100,7 +100,7 @@ const TargetControlFigure = ({ identifiers, moduleKey, figureType, sectionLayout
                     Control: seriesName === 'Control',
                 },
                 textStyle: {
-                    color: textColor,
+                    color: 'white',
                 },
             },
         };

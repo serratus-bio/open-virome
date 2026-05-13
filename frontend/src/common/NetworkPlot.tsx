@@ -40,7 +40,7 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick, module = "" }) =
             style: {
                 backgroundColor: 'data(color)',
                 label: 'data(label)',
-                color: 'white',
+                color: isDark ? 'white' : '#333',
                 shape: 'round-hexagon',
                 opacity: 1,
                 width: 35,
@@ -51,8 +51,8 @@ const NetworkPlot = ({ plotData = [], onNodeClick, onEdgeClick, module = "" }) =
         {
             selector: 'node[type="run"]',
             style: {
-                backgroundColor: 'white',
-                color: 'white',
+                backgroundColor: isDark ? 'white' : '#666',
+                color: isDark ? 'white' : '#333',
                 shape: 'ellipse',
                 opacity: 0.7,
                 width: 20,

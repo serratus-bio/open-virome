@@ -196,13 +196,13 @@ export const getViromeScatterPlotData = (rows = []) => {
             right: '6%',
             bottom: '6%',
             containLabel: true,
-            borderColor: textColor,
+            borderColor: 'white',
         },
         title: {
             show: true,
             text: '   Virome Component Summary',
             textStyle: {
-                color: textColor,
+                color: 'white',
                 fontSize: 14,
                 fontWeight: 'normal',
                 fontStyle: 'italic',
@@ -230,7 +230,7 @@ export const getViromeScatterPlotData = (rows = []) => {
                 type: 'scatter',
                 label: {
                     show: false,
-                    color: textColor,
+                    color: 'white',
                 },
                 emphasis: {
                     focus: 'series',
@@ -317,7 +317,7 @@ export const getMWASScatterPlotData = (data, activeMetadataType) => {
         title: {
             text: 'Metadata-wide association study (MWAS)',
             textStyle: {
-                color: textColor,
+                color: 'white',
                 fontSize: 14,
                 fontWeight: 'normal',
                 fontStyle: 'italic',
@@ -378,7 +378,7 @@ export const getMWASScatterPlotData = (data, activeMetadataType) => {
                 type: 'scatter',
                 label: {
                     show: false,
-                    color: textColor,
+                    color: 'white',
                 },
                 emphasis: {
                     focus: 'series',

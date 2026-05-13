@@ -75,7 +75,7 @@ export const getBarPlotData = (data, maxRows = undefined, imagePath="") => {
                 stack: 'total',
                 label: {
                     show: true,
-                    color: textColor,
+                    color: 'white',
                 },
                 emphasis: {
                     focus: 'series',
